@@ -527,13 +527,8 @@ export default function App() {
   const getVideoUrl = (item, audioStreamIndex = null) => {
     if (!item || !user) return '';
 
-    // Endpoint streaming Emby con transcoding per selezione tracce
-    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mp4?api_key=${API_KEY}`;
-
-    // Parametri per il transcoding
-    url += `&Container=mp4`;
-    url += `&DeviceId=web-player`;
-    url += `&MediaSourceId=${item.Id}`;
+    // Endpoint streaming Emby semplificato
+    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream?api_key=${API_KEY}`;
 
     // Aggiungi la traccia audio selezionata se disponibile
     if (audioStreamIndex !== null) {
