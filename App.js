@@ -411,7 +411,17 @@ export default function App() {
 
   const getVideoUrl = (item) => {
     if (!item || !user) return '';
-    return `${EMBY_SERVER}/Videos/${item.Id}/stream?DeviceId=web-client&MediaSourceId=${item.Id}&api_key=${API_KEY}`;
+    // URL completo per streaming Emby con tutti i parametri necessari
+    const url = `${EMBY_SERVER}/Videos/${item.Id}/stream?` +
+      `Static=false&` +
+      `MediaSourceId=${item.Id}&` +
+      `DeviceId=web-client&` +
+      `api_key=${API_KEY}&` +
+      `Tag=${item.ImageTags?.Primary || ''}&` +
+      `PlaySessionId=${Date.now()}`;
+
+    console.log('🎬 Video URL generated:', url);
+    return url;
   };
 
   if (!user) {
@@ -602,89 +612,96 @@ export default function App() {
           <div className="relative bg-gray-900/95 backdrop-blur-xl rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/10" onClick={e=>e.stopPropagation()}>
             <button onClick={closeModal} className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 rounded-full p-2 transition"><X className="w-6 h-6"/></button>
             {loadingDetails?<div className="flex items-center justify-center py-20"><div className="text-white text-lg">Caricamento...</div></div>:itemDetails?(
-              <div className="grid md:grid-cols-2 gap-8 p-8">
-                <div><img src={getImg(itemDetails)} alt={itemDetails.Name} className="w-full rounded-lg shadow-2xl"/></div>
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-4xl font-bold mb-2">{itemDetails.Name}</h2>
-                    <div className="flex items-center gap-4 text-sm text-gray-400">
-                      {itemDetails.ProductionYear && <span>{itemDetails.ProductionYear}</span>}
-                      {itemDetails.OfficialRating && <span className="px-2 py-1 border border-gray-600 rounded">{itemDetails.OfficialRating}</span>}
-                      {itemDetails.CommunityRating && <span className="flex items-center gap-1"><Star className="w-4 h-4 fill-yellow-500 text-yellow-500"/>{itemDetails.CommunityRating.toFixed(1)}</span>}
-                    </div>
-                  </div>
-                  <button onClick={()=>{closeModal();startPlay(itemDetails.Type==='Series'&&episodes.length>0?episodes[0]:itemDetails);}} className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition transform hover:scale-105 shadow-lg"><Play className="w-6 h-6 fill-current"/>Riproduci</button>
-                  {itemDetails.Overview && <div><h3 className="text-xl font-semibold mb-2">Trama</h3><p className="text-gray-300 leading-relaxed">{itemDetails.Overview}</p></div>}
-                  {itemDetails.Genres?.length>0 && <div><span className="text-gray-400">Generi: </span><span className="text-white">{itemDetails.Genres.join(', ')}</span></div>}
-                  {itemDetails.People?.filter(p=>p.Type==='Actor').length>0 && <div><h3 className="text-xl font-semibold mb-3">Cast</h3><div className="flex flex-wrap gap-2">{itemDetails.People.filter(p=>p.Type==='Actor').slice(0,10).map(p=><span key={p.Id} className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full text-sm text-gray-300 transition">{p.Name}</span>)}</div></div>}
-
-                  {itemDetails.Type==='Series' && seasons.length>0 && (
-                    <div className="space-y-4 mt-6">
-                      <div>
-                        <label className="block text-xl font-semibold mb-3">Stagione</label>
-                        <div className="relative">
-                          <select value={selectedSeason||''} onChange={e=>loadEps(e.target.value)} className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 appearance-none">
-                            {seasons.map(s=><option key={s.Id} value={s.Id} className="bg-gray-800 text-white">{s.Name}</option>)}
-                          </select>
-                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"/>
-                        </div>
+              <div className="p-8">
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  <div><img src={getImg(itemDetails)} alt={itemDetails.Name} className="w-full rounded-lg shadow-2xl"/></div>
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-4xl font-bold mb-2">{itemDetails.Name}</h2>
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        {itemDetails.ProductionYear && <span>{itemDetails.ProductionYear}</span>}
+                        {itemDetails.OfficialRating && <span className="px-2 py-1 border border-gray-600 rounded">{itemDetails.OfficialRating}</span>}
+                        {itemDetails.CommunityRating && <span className="flex items-center gap-1"><Star className="w-4 h-4 fill-yellow-500 text-yellow-500"/>{itemDetails.CommunityRating.toFixed(1)}</span>}
                       </div>
+                    </div>
+                    <button onClick={()=>{closeModal();startPlay(itemDetails.Type==='Series'&&episodes.length>0?episodes[0]:itemDetails);}} className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition transform hover:scale-105 shadow-lg"><Play className="w-6 h-6 fill-current"/>Riproduci</button>
+                    {itemDetails.Overview && <div><h3 className="text-xl font-semibold mb-2">Trama</h3><p className="text-gray-300 leading-relaxed">{itemDetails.Overview}</p></div>}
+                    {itemDetails.Genres?.length>0 && <div><span className="text-gray-400">Generi: </span><span className="text-white">{itemDetails.Genres.join(', ')}</span></div>}
+                    {itemDetails.People?.filter(p=>p.Type==='Actor').length>0 && <div><h3 className="text-xl font-semibold mb-3">Cast</h3><div className="flex flex-wrap gap-2">{itemDetails.People.filter(p=>p.Type==='Actor').slice(0,10).map(p=><span key={p.Id} className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full text-sm text-gray-300 transition">{p.Name}</span>)}</div></div>}
 
-                      {loadingEpisodes ? (
-                        <div className="flex items-center justify-center py-12">
-                          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-                          <span className="ml-3 text-gray-400">Caricamento episodi...</span>
-                        </div>
-                      ) : episodes.length > 0 ? (
-                        <div className="space-y-4">
-                          <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Episodi ({episodes.length})</h3>
-                          <div className="relative group/container">
-                            <button onClick={()=>scroll(`eps-${selectedSeason}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black/80 hover:bg-emerald-600/90 backdrop-blur-xl p-3 rounded-full opacity-0 group-hover/container:opacity-100 transition-all duration-300 shadow-2xl border border-white/10 hover:border-emerald-500/50 hover:scale-110">
-                              <ChevronLeft className="w-6 h-6"/>
-                            </button>
-                            <div id={`eps-${selectedSeason}`} className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide scroll-smooth -mx-8 px-8">
-                              {episodes.map(ep=><div key={ep.Id} className="flex-none w-[420px] bg-gradient-to-br from-white/10 via-white/5 to-transparent hover:from-emerald-600/20 hover:via-emerald-500/10 hover:to-transparent backdrop-blur-sm border border-white/10 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer group/card hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20" onClick={()=>{closeModal();startPlay(ep);}}>
-                                <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-black overflow-hidden">
-                                  {ep.ImageTags?.Primary?<img src={getImg(ep,'Primary')} alt={ep.Name} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700"/>:<div className="w-full h-full flex items-center justify-center"><Play className="w-16 h-16 text-gray-700"/></div>}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover/card:opacity-80 transition-opacity duration-500"></div>
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                    <div className="bg-gradient-to-r from-emerald-600 to-green-600 rounded-full p-4 scale-75 group-hover/card:scale-100 transition-transform duration-300 shadow-2xl">
-                                      <Play className="w-8 h-8 fill-white"/>
-                                    </div>
-                                  </div>
-                                  <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/20">
-                                    <span className="text-emerald-400 font-bold text-sm">Episodio {ep.IndexNumber}</span>
-                                  </div>
-                                  {ep.RunTimeTicks && (
-                                    <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/20">
-                                      <span className="text-gray-300 text-sm font-medium">{Math.floor(ep.RunTimeTicks/600000000)} min</span>
-                                    </div>
-                                  )}
-                                  {ep.UserData?.PlayedPercentage > 0 && (
-                                    <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50 backdrop-blur-sm">
-                                      <div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 shadow-lg shadow-emerald-500/50 transition-all duration-300" style={{width:`${ep.UserData.PlayedPercentage}%`}}></div>
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="p-5 space-y-3">
-                                  <h4 className="text-lg font-bold text-white group-hover/card:text-emerald-400 transition-colors duration-300 line-clamp-1">{ep.Name || `Episodio ${ep.IndexNumber}`}</h4>
-                                  {ep.Overview && <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 group-hover/card:text-gray-300 transition-colors duration-300">{ep.Overview}</p>}
-                                </div>
-                              </div>)}
-                            </div>
-                            <button onClick={()=>scroll(`eps-${selectedSeason}`,'right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-black/80 hover:bg-emerald-600/90 backdrop-blur-xl p-3 rounded-full opacity-0 group-hover/container:opacity-100 transition-all duration-300 shadow-2xl border border-white/10 hover:border-emerald-500/50 hover:scale-110">
-                              <ChevronRight className="w-6 h-6"/>
-                            </button>
+                    {itemDetails.Type==='Series' && seasons.length>0 && (
+                      <div className="space-y-4 mt-6">
+                        <div>
+                          <label className="block text-xl font-semibold mb-3">Stagione</label>
+                          <div className="relative">
+                            <select value={selectedSeason||''} onChange={e=>loadEps(e.target.value)} className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 appearance-none">
+                              {seasons.map(s=><option key={s.Id} value={s.Id} className="bg-gray-800 text-white">{s.Name}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"/>
                           </div>
                         </div>
-                      ) : (
-                        <div className="text-center py-8 text-gray-400">
-                          Nessun episodio trovato per questa stagione
-                        </div>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Sezione episodi a tutta larghezza */}
+                {itemDetails.Type==='Series' && seasons.length>0 && (
+                  <div className="w-full">
+                    {loadingEpisodes ? (
+                      <div className="flex items-center justify-center py-12">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                        <span className="ml-3 text-gray-400">Caricamento episodi...</span>
+                      </div>
+                    ) : episodes.length > 0 ? (
+                      <div className="space-y-4">
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Episodi ({episodes.length})</h3>
+                        <div className="relative group/container">
+                          <button onClick={()=>scroll(`eps-${selectedSeason}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black/80 hover:bg-emerald-600/90 backdrop-blur-xl p-3 rounded-full opacity-0 group-hover/container:opacity-100 transition-all duration-300 shadow-2xl border border-white/10 hover:border-emerald-500/50 hover:scale-110">
+                            <ChevronLeft className="w-6 h-6"/>
+                          </button>
+                          <div id={`eps-${selectedSeason}`} className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide scroll-smooth">
+                            {episodes.map(ep=><div key={ep.Id} className="flex-none w-[420px] bg-gradient-to-br from-white/10 via-white/5 to-transparent hover:from-emerald-600/20 hover:via-emerald-500/10 hover:to-transparent backdrop-blur-sm border border-white/10 hover:border-emerald-500/50 rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer group/card hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20" onClick={()=>{closeModal();startPlay(ep);}}>
+                              <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+                                {ep.ImageTags?.Primary?<img src={getImg(ep,'Primary')} alt={ep.Name} className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700"/>:<div className="w-full h-full flex items-center justify-center"><Play className="w-16 h-16 text-gray-700"/></div>}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover/card:opacity-80 transition-opacity duration-500"></div>
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                  <div className="bg-gradient-to-r from-emerald-600 to-green-600 rounded-full p-4 scale-75 group-hover/card:scale-100 transition-transform duration-300 shadow-2xl">
+                                    <Play className="w-8 h-8 fill-white"/>
+                                  </div>
+                                </div>
+                                <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/20">
+                                  <span className="text-emerald-400 font-bold text-sm">Episodio {ep.IndexNumber}</span>
+                                </div>
+                                {ep.RunTimeTicks && (
+                                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/20">
+                                    <span className="text-gray-300 text-sm font-medium">{Math.floor(ep.RunTimeTicks/600000000)} min</span>
+                                  </div>
+                                )}
+                                {ep.UserData?.PlayedPercentage > 0 && (
+                                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50 backdrop-blur-sm">
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 shadow-lg shadow-emerald-500/50 transition-all duration-300" style={{width:`${ep.UserData.PlayedPercentage}%`}}></div>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="p-5 space-y-3">
+                                <h4 className="text-lg font-bold text-white group-hover/card:text-emerald-400 transition-colors duration-300 line-clamp-1">{ep.Name || `Episodio ${ep.IndexNumber}`}</h4>
+                                {ep.Overview && <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 group-hover/card:text-gray-300 transition-colors duration-300">{ep.Overview}</p>}
+                              </div>
+                            </div>)}
+                          </div>
+                          <button onClick={()=>scroll(`eps-${selectedSeason}`,'right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-black/80 hover:bg-emerald-600/90 backdrop-blur-xl p-3 rounded-full opacity-0 group-hover/container:opacity-100 transition-all duration-300 shadow-2xl border border-white/10 hover:border-emerald-500/50 hover:scale-110">
+                            <ChevronRight className="w-6 h-6"/>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-400">
+                        Nessun episodio trovato per questa stagione
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ):<div className="flex items-center justify-center py-20"><div className="text-white text-lg">Errore nel caricamento</div></div>}
           </div>
@@ -698,13 +715,28 @@ export default function App() {
             className="w-full h-full"
             src={getVideoUrl(playingItem)}
             autoPlay
+            crossOrigin="anonymous"
             onClick={togglePlay}
+            onLoadStart={()=>console.log('📥 Video loading started')}
+            onCanPlay={()=>console.log('✅ Video can play')}
+            onPlaying={()=>console.log('▶️ Video playing')}
+            onWaiting={()=>console.log('⏳ Video buffering')}
+            onStalled={()=>console.log('⚠️ Video stalled')}
             onTimeUpdate={()=>videoRef.current&&setCurrentTime(videoRef.current.currentTime)}
-            onLoadedMetadata={()=>videoRef.current&&setDuration(videoRef.current.duration)}
+            onLoadedMetadata={()=>{
+              if(videoRef.current){
+                setDuration(videoRef.current.duration);
+                console.log('📊 Video metadata loaded - Duration:', videoRef.current.duration);
+              }
+            }}
             onError={(e)=>{
-              console.error('Video playback error:', e);
-              console.error('Video URL:', getVideoUrl(playingItem));
-              console.error('Playing item:', playingItem);
+              console.error('❌ Video playback error:', e);
+              console.error('🎬 Video URL:', getVideoUrl(playingItem));
+              console.error('📋 Playing item:', playingItem);
+              if(videoRef.current && videoRef.current.error){
+                console.error('🔴 Error code:', videoRef.current.error.code);
+                console.error('🔴 Error message:', videoRef.current.error.message);
+              }
             }}
           />
           {showSkipIndicator && (
