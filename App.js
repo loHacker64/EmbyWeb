@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages } from 'lucide-react';
+import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
 
 const EMBY_SERVER = 'https://ilmioserver.diskstation.me:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
@@ -46,11 +46,15 @@ export default function App() {
   const [audioTracks, setAudioTracks] = useState([]);
   const [selectedAudioTrack, setSelectedAudioTrack] = useState(null);
   const [showAudioMenu, setShowAudioMenu] = useState(false);
+  const [subtitleTracks, setSubtitleTracks] = useState([]);
+  const [selectedSubtitleTrack, setSelectedSubtitleTrack] = useState(null);
+  const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
   const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
   const skipTimeoutRef = useRef(null);
   const movieGridRef = useRef(null);
   const seriesGridRef = useRef(null);
+  const progressIntervalRef = useRef(null);
 
   useEffect(() => {
     if (featuredItems.length > 0) {
@@ -346,8 +350,10 @@ export default function App() {
       );
       const data = await res.json();
 
-      // Estrai le tracce audio
+      // Estrai le tracce audio e sottotitoli
       const audioStreams = [];
+      const subtitleStreams = [];
+
       if (data.MediaSources && data.MediaSources[0]) {
         const streams = data.MediaSources[0].MediaStreams || [];
         streams.forEach(stream => {
@@ -360,12 +366,26 @@ export default function App() {
               codec: stream.Codec || '',
               isDefault: stream.IsDefault || false
             });
+          } else if (stream.Type === 'Subtitle') {
+            subtitleStreams.push({
+              index: stream.Index,
+              language: stream.Language || 'und',
+              displayLanguage: stream.DisplayLanguage || stream.Language || 'Sconosciuta',
+              title: stream.Title || '',
+              codec: stream.Codec || '',
+              isDefault: stream.IsDefault || false,
+              isForced: stream.IsForced || false,
+              deliveryUrl: stream.DeliveryUrl || null
+            });
           }
         });
       }
 
       console.log('🎵 Tracce audio trovate:', audioStreams);
+      console.log('📝 Tracce sottotitoli trovate:', subtitleStreams);
+
       setAudioTracks(audioStreams);
+      setSubtitleTracks(subtitleStreams);
 
       // Seleziona la traccia italiana come default, altrimenti la prima
       const italianTrack = audioStreams.find(t => t.language === 'ita' || t.language === 'it');
@@ -378,23 +398,61 @@ export default function App() {
         setSelectedAudioTrack(null);
       }
 
+      // Seleziona sottotitoli italiani se disponibili
+      const italianSub = subtitleStreams.find(t => t.language === 'ita' || t.language === 'it');
+      if (italianSub) {
+        console.log('📝 Sottotitoli selezionati:', italianSub.displayLanguage);
+        setSelectedSubtitleTrack(italianSub.index);
+      } else {
+        setSelectedSubtitleTrack(null);
+      }
+
     } catch (error) {
-      console.error('❌ Errore caricamento tracce audio:', error);
+      console.error('❌ Errore caricamento tracce:', error);
       setAudioTracks([]);
       setSelectedAudioTrack(null);
+      setSubtitleTracks([]);
+      setSelectedSubtitleTrack(null);
     }
 
     setPlayingItem(item);
     setIsPlaying(true);
+
+    // Notifica Emby dell'inizio della riproduzione
+    setTimeout(() => reportPlaybackStart(item), 1000);
+
+    // Avvia l'aggiornamento periodico del progresso (ogni 10 secondi)
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    progressIntervalRef.current = setInterval(() => {
+      if (videoRef.current && item) {
+        reportPlaybackProgress(item, videoRef.current.currentTime * 1000);
+      }
+    }, 10000);
   };
 
   const closePlayer = () => {
+    // Notifica Emby della fine della riproduzione
+    if (playingItem && videoRef.current) {
+      reportPlaybackStopped(playingItem, videoRef.current.currentTime * 1000);
+    }
+
+    // Ferma l'aggiornamento del progresso
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+
     setPlayingItem(null);
     setIsPlaying(false);
     setCurrentTime(0);
     setAudioTracks([]);
     setSelectedAudioTrack(null);
     setShowAudioMenu(false);
+    setSubtitleTracks([]);
+    setSelectedSubtitleTrack(null);
+    setShowSubtitleMenu(false);
   };
 
   const togglePlay = () => {
@@ -465,8 +523,8 @@ export default function App() {
   const getVideoUrl = (item, audioStreamIndex = null) => {
     if (!item || !user) return '';
 
-    // Endpoint diretto Emby per download/streaming
-    let url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
+    // Endpoint streaming Emby con supporto traccia audio
+    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mp4?api_key=${API_KEY}&Static=true`;
 
     // Aggiungi la traccia audio selezionata se disponibile
     if (audioStreamIndex !== null) {
@@ -502,6 +560,109 @@ export default function App() {
     }
 
     setShowAudioMenu(false);
+  };
+
+  const changeSubtitleTrack = (trackIndex) => {
+    console.log('📝 Cambio sottotitoli a index:', trackIndex);
+
+    if (videoRef.current && videoRef.current.textTracks) {
+      // Disabilita tutti i sottotitoli
+      for (let i = 0; i < videoRef.current.textTracks.length; i++) {
+        videoRef.current.textTracks[i].mode = 'hidden';
+      }
+
+      // Abilita il sottotitolo selezionato
+      if (trackIndex !== null) {
+        const trackToEnable = Array.from(videoRef.current.textTracks).find(
+          (t, idx) => subtitleTracks[idx]?.index === trackIndex
+        );
+        if (trackToEnable) {
+          trackToEnable.mode = 'showing';
+        }
+      }
+
+      setSelectedSubtitleTrack(trackIndex);
+    }
+
+    setShowSubtitleMenu(false);
+  };
+
+  // Notifica Emby dell'inizio della riproduzione
+  const reportPlaybackStart = async (item) => {
+    if (!user || !item) return;
+
+    try {
+      await fetch(`${EMBY_SERVER}/Sessions/Playing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Emby-Token': user.AccessToken
+        },
+        body: JSON.stringify({
+          ItemId: item.Id,
+          PositionTicks: 0,
+          IsPaused: false,
+          IsMuted: false,
+          AudioStreamIndex: selectedAudioTrack,
+          SubtitleStreamIndex: selectedSubtitleTrack
+        })
+      });
+      console.log('📊 Riproduzione iniziata notificata a Emby');
+    } catch (error) {
+      console.error('❌ Errore notifica inizio riproduzione:', error);
+    }
+  };
+
+  // Aggiorna il progresso di riproduzione
+  const reportPlaybackProgress = async (item, positionMs) => {
+    if (!user || !item) return;
+
+    const positionTicks = Math.floor(positionMs * 10000); // Converti ms in ticks (1ms = 10000 ticks)
+
+    try {
+      await fetch(`${EMBY_SERVER}/Sessions/Playing/Progress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Emby-Token': user.AccessToken
+        },
+        body: JSON.stringify({
+          ItemId: item.Id,
+          PositionTicks: positionTicks,
+          IsPaused: !isPlaying,
+          IsMuted: isMuted,
+          AudioStreamIndex: selectedAudioTrack,
+          SubtitleStreamIndex: selectedSubtitleTrack
+        })
+      });
+      console.log('📊 Progresso aggiornato:', Math.floor(positionMs / 1000), 's');
+    } catch (error) {
+      console.error('❌ Errore aggiornamento progresso:', error);
+    }
+  };
+
+  // Notifica la fine della riproduzione
+  const reportPlaybackStopped = async (item, positionMs) => {
+    if (!user || !item) return;
+
+    const positionTicks = Math.floor(positionMs * 10000);
+
+    try {
+      await fetch(`${EMBY_SERVER}/Sessions/Playing/Stopped`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Emby-Token': user.AccessToken
+        },
+        body: JSON.stringify({
+          ItemId: item.Id,
+          PositionTicks: positionTicks
+        })
+      });
+      console.log('📊 Fine riproduzione notificata a Emby');
+    } catch (error) {
+      console.error('❌ Errore notifica fine riproduzione:', error);
+    }
   };
 
   if (!user) {
@@ -649,8 +810,8 @@ export default function App() {
 
         {activeView==='movies' && (
           <div ref={movieGridRef}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-3xl font-bold">Film ({movieLibrary.length})</h3>
+            <div className="flex justify-between items-center mb-6 pt-12">
+              <h3 className="text-3xl font-bold">Film</h3>
               <select value={movieSortOrder} onChange={e=>loadMoviesSort(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500">
                 <option value="SortName" className="bg-gray-800 text-white">A-Z</option>
                 <option value="DateCreated" className="bg-gray-800 text-white">Più recenti</option>
@@ -668,8 +829,8 @@ export default function App() {
 
         {activeView==='series' && (
           <div ref={seriesGridRef}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-3xl font-bold">Serie TV ({seriesLibrary.length})</h3>
+            <div className="flex justify-between items-center mb-6 pt-12">
+              <h3 className="text-3xl font-bold">Serie TV</h3>
               <select value={seriesSortOrder} onChange={e=>loadSeriesSort(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500">
                 <option value="SortName" className="bg-gray-800 text-white">A-Z</option>
                 <option value="DateCreated" className="bg-gray-800 text-white">Più recenti</option>
@@ -692,32 +853,32 @@ export default function App() {
           <div className="relative bg-gray-900/95 backdrop-blur-xl rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/10" onClick={e=>e.stopPropagation()}>
             <button onClick={closeModal} className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 rounded-full p-2 transition"><X className="w-6 h-6"/></button>
             {loadingDetails?<div className="flex items-center justify-center py-20"><div className="text-white text-lg">Caricamento...</div></div>:itemDetails?(
-              <div className="p-8">
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="p-6">
+                <div className="grid md:grid-cols-[300px_1fr] gap-6 mb-6">
                   <div><img src={getImg(itemDetails)} alt={itemDetails.Name} className="w-full rounded-lg shadow-2xl"/></div>
-                  <div className="space-y-6">
+                  <div className="space-y-3">
                     <div>
-                      <h2 className="text-4xl font-bold mb-2">{itemDetails.Name}</h2>
-                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                      <h2 className="text-2xl font-bold mb-2">{itemDetails.Name}</h2>
+                      <div className="flex items-center gap-3 text-xs text-gray-400">
                         {itemDetails.ProductionYear && <span>{itemDetails.ProductionYear}</span>}
                         {itemDetails.OfficialRating && <span className="px-2 py-1 border border-gray-600 rounded">{itemDetails.OfficialRating}</span>}
-                        {itemDetails.CommunityRating && <span className="flex items-center gap-1"><Star className="w-4 h-4 fill-yellow-500 text-yellow-500"/>{itemDetails.CommunityRating.toFixed(1)}</span>}
+                        {itemDetails.CommunityRating && <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-yellow-500 text-yellow-500"/>{itemDetails.CommunityRating.toFixed(1)}</span>}
                       </div>
                     </div>
-                    <button onClick={()=>{closeModal();startPlay(itemDetails.Type==='Series'&&episodes.length>0?episodes[0]:itemDetails);}} className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition transform hover:scale-105 shadow-lg"><Play className="w-6 h-6 fill-current"/>Riproduci</button>
-                    {itemDetails.Overview && <div><h3 className="text-xl font-semibold mb-2">Trama</h3><p className="text-gray-300 leading-relaxed">{itemDetails.Overview}</p></div>}
-                    {itemDetails.Genres?.length>0 && <div><span className="text-gray-400">Generi: </span><span className="text-white">{itemDetails.Genres.join(', ')}</span></div>}
-                    {itemDetails.People?.filter(p=>p.Type==='Actor').length>0 && <div><h3 className="text-xl font-semibold mb-3">Cast</h3><div className="flex flex-wrap gap-2">{itemDetails.People.filter(p=>p.Type==='Actor').slice(0,10).map(p=><span key={p.Id} className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full text-sm text-gray-300 transition">{p.Name}</span>)}</div></div>}
+                    <button onClick={()=>{closeModal();startPlay(itemDetails.Type==='Series'&&episodes.length>0?episodes[0]:itemDetails);}} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition transform hover:scale-105 shadow-lg"><Play className="w-5 h-5 fill-current"/>Riproduci</button>
+                    {itemDetails.Overview && <div><h3 className="text-lg font-semibold mb-1">Trama</h3><p className="text-gray-300 text-sm leading-relaxed line-clamp-3">{itemDetails.Overview}</p></div>}
+                    {itemDetails.Genres?.length>0 && <div className="text-sm"><span className="text-gray-400">Generi: </span><span className="text-white">{itemDetails.Genres.join(', ')}</span></div>}
+                    {itemDetails.People?.filter(p=>p.Type==='Actor').length>0 && <div><h3 className="text-lg font-semibold mb-2">Cast</h3><div className="flex flex-wrap gap-2">{itemDetails.People.filter(p=>p.Type==='Actor').slice(0,6).map(p=><span key={p.Id} className="bg-white/10 hover:bg-white/20 px-2 py-1 rounded-full text-xs text-gray-300 transition">{p.Name}</span>)}</div></div>}
 
                     {itemDetails.Type==='Series' && seasons.length>0 && (
-                      <div className="space-y-4 mt-6">
+                      <div className="space-y-2 mt-4">
                         <div>
-                          <label className="block text-xl font-semibold mb-3">Stagione</label>
+                          <label className="block text-lg font-semibold mb-2">Stagione</label>
                           <div className="relative">
-                            <select value={selectedSeason||''} onChange={e=>loadEps(e.target.value)} className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 appearance-none">
+                            <select value={selectedSeason||''} onChange={e=>loadEps(e.target.value)} className="w-full max-w-xs bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 appearance-none">
                               {seasons.map(s=><option key={s.Id} value={s.Id} className="bg-gray-800 text-white">{s.Name}</option>)}
                             </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"/>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"/>
                           </div>
                         </div>
                       </div>
@@ -815,7 +976,19 @@ export default function App() {
                 console.error('Messaggio:', videoRef.current.error.message);
               }
             }}
-          />
+          >
+            {/* Tracce sottotitoli */}
+            {subtitleTracks.map(track => (
+              <track
+                key={track.index}
+                kind="subtitles"
+                src={`${EMBY_SERVER}/Videos/${playingItem.Id}/${playingItem.MediaSources?.[0]?.Id}/Subtitles/${track.index}/Stream.vtt?api_key=${API_KEY}`}
+                srcLang={track.language}
+                label={track.displayLanguage + (track.title ? ` - ${track.title}` : '')}
+                default={track.index === selectedSubtitleTrack}
+              />
+            ))}
+          </video>
 
           {/* Indicatore Skip +10/-10 secondi */}
           {showSkipIndicator && (
@@ -983,6 +1156,75 @@ export default function App() {
                                       </div>
                                     </div>
                                     {selectedAudioTrack === track.index && (
+                                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    )}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Selezione sottotitoli */}
+                    {subtitleTracks.length > 0 && (
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowSubtitleMenu(!showSubtitleMenu)}
+                          className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20 flex items-center gap-2"
+                        >
+                          <Subtitles className="w-6 h-6"/>
+                        </button>
+
+                        {/* Menu dropdown sottotitoli */}
+                        {showSubtitleMenu && (
+                          <div className="absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]">
+                            <div className="p-3 border-b border-white/10">
+                              <h4 className="text-sm font-bold text-white">Sottotitoli</h4>
+                            </div>
+                            <div className="max-h-[300px] overflow-y-auto">
+                              {/* Opzione Nessuno */}
+                              <button
+                                onClick={() => changeSubtitleTrack(null)}
+                                className={`w-full text-left px-4 py-3 transition-colors ${
+                                  selectedSubtitleTrack === null
+                                    ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
+                                    : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <div className="font-medium text-sm">Nessuno</div>
+                                  </div>
+                                  {selectedSubtitleTrack === null && (
+                                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                  )}
+                                </div>
+                              </button>
+
+                              {/* Tracce sottotitoli */}
+                              {subtitleTracks.map(track => (
+                                <button
+                                  key={track.index}
+                                  onClick={() => changeSubtitleTrack(track.index)}
+                                  className={`w-full text-left px-4 py-3 transition-colors ${
+                                    selectedSubtitleTrack === track.index
+                                      ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
+                                      : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <div className="font-medium text-sm">
+                                        {track.displayLanguage}
+                                        {track.title && ` - ${track.title}`}
+                                      </div>
+                                      <div className="text-xs text-gray-500 mt-1">
+                                        {track.codec.toUpperCase()}
+                                      </div>
+                                    </div>
+                                    {selectedSubtitleTrack === track.index && (
                                       <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                                     )}
                                   </div>
