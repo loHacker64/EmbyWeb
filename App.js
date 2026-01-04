@@ -27,6 +27,7 @@ export default function App() {
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [loadingEpisodes, setLoadingEpisodes] = useState(false);
   const [movieSortOrder, setMovieSortOrder] = useState('DateCreated');
   const [seriesSortOrder, setSeriesSortOrder] = useState('DateCreated');
   const [playingItem, setPlayingItem] = useState(null);
@@ -240,40 +241,57 @@ export default function App() {
     setSelectedSeason(null);
     setEpisodes([]);
     closeSearch();
-    
-    const res = await fetch(`${EMBY_SERVER}/Users/${user.User.Id}/Items/${item.Id}?Fields=Overview,People,Genres,CommunityRating,OfficialRating,ProductionYear&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
-    const details = await res.json();
-    setItemDetails(details);
-    
-    if (details.Type === 'Series') {
-      const sRes = await fetch(`${EMBY_SERVER}/Shows/${item.Id}/Seasons?userId=${user.User.Id}&Fields=Overview&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
-      if (sRes.ok) {
-        const sData = await sRes.json();
-        const seasonsList = sData.Items || [];
-        setSeasons(seasonsList);
-        if (seasonsList.length > 0) {
-          setSelectedSeason(seasonsList[0].Id);
-          await loadEps(seasonsList[0].Id);
+
+    try {
+      const res = await fetch(`${EMBY_SERVER}/Users/${user.User.Id}/Items/${item.Id}?Fields=Overview,People,Genres,CommunityRating,OfficialRating,ProductionYear&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
+      const details = await res.json();
+      setItemDetails(details);
+
+      if (details.Type === 'Series') {
+        const sRes = await fetch(`${EMBY_SERVER}/Shows/${item.Id}/Seasons?userId=${user.User.Id}&Fields=Overview,IndexNumber&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
+        if (sRes.ok) {
+          const sData = await sRes.json();
+          const seasonsList = (sData.Items || []).filter(s => s.IndexNumber !== 0);
+          setSeasons(seasonsList);
+          if (seasonsList.length > 0) {
+            const firstSeasonId = seasonsList[0].Id;
+            setSelectedSeason(firstSeasonId);
+            await loadEps(firstSeasonId);
+          }
         }
       }
+    } catch (error) {
+      console.error('Error loading details:', error);
     }
     setLoadingDetails(false);
   };
 
   const loadEps = async (seasonId) => {
-    if (!user) return;
+    if (!user || !seasonId) return;
+
+    setLoadingEpisodes(true);
     setSelectedSeason(seasonId);
     setEpisodes([]);
 
     try {
-      const res = await fetch(`${EMBY_SERVER}/Shows/${seasonId}/Episodes?userId=${user.User.Id}&Fields=Overview,ImageTags,UserData&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
+      const url = `${EMBY_SERVER}/Shows/${seasonId}/Episodes?userId=${user.User.Id}&Fields=Overview,PrimaryImageAspectRatio&api_key=${API_KEY}`;
+      console.log('Loading episodes from:', url);
+
+      const res = await fetch(url, {headers:{'X-Emby-Token':user.AccessToken}});
+
       if (res.ok) {
         const data = await res.json();
-        setEpisodes(data.Items || []);
-        console.log('Episodes loaded:', data.Items?.length);
+        console.log('Episodes response:', data);
+        const episodesList = data.Items || [];
+        setEpisodes(episodesList);
+        console.log('Episodes loaded successfully:', episodesList.length, 'episodes');
+      } else {
+        console.error('Failed to load episodes:', res.status, res.statusText);
       }
     } catch (error) {
       console.error('Error loading episodes:', error);
+    } finally {
+      setLoadingEpisodes(false);
     }
   };
 
@@ -286,6 +304,7 @@ export default function App() {
   };
 
   const startPlay = (item) => {
+    console.log('Starting playback for:', item);
     setPlayingItem(item);
     setIsPlaying(true);
   };
@@ -359,6 +378,11 @@ export default function App() {
   const scroll = (id, dir) => {
     const row = document.getElementById(id);
     if (row) row.scrollBy({left: dir === 'left' ? -1000 : 1000, behavior:'smooth'});
+  };
+
+  const getVideoUrl = (item) => {
+    if (!item || !user) return '';
+    return `${EMBY_SERVER}/Videos/${item.Id}/stream?DeviceId=web-client&MediaSourceId=${item.Id}&api_key=${API_KEY}`;
   };
 
   if (!user) {
@@ -564,8 +588,9 @@ export default function App() {
                   {itemDetails.Overview && <div><h3 className="text-xl font-semibold mb-2">Trama</h3><p className="text-gray-300 leading-relaxed">{itemDetails.Overview}</p></div>}
                   {itemDetails.Genres?.length>0 && <div><span className="text-gray-400">Generi: </span><span className="text-white">{itemDetails.Genres.join(', ')}</span></div>}
                   {itemDetails.People?.filter(p=>p.Type==='Actor').length>0 && <div><h3 className="text-xl font-semibold mb-3">Cast</h3><div className="flex flex-wrap gap-2">{itemDetails.People.filter(p=>p.Type==='Actor').slice(0,10).map(p=><span key={p.Id} className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full text-sm text-gray-300 transition">{p.Name}</span>)}</div></div>}
+
                   {itemDetails.Type==='Series' && seasons.length>0 && (
-                    <div className="space-y-4">
+                    <div className="space-y-4 mt-6">
                       <div>
                         <label className="block text-xl font-semibold mb-3">Stagione</label>
                         <div className="relative">
@@ -575,9 +600,15 @@ export default function App() {
                           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"/>
                         </div>
                       </div>
-                      {episodes.length>0 && (
+
+                      {loadingEpisodes ? (
+                        <div className="flex items-center justify-center py-12">
+                          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                          <span className="ml-3 text-gray-400">Caricamento episodi...</span>
+                        </div>
+                      ) : episodes.length > 0 ? (
                         <div className="space-y-4">
-                          <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Episodi</h3>
+                          <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Episodi ({episodes.length})</h3>
                           <div className="relative group/container">
                             <button onClick={()=>scroll(`eps-${selectedSeason}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black/80 hover:bg-emerald-600/90 backdrop-blur-xl p-3 rounded-full opacity-0 group-hover/container:opacity-100 transition-all duration-300 shadow-2xl border border-white/10 hover:border-emerald-500/50 hover:scale-110">
                               <ChevronLeft className="w-6 h-6"/>
@@ -600,14 +631,14 @@ export default function App() {
                                       <span className="text-gray-300 text-sm font-medium">{Math.floor(ep.RunTimeTicks/600000000)} min</span>
                                     </div>
                                   )}
-                                  {ep.UserData?.PlayedPercentage && (
+                                  {ep.UserData?.PlayedPercentage > 0 && (
                                     <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50 backdrop-blur-sm">
                                       <div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 shadow-lg shadow-emerald-500/50 transition-all duration-300" style={{width:`${ep.UserData.PlayedPercentage}%`}}></div>
                                     </div>
                                   )}
                                 </div>
                                 <div className="p-5 space-y-3">
-                                  <h4 className="text-lg font-bold text-white group-hover/card:text-emerald-400 transition-colors duration-300 line-clamp-1">{ep.Name}</h4>
+                                  <h4 className="text-lg font-bold text-white group-hover/card:text-emerald-400 transition-colors duration-300 line-clamp-1">{ep.Name || `Episodio ${ep.IndexNumber}`}</h4>
                                   {ep.Overview && <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 group-hover/card:text-gray-300 transition-colors duration-300">{ep.Overview}</p>}
                                 </div>
                               </div>)}
@@ -617,19 +648,36 @@ export default function App() {
                             </button>
                           </div>
                         </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-400">
+                          Nessun episodio trovato per questa stagione
+                        </div>
                       )}
                     </div>
                   )}
                 </div>
               </div>
-            ):<div className="flex items-center justify-center py-20"><div className="text-white text-lg">Errore</div></div>}
+            ):<div className="flex items-center justify-center py-20"><div className="text-white text-lg">Errore nel caricamento</div></div>}
           </div>
         </div>
       )}
 
       {playingItem && (
         <div className="fixed inset-0 z-[200] bg-black" onMouseMove={showCtrls}>
-          <video ref={videoRef} className="w-full h-full" src={`${EMBY_SERVER}/Videos/${playingItem.Id}/stream?api_key=${API_KEY}&Static=false`} autoPlay onClick={togglePlay} onTimeUpdate={()=>videoRef.current&&setCurrentTime(videoRef.current.currentTime)} onLoadedMetadata={()=>videoRef.current&&setDuration(videoRef.current.duration)} onError={(e)=>console.error('Video error:', e)} />
+          <video
+            ref={videoRef}
+            className="w-full h-full"
+            src={getVideoUrl(playingItem)}
+            autoPlay
+            onClick={togglePlay}
+            onTimeUpdate={()=>videoRef.current&&setCurrentTime(videoRef.current.currentTime)}
+            onLoadedMetadata={()=>videoRef.current&&setDuration(videoRef.current.duration)}
+            onError={(e)=>{
+              console.error('Video playback error:', e);
+              console.error('Video URL:', getVideoUrl(playingItem));
+              console.error('Playing item:', playingItem);
+            }}
+          />
           {showSkipIndicator && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="bg-black/80 backdrop-blur-xl rounded-full p-6 animate-pulse">
