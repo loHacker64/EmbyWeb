@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown } from 'lucide-react';
+import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages } from 'lucide-react';
 
 const EMBY_SERVER = 'https://ilmioserver.diskstation.me:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
@@ -43,6 +43,9 @@ export default function App() {
   const [hasMoreMovies, setHasMoreMovies] = useState(true);
   const [hasMoreSeries, setHasMoreSeries] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [audioTracks, setAudioTracks] = useState([]);
+  const [selectedAudioTrack, setSelectedAudioTrack] = useState(null);
+  const [showAudioMenu, setShowAudioMenu] = useState(false);
   const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
   const skipTimeoutRef = useRef(null);
@@ -332,8 +335,55 @@ export default function App() {
     setEpisodes([]);
   };
 
-  const startPlay = (item) => {
-    console.log('Starting playback for:', item);
+  const startPlay = async (item) => {
+    console.log('🎬 Starting playback for:', item.Name);
+
+    // Carica le tracce audio dal server Emby
+    try {
+      const res = await fetch(
+        `${EMBY_SERVER}/Users/${user.User.Id}/Items/${item.Id}?Fields=MediaSources,MediaStreams&api_key=${API_KEY}`,
+        { headers: { 'X-Emby-Token': user.AccessToken } }
+      );
+      const data = await res.json();
+
+      // Estrai le tracce audio
+      const audioStreams = [];
+      if (data.MediaSources && data.MediaSources[0]) {
+        const streams = data.MediaSources[0].MediaStreams || [];
+        streams.forEach(stream => {
+          if (stream.Type === 'Audio') {
+            audioStreams.push({
+              index: stream.Index,
+              language: stream.Language || 'und',
+              displayLanguage: stream.DisplayLanguage || stream.Language || 'Sconosciuta',
+              title: stream.Title || '',
+              codec: stream.Codec || '',
+              isDefault: stream.IsDefault || false
+            });
+          }
+        });
+      }
+
+      console.log('🎵 Tracce audio trovate:', audioStreams);
+      setAudioTracks(audioStreams);
+
+      // Seleziona la traccia italiana come default, altrimenti la prima
+      const italianTrack = audioStreams.find(t => t.language === 'ita' || t.language === 'it');
+      const defaultTrack = italianTrack || audioStreams.find(t => t.isDefault) || audioStreams[0];
+
+      if (defaultTrack) {
+        console.log('🎵 Traccia audio selezionata:', defaultTrack.displayLanguage);
+        setSelectedAudioTrack(defaultTrack.index);
+      } else {
+        setSelectedAudioTrack(null);
+      }
+
+    } catch (error) {
+      console.error('❌ Errore caricamento tracce audio:', error);
+      setAudioTracks([]);
+      setSelectedAudioTrack(null);
+    }
+
     setPlayingItem(item);
     setIsPlaying(true);
   };
@@ -342,6 +392,9 @@ export default function App() {
     setPlayingItem(null);
     setIsPlaying(false);
     setCurrentTime(0);
+    setAudioTracks([]);
+    setSelectedAudioTrack(null);
+    setShowAudioMenu(false);
   };
 
   const togglePlay = () => {
@@ -409,15 +462,46 @@ export default function App() {
     if (row) row.scrollBy({left: dir === 'left' ? -1000 : 1000, behavior:'smooth'});
   };
 
-  const getVideoUrl = (item) => {
+  const getVideoUrl = (item, audioStreamIndex = null) => {
     if (!item || !user) return '';
 
     // Endpoint diretto Emby per download/streaming
-    const url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
+    let url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
 
-    console.log('🎬 NEW Video Player - URL:', url);
-    console.log('📋 Item:', item.Name, '| ID:', item.Id);
+    // Aggiungi la traccia audio selezionata se disponibile
+    if (audioStreamIndex !== null) {
+      url += `&AudioStreamIndex=${audioStreamIndex}`;
+    }
+
+    console.log('🎬 Video URL:', url);
+    console.log('📋 Item:', item.Name, '| 🎵 Audio Track:', audioStreamIndex);
     return url;
+  };
+
+  const changeAudioTrack = (trackIndex) => {
+    if (!videoRef.current) return;
+
+    // Salva il tempo corrente
+    const savedTime = videoRef.current.currentTime;
+    console.log('🎵 Cambio traccia audio a index:', trackIndex);
+
+    // Cambia la traccia audio (il video si ricaricherà automaticamente)
+    setSelectedAudioTrack(trackIndex);
+
+    // Ripristina il tempo quando il video si ricarica
+    const handleLoadedMetadata = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = savedTime;
+        videoRef.current.play();
+        videoRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      }
+    };
+
+    if (videoRef.current) {
+      videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+    }
+
+    setShowAudioMenu(false);
   };
 
   if (!user) {
@@ -710,7 +794,7 @@ export default function App() {
           <video
             ref={videoRef}
             className="w-full h-full object-contain"
-            src={getVideoUrl(playingItem)}
+            src={getVideoUrl(playingItem, selectedAudioTrack)}
             autoPlay
             onClick={togglePlay}
             onTimeUpdate={()=>{
@@ -859,13 +943,65 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Lato destro - Fullscreen */}
-                  <button
-                    onClick={toggleFull}
-                    className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
-                  >
-                    <Maximize className="w-6 h-6"/>
-                  </button>
+                  {/* Lato destro - Audio e Fullscreen */}
+                  <div className="flex items-center gap-4">
+                    {/* Selezione traccia audio */}
+                    {audioTracks.length > 1 && (
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowAudioMenu(!showAudioMenu)}
+                          className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20 flex items-center gap-2"
+                        >
+                          <Languages className="w-6 h-6"/>
+                        </button>
+
+                        {/* Menu dropdown tracce audio */}
+                        {showAudioMenu && (
+                          <div className="absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]">
+                            <div className="p-3 border-b border-white/10">
+                              <h4 className="text-sm font-bold text-white">Traccia Audio</h4>
+                            </div>
+                            <div className="max-h-[300px] overflow-y-auto">
+                              {audioTracks.map(track => (
+                                <button
+                                  key={track.index}
+                                  onClick={() => changeAudioTrack(track.index)}
+                                  className={`w-full text-left px-4 py-3 transition-colors ${
+                                    selectedAudioTrack === track.index
+                                      ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
+                                      : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <div className="font-medium text-sm">
+                                        {track.displayLanguage}
+                                        {track.title && ` - ${track.title}`}
+                                      </div>
+                                      <div className="text-xs text-gray-500 mt-1">
+                                        {track.codec.toUpperCase()}
+                                      </div>
+                                    </div>
+                                    {selectedAudioTrack === track.index && (
+                                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    )}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Fullscreen */}
+                    <button
+                      onClick={toggleFull}
+                      className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                    >
+                      <Maximize className="w-6 h-6"/>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
