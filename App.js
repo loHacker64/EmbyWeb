@@ -264,12 +264,13 @@ export default function App() {
     if (!user) return;
     setSelectedSeason(seasonId);
     setEpisodes([]);
-    
+
     try {
-      const res = await fetch(`${EMBY_SERVER}/Shows/${seasonId}/Episodes?userId=${user.User.Id}&Fields=Overview&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
+      const res = await fetch(`${EMBY_SERVER}/Shows/${seasonId}/Episodes?userId=${user.User.Id}&Fields=Overview,ImageTags,UserData&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
       if (res.ok) {
         const data = await res.json();
         setEpisodes(data.Items || []);
+        console.log('Episodes loaded:', data.Items?.length);
       }
     } catch (error) {
       console.error('Error loading episodes:', error);
@@ -628,7 +629,7 @@ export default function App() {
 
       {playingItem && (
         <div className="fixed inset-0 z-[200] bg-black" onMouseMove={showCtrls}>
-          <video ref={videoRef} className="w-full h-full" src={`${EMBY_SERVER}/Videos/${playingItem.Id}/stream?static=true&api_key=${API_KEY}`} autoPlay onClick={togglePlay} onTimeUpdate={()=>videoRef.current&&setCurrentTime(videoRef.current.currentTime)} onLoadedMetadata={()=>videoRef.current&&setDuration(videoRef.current.duration)} />
+          <video ref={videoRef} className="w-full h-full" src={`${EMBY_SERVER}/Videos/${playingItem.Id}/stream?api_key=${API_KEY}&Static=false`} autoPlay onClick={togglePlay} onTimeUpdate={()=>videoRef.current&&setCurrentTime(videoRef.current.currentTime)} onLoadedMetadata={()=>videoRef.current&&setDuration(videoRef.current.duration)} onError={(e)=>console.error('Video error:', e)} />
           {showSkipIndicator && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="bg-black/80 backdrop-blur-xl rounded-full p-6 animate-pulse">
