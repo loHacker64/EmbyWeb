@@ -49,6 +49,7 @@ export default function App() {
   const [subtitleTracks, setSubtitleTracks] = useState([]);
   const [selectedSubtitleTrack, setSelectedSubtitleTrack] = useState(null);
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
+  const [mediaSourceId, setMediaSourceId] = useState(null);
   const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
   const skipTimeoutRef = useRef(null);
@@ -355,7 +356,9 @@ export default function App() {
       const subtitleStreams = [];
 
       if (data.MediaSources && data.MediaSources[0]) {
-        const streams = data.MediaSources[0].MediaStreams || [];
+        const mediaSource = data.MediaSources[0];
+        setMediaSourceId(mediaSource.Id);
+        const streams = mediaSource.MediaStreams || [];
         streams.forEach(stream => {
           if (stream.Type === 'Audio') {
             audioStreams.push({
@@ -453,6 +456,7 @@ export default function App() {
     setSubtitleTracks([]);
     setSelectedSubtitleTrack(null);
     setShowSubtitleMenu(false);
+    setMediaSourceId(null);
   };
 
   const togglePlay = () => {
@@ -523,8 +527,13 @@ export default function App() {
   const getVideoUrl = (item, audioStreamIndex = null) => {
     if (!item || !user) return '';
 
-    // Endpoint streaming Emby con supporto traccia audio
-    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mp4?api_key=${API_KEY}&Static=true`;
+    // Endpoint streaming Emby con transcoding per selezione tracce
+    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mp4?api_key=${API_KEY}`;
+
+    // Parametri per il transcoding
+    url += `&Container=mp4`;
+    url += `&DeviceId=web-player`;
+    url += `&MediaSourceId=${item.Id}`;
 
     // Aggiungi la traccia audio selezionata se disponibile
     if (audioStreamIndex !== null) {
@@ -564,25 +573,33 @@ export default function App() {
 
   const changeSubtitleTrack = (trackIndex) => {
     console.log('📝 Cambio sottotitoli a index:', trackIndex);
+    setSelectedSubtitleTrack(trackIndex);
 
-    if (videoRef.current && videoRef.current.textTracks) {
-      // Disabilita tutti i sottotitoli
-      for (let i = 0; i < videoRef.current.textTracks.length; i++) {
-        videoRef.current.textTracks[i].mode = 'hidden';
-      }
+    // Aspetta che il React ri-renderizzi con il nuovo selectedSubtitleTrack
+    setTimeout(() => {
+      if (videoRef.current && videoRef.current.textTracks) {
+        // Disabilita tutti i sottotitoli
+        for (let i = 0; i < videoRef.current.textTracks.length; i++) {
+          videoRef.current.textTracks[i].mode = 'disabled';
+        }
 
-      // Abilita il sottotitolo selezionato
-      if (trackIndex !== null) {
-        const trackToEnable = Array.from(videoRef.current.textTracks).find(
-          (t, idx) => subtitleTracks[idx]?.index === trackIndex
-        );
-        if (trackToEnable) {
-          trackToEnable.mode = 'showing';
+        // Abilita il sottotitolo selezionato
+        if (trackIndex !== null) {
+          for (let i = 0; i < videoRef.current.textTracks.length; i++) {
+            const track = videoRef.current.textTracks[i];
+            // Cerca la traccia corrispondente all'indice selezionato
+            const matchingTrack = subtitleTracks.find((st, idx) => idx === i);
+            if (matchingTrack && matchingTrack.index === trackIndex) {
+              track.mode = 'showing';
+              console.log('✅ Sottotitoli abilitati:', matchingTrack.displayLanguage);
+              break;
+            }
+          }
+        } else {
+          console.log('❌ Sottotitoli disabilitati');
         }
       }
-
-      setSelectedSubtitleTrack(trackIndex);
-    }
+    }, 100);
 
     setShowSubtitleMenu(false);
   };
@@ -628,11 +645,14 @@ export default function App() {
         },
         body: JSON.stringify({
           ItemId: item.Id,
+          MediaSourceId: mediaSourceId || item.Id,
           PositionTicks: positionTicks,
           IsPaused: !isPlaying,
           IsMuted: isMuted,
           AudioStreamIndex: selectedAudioTrack,
-          SubtitleStreamIndex: selectedSubtitleTrack
+          SubtitleStreamIndex: selectedSubtitleTrack,
+          PlayMethod: 'DirectStream',
+          PlaySessionId: `web-${Date.now()}`
         })
       });
       console.log('📊 Progresso aggiornato:', Math.floor(positionMs / 1000), 's');
@@ -982,7 +1002,7 @@ export default function App() {
               <track
                 key={track.index}
                 kind="subtitles"
-                src={`${EMBY_SERVER}/Videos/${playingItem.Id}/${playingItem.MediaSources?.[0]?.Id}/Subtitles/${track.index}/Stream.vtt?api_key=${API_KEY}`}
+                src={`${EMBY_SERVER}/Videos/${playingItem.Id}/${mediaSourceId}/Subtitles/${track.index}/Stream.vtt?api_key=${API_KEY}`}
                 srcLang={track.language}
                 label={track.displayLanguage + (track.title ? ` - ${track.title}` : '')}
                 default={track.index === selectedSubtitleTrack}
