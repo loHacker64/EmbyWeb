@@ -411,16 +411,13 @@ export default function App() {
 
   const getVideoUrl = (item) => {
     if (!item || !user) return '';
-    // URL completo per streaming Emby con tutti i parametri necessari
-    const url = `${EMBY_SERVER}/Videos/${item.Id}/stream?` +
-      `Static=false&` +
-      `MediaSourceId=${item.Id}&` +
-      `DeviceId=web-client&` +
-      `api_key=${API_KEY}&` +
-      `Tag=${item.ImageTags?.Primary || ''}&` +
-      `PlaySessionId=${Date.now()}`;
+
+    // URL semplificato - endpoint diretto Emby per streaming
+    const url = `${EMBY_SERVER}/Videos/${item.Id}/stream?api_key=${API_KEY}`;
 
     console.log('🎬 Video URL generated:', url);
+    console.log('📋 Item ID:', item.Id);
+    console.log('👤 User token:', user.AccessToken);
     return url;
   };
 
