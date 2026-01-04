@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown } from 'lucide-react';
 
-const EMBY_SERVER = 'http://192.168.1.100:8096';
+const EMBY_SERVER = 'https://ilmioserver.diskstation.me:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
 
 export default function App() {
@@ -408,7 +408,7 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <a href="http://192.168.1.100:8096" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LayoutGrid className="w-4 h-4" /><span className="text-sm">Versione classica</span></a>
+            <a href="https://ilmioserver.diskstattion.me:8096" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LayoutGrid className="w-4 h-4" /><span className="text-sm">Versione classica</span></a>
             <button onClick={()=>setUser(null)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LogOut className="w-4 h-4" /></button>
           </div>
         </div>
