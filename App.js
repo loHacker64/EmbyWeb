@@ -412,8 +412,8 @@ export default function App() {
   const getVideoUrl = (item) => {
     if (!item || !user) return '';
 
-    // URL semplificato - endpoint diretto Emby per streaming
-    const url = `${EMBY_SERVER}/Videos/${item.Id}/stream?api_key=${API_KEY}`;
+    // Endpoint Emby per streaming HTML5 con transcoding automatico
+    const url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mp4?MediaSourceId=${item.Id}&api_key=${API_KEY}`;
 
     console.log('🎬 Video URL generated:', url);
     console.log('📋 Item ID:', item.Id);
