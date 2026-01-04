@@ -248,16 +248,28 @@ export default function App() {
       setItemDetails(details);
 
       if (details.Type === 'Series') {
-        const sRes = await fetch(`${EMBY_SERVER}/Shows/${item.Id}/Seasons?userId=${user.User.Id}&Fields=Overview,IndexNumber&api_key=${API_KEY}`, {headers:{'X-Emby-Token':user.AccessToken}});
+        const seasonsUrl = `${EMBY_SERVER}/Shows/${item.Id}/Seasons?userId=${user.User.Id}&Fields=Overview,IndexNumber&api_key=${API_KEY}`;
+        console.log('🎬 Loading seasons from:', seasonsUrl);
+
+        const sRes = await fetch(seasonsUrl, {headers:{'X-Emby-Token':user.AccessToken}});
+        console.log('📡 Seasons response status:', sRes.status);
+
         if (sRes.ok) {
           const sData = await sRes.json();
+          console.log('✅ Seasons data:', sData);
           const seasonsList = (sData.Items || []).filter(s => s.IndexNumber !== 0);
+          console.log('📺 Seasons found (excluding specials):', seasonsList.length);
+          console.log('📋 Seasons list:', seasonsList);
+
           setSeasons(seasonsList);
           if (seasonsList.length > 0) {
             const firstSeasonId = seasonsList[0].Id;
+            console.log('🎯 Loading episodes for first season ID:', firstSeasonId, 'Name:', seasonsList[0].Name);
             setSelectedSeason(firstSeasonId);
             await loadEps(firstSeasonId);
           }
+        } else {
+          console.error('❌ Failed to load seasons:', sRes.status);
         }
       }
     } catch (error) {
@@ -274,22 +286,39 @@ export default function App() {
     setEpisodes([]);
 
     try {
-      const url = `${EMBY_SERVER}/Shows/${seasonId}/Episodes?userId=${user.User.Id}&Fields=Overview,PrimaryImageAspectRatio&api_key=${API_KEY}`;
-      console.log('Loading episodes from:', url);
+      // Provo ENTRAMBI gli endpoint Emby per essere sicuro
+      const url1 = `${EMBY_SERVER}/Shows/${seasonId}/Episodes?userId=${user.User.Id}&Fields=Overview,PrimaryImageAspectRatio,SeriesInfo,UserData&api_key=${API_KEY}`;
+      const url2 = `${EMBY_SERVER}/Users/${user.User.Id}/Items?ParentId=${seasonId}&Fields=Overview,PrimaryImageAspectRatio,UserData&api_key=${API_KEY}`;
 
-      const res = await fetch(url, {headers:{'X-Emby-Token':user.AccessToken}});
+      console.log('🔍 Trying endpoint 1:', url1);
+      let res = await fetch(url1, {headers:{'X-Emby-Token':user.AccessToken}});
+
+      console.log('📡 Endpoint 1 response:', res.status, res.statusText);
+
+      // Se il primo fallisce, provo il secondo
+      if (!res.ok) {
+        console.log('🔄 Trying endpoint 2:', url2);
+        res = await fetch(url2, {headers:{'X-Emby-Token':user.AccessToken}});
+        console.log('📡 Endpoint 2 response:', res.status, res.statusText);
+      }
 
       if (res.ok) {
         const data = await res.json();
-        console.log('Episodes response:', data);
+        console.log('✅ Episodes API response:', data);
         const episodesList = data.Items || [];
+        console.log('📺 Episodes found:', episodesList.length);
+        if (episodesList.length > 0) {
+          console.log('📋 First episode sample:', episodesList[0]);
+        }
         setEpisodes(episodesList);
-        console.log('Episodes loaded successfully:', episodesList.length, 'episodes');
       } else {
-        console.error('Failed to load episodes:', res.status, res.statusText);
+        const errorText = await res.text();
+        console.error('❌ Both endpoints failed');
+        console.error('❌ Status:', res.status, res.statusText);
+        console.error('❌ Error response:', errorText);
       }
     } catch (error) {
-      console.error('Error loading episodes:', error);
+      console.error('💥 Error loading episodes:', error);
     } finally {
       setLoadingEpisodes(false);
     }
