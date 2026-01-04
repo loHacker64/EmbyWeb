@@ -577,25 +577,34 @@ export default function App() {
                       {episodes.length>0 && (
                         <div>
                           <h3 className="text-xl font-semibold mb-4">Episodi ({episodes.length})</h3>
-                          <div className="relative group">
-                            <button onClick={()=>scroll(`eps-${selectedSeason}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-6 h-6"/></button>
-                            <div id={`eps-${selectedSeason}`} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth -mx-8 px-8">
-                              {episodes.map(ep=><div key={ep.Id} className="flex-none w-80 bg-white/5 hover:bg-white/10 rounded-lg overflow-hidden transition cursor-pointer" onClick={()=>{closeModal();startPlay(ep);}}>
-                                <div className="relative aspect-video bg-gray-800">
-                                  {ep.ImageTags?.Primary?<img src={getImg(ep,'Primary')} alt={ep.Name} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>:<div className="w-full h-full flex items-center justify-center text-gray-500"><Play className="w-12 h-12"/></div>}
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center"><div className="bg-emerald-600 rounded-full p-3 scale-75 hover:scale-100 transition"><Play className="w-6 h-6 fill-white"/></div></div>
-                                </div>
-                                <div className="p-4">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-emerald-500 font-semibold text-sm">Ep. {ep.IndexNumber}</span>
-                                    {ep.RunTimeTicks && <span className="text-gray-500 text-xs">{Math.floor(ep.RunTimeTicks/600000000)} min</span>}
+                          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
+                            {episodes.map(ep=><div key={ep.Id} className="flex gap-4 bg-white/5 hover:bg-white/10 rounded-lg overflow-hidden transition cursor-pointer group" onClick={()=>{closeModal();startPlay(ep);}}>
+                              <div className="relative w-48 flex-shrink-0 aspect-video bg-gray-800">
+                                {ep.ImageTags?.Primary?<img src={getImg(ep,'Primary')} alt={ep.Name} className="w-full h-full object-cover group-hover:opacity-80 transition"/>:<div className="w-full h-full flex items-center justify-center text-gray-500"><Play className="w-8 h-8"/></div>}
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                  <div className="bg-emerald-600 rounded-full p-2">
+                                    <Play className="w-5 h-5 fill-white"/>
                                   </div>
-                                  {ep.Name && <h4 className="text-white font-medium mb-2 line-clamp-1">{ep.Name}</h4>}
-                                  {ep.Overview && <p className="text-gray-400 text-sm line-clamp-2">{ep.Overview}</p>}
                                 </div>
-                              </div>)}
-                            </div>
-                            <button onClick={()=>scroll(`eps-${selectedSeason}`,'right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-6 h-6"/></button>
+                                {ep.UserData?.PlayedPercentage && (
+                                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700">
+                                    <div className="h-full bg-emerald-500" style={{width:`${ep.UserData.PlayedPercentage}%`}}></div>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 py-3 pr-4 min-w-0">
+                                <div className="flex items-start justify-between gap-4 mb-2">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-3 mb-1">
+                                      <span className="text-lg font-bold text-white">{ep.IndexNumber}</span>
+                                      <h4 className="text-base font-semibold text-white truncate">{ep.Name}</h4>
+                                    </div>
+                                  </div>
+                                  {ep.RunTimeTicks && <span className="text-gray-400 text-sm flex-shrink-0">{Math.floor(ep.RunTimeTicks/600000000)} min</span>}
+                                </div>
+                                {ep.Overview && <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">{ep.Overview}</p>}
+                              </div>
+                            </div>)}
                           </div>
                         </div>
                       )}
