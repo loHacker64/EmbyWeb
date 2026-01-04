@@ -412,12 +412,11 @@ export default function App() {
   const getVideoUrl = (item) => {
     if (!item || !user) return '';
 
-    // Endpoint Emby per streaming HTML5 con transcoding automatico
-    const url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mp4?MediaSourceId=${item.Id}&api_key=${API_KEY}`;
+    // Endpoint diretto Emby per download/streaming
+    const url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
 
-    console.log('🎬 Video URL generated:', url);
-    console.log('📋 Item ID:', item.Id);
-    console.log('👤 User token:', user.AccessToken);
+    console.log('🎬 NEW Video Player - URL:', url);
+    console.log('📋 Item:', item.Name, '| ID:', item.Id);
     return url;
   };
 
@@ -706,67 +705,168 @@ export default function App() {
       )}
 
       {playingItem && (
-        <div className="fixed inset-0 z-[200] bg-black" onMouseMove={showCtrls}>
+        <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
+          {/* Video Element - Completamente riscritto */}
           <video
             ref={videoRef}
-            className="w-full h-full"
+            className="w-full h-full object-contain"
             src={getVideoUrl(playingItem)}
             autoPlay
-            crossOrigin="anonymous"
             onClick={togglePlay}
-            onLoadStart={()=>console.log('📥 Video loading started')}
-            onCanPlay={()=>console.log('✅ Video can play')}
-            onPlaying={()=>console.log('▶️ Video playing')}
-            onWaiting={()=>console.log('⏳ Video buffering')}
-            onStalled={()=>console.log('⚠️ Video stalled')}
-            onTimeUpdate={()=>videoRef.current&&setCurrentTime(videoRef.current.currentTime)}
+            onTimeUpdate={()=>{
+              if(videoRef.current) setCurrentTime(videoRef.current.currentTime);
+            }}
             onLoadedMetadata={()=>{
               if(videoRef.current){
                 setDuration(videoRef.current.duration);
-                console.log('📊 Video metadata loaded - Duration:', videoRef.current.duration);
+                console.log('✅ Video caricato:', playingItem.Name);
+                console.log('⏱️ Durata:', Math.floor(videoRef.current.duration/60), 'minuti');
               }
             }}
             onError={(e)=>{
-              console.error('❌ Video playback error:', e);
-              console.error('🎬 Video URL:', getVideoUrl(playingItem));
-              console.error('📋 Playing item:', playingItem);
-              if(videoRef.current && videoRef.current.error){
-                console.error('🔴 Error code:', videoRef.current.error.code);
-                console.error('🔴 Error message:', videoRef.current.error.message);
+              console.error('❌ ERRORE RIPRODUZIONE');
+              console.error('URL tentato:', getVideoUrl(playingItem));
+              if(videoRef.current?.error){
+                console.error('Codice errore:', videoRef.current.error.code);
+                console.error('Messaggio:', videoRef.current.error.message);
               }
             }}
           />
+
+          {/* Indicatore Skip +10/-10 secondi */}
           {showSkipIndicator && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-black/80 backdrop-blur-xl rounded-full p-6 animate-pulse">
-                {showSkipIndicator>0?<><RotateCw className="w-12 h-12 text-emerald-500"/><p className="text-white mt-2">+10s</p></>:<><RotateCcw className="w-12 h-12 text-emerald-500"/><p className="text-white mt-2">-10s</p></>}
+              <div className="bg-black/90 backdrop-blur-2xl rounded-2xl px-8 py-6 border border-emerald-500/30">
+                {showSkipIndicator > 0 ? (
+                  <div className="flex items-center gap-4">
+                    <RotateCw className="w-10 h-10 text-emerald-400"/>
+                    <span className="text-2xl font-bold text-white">+10s</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <RotateCcw className="w-10 h-10 text-emerald-400"/>
+                    <span className="text-2xl font-bold text-white">-10s</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
-          <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/50 transition-opacity duration-300 ${showControls?'opacity-100':'opacity-0'}`}>
-            <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-              <button onClick={closePlayer} className="bg-black/50 hover:bg-black/70 rounded-full p-2 backdrop-blur-sm transition"><X className="w-6 h-6"/></button>
-              <h3 className="text-xl font-semibold">{playingItem.SeriesName||playingItem.Name}</h3>
-              <div className="w-10"></div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
-              <div className="w-full h-1 bg-gray-600 rounded-full cursor-pointer group" onClick={e=>{const rect=e.currentTarget.getBoundingClientRect();const x=e.clientX-rect.left;const pct=x/rect.width;if(videoRef.current)videoRef.current.currentTime=pct*duration;}}>
-                <div className="h-full bg-emerald-500 rounded-full relative group-hover:h-2 transition-all" style={{width:`${(currentTime/duration)*100}%`}}>
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition"></div>
+
+          {/* Controlli Video - Design completamente nuovo */}
+          <div className={`absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/95 transition-opacity duration-500 ${showControls?'opacity-100':'opacity-0 pointer-events-none'}`}>
+
+            {/* Header - Titolo e chiudi */}
+            <div className="absolute top-0 left-0 right-0 p-8">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h2 className="text-3xl font-bold text-white drop-shadow-2xl mb-2">
+                    {playingItem.SeriesName || playingItem.Name}
+                  </h2>
+                  {playingItem.SeriesName && (
+                    <p className="text-lg text-gray-300 drop-shadow-lg">
+                      S{playingItem.ParentIndexNumber} · E{playingItem.IndexNumber} · {playingItem.Name}
+                    </p>
+                  )}
                 </div>
+                <button
+                  onClick={closePlayer}
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                >
+                  <X className="w-7 h-7"/>
+                </button>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <button onClick={togglePlay} className="bg-white/20 hover:bg-white/30 rounded-full p-3 backdrop-blur-sm transition">{isPlaying?<Pause className="w-6 h-6"/>:<Play className="w-6 h-6 fill-current"/>}</button>
-                  <button onClick={()=>skip(-10)} className="bg-white/20 hover:bg-white/30 rounded-full p-2 backdrop-blur-sm transition"><RotateCcw className="w-5 h-5"/></button>
-                  <button onClick={()=>skip(10)} className="bg-white/20 hover:bg-white/30 rounded-full p-2 backdrop-blur-sm transition"><RotateCw className="w-5 h-5"/></button>
-                  <div className="flex items-center gap-2">
-                    <button onClick={toggleMute} className="text-white hover:text-emerald-500 transition">{isMuted?<VolumeX className="w-5 h-5"/>:<Volume2 className="w-5 h-5"/>}</button>
-                    <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolume} className="w-20 accent-emerald-500"/>
+            </div>
+
+            {/* Footer - Controlli completi */}
+            <div className="absolute bottom-0 left-0 right-0 p-8">
+              <div className="space-y-6">
+
+                {/* Progress Bar */}
+                <div className="relative group/progress">
+                  <div
+                    className="h-2 bg-white/20 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden"
+                    onClick={e=>{
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const x = e.clientX - rect.left;
+                      const percentage = x / rect.width;
+                      if(videoRef.current && duration) {
+                        videoRef.current.currentTime = percentage * duration;
+                      }
+                    }}
+                  >
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-full relative transition-all"
+                      style={{width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`}}
+                    >
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-xl opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
+                    </div>
                   </div>
-                  <span className="text-sm text-gray-300">{formatTime(currentTime)} / {formatTime(duration)}</span>
+
+                  {/* Time Display */}
+                  <div className="flex justify-between items-center mt-3">
+                    <span className="text-sm font-medium text-gray-300">{formatTime(currentTime)}</span>
+                    <span className="text-sm font-medium text-gray-300">{formatTime(duration)}</span>
+                  </div>
                 </div>
-                <button onClick={toggleFull} className="bg-white/20 hover:bg-white/30 rounded-full p-2 backdrop-blur-sm transition"><Maximize className="w-5 h-5"/></button>
+
+                {/* Controlli principali */}
+                <div className="flex items-center justify-between">
+
+                  {/* Lato sinistro - Play/Pause e Skip */}
+                  <div className="flex items-center gap-4">
+
+                    {/* Play/Pause - Grande e centrale */}
+                    <button
+                      onClick={togglePlay}
+                      className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 rounded-full p-4 transition-all transform hover:scale-110 shadow-2xl"
+                    >
+                      {isPlaying ?
+                        <Pause className="w-8 h-8 text-white"/> :
+                        <Play className="w-8 h-8 text-white fill-current"/>
+                      }
+                    </button>
+
+                    {/* Skip -10s */}
+                    <button
+                      onClick={()=>skip(-10)}
+                      className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                    >
+                      <RotateCcw className="w-6 h-6"/>
+                    </button>
+
+                    {/* Skip +10s */}
+                    <button
+                      onClick={()=>skip(10)}
+                      className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                    >
+                      <RotateCw className="w-6 h-6"/>
+                    </button>
+
+                    {/* Volume Controls */}
+                    <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl rounded-full px-4 py-2 border border-white/20">
+                      <button onClick={toggleMute} className="hover:text-emerald-400 transition-colors">
+                        {isMuted ? <VolumeX className="w-5 h-5"/> : <Volume2 className="w-5 h-5"/>}
+                      </button>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={volume}
+                        onChange={handleVolume}
+                        className="w-24 accent-emerald-500 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Lato destro - Fullscreen */}
+                  <button
+                    onClick={toggleFull}
+                    className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                  >
+                    <Maximize className="w-6 h-6"/>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
