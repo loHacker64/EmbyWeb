@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
 
-const EMBY_SERVER = 'https://ilmioserver.diskstation.me:8096';
+const EMBY_SERVER = 'http://192.168.1.100:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
 
 export default function App() {
