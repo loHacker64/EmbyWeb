@@ -423,10 +423,6 @@ export default function App() {
       setSelectedSubtitleTrack(null);
     }
 
-    // Genera un PlaySessionId unico per questa sessione di riproduzione
-    const sessionId = `emby-web-${item.Id}-${Date.now()}`;
-    setPlaySessionId(sessionId);
-
     setPlayingItem(item);
     setIsPlaying(true);
 
@@ -533,53 +529,19 @@ export default function App() {
     if (row) row.scrollBy({left: dir === 'left' ? -1000 : 1000, behavior:'smooth'});
   };
 
-  const getVideoUrl = (item, audioIndex) => {
+  const getVideoUrl = (item) => {
     if (!item || !user) return '';
 
-    // Costruisci URL base
-    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mkv?api_key=${API_KEY}`;
-
-    // Parametri per Direct Stream (no transcoding)
-    url += `&Static=true`;
-    url += `&MediaSourceId=${mediaSourceId || item.Id}`;
-    url += `&DeviceId=emby-web-player`;
-
-    // Usa il PlaySessionId salvato nello state (generato una sola volta)
-    if (playSessionId) {
-      url += `&PlaySessionId=${playSessionId}`;
-    }
-
-    // Specifica la traccia audio
-    if (audioIndex !== null && audioIndex !== undefined) {
-      url += `&AudioStreamIndex=${audioIndex}`;
-    }
+    // URL semplice per download diretto - il browser userà la traccia default
+    const url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
 
     return url;
   };
 
   const changeAudioTrack = (trackIndex) => {
-    if (!videoRef.current) return;
-
-    console.log('🎵 Cambio traccia audio da', selectedAudioTrack, 'a', trackIndex);
-
-    // Salva la posizione corrente
-    const savedTime = videoRef.current.currentTime;
-    const wasPaused = videoRef.current.paused;
-
-    // Aggiorna lo stato - questo ricaricherà il video con la nuova traccia
+    console.log('⚠️  Cambio traccia audio non supportato con l\'endpoint attuale');
+    console.log('ℹ️  Il browser usa automaticamente la prima traccia audio del file');
     setSelectedAudioTrack(trackIndex);
-
-    // Aspetta che React aggiorni e poi ripristina la posizione
-    setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.currentTime = savedTime;
-        if (!wasPaused) {
-          videoRef.current.play().catch(e => console.log('Autoplay bloccato:', e));
-        }
-        console.log('✅ Traccia cambiata, ripristinato a', Math.floor(savedTime), 's');
-      }
-    }, 500);
-
     setShowAudioMenu(false);
   };
 
@@ -993,10 +955,9 @@ export default function App() {
         <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
           {/* Video Element - Completamente riscritto */}
           <video
-            key={`video-${playingItem.Id}-${selectedAudioTrack}`}
             ref={videoRef}
             className="w-full h-full object-contain"
-            src={getVideoUrl(playingItem, selectedAudioTrack)}
+            src={getVideoUrl(playingItem)}
             autoPlay
             onClick={togglePlay}
             onTimeUpdate={()=>{
@@ -1005,13 +966,13 @@ export default function App() {
             onLoadedMetadata={()=>{
               if(videoRef.current){
                 setDuration(videoRef.current.duration);
-                console.log('✅ Video caricato - Audio ITA:', selectedAudioTrack === 2 ? 'SÌ' : 'NO', '(index:', selectedAudioTrack, ')');
-                console.log('⏱️ Durata:', Math.floor(videoRef.current.duration/60), 'minuti');
+                console.log('✅ Video caricato - Durata:', Math.floor(videoRef.current.duration/60), 'min');
+                console.log('ℹ️  L\'audio sarà quello di default del file (solitamente la prima traccia)');
               }
             }}
             onError={(e)=>{
               console.error('❌ ERRORE RIPRODUZIONE');
-              console.error('URL tentato:', getVideoUrl(playingItem, selectedAudioTrack));
+              console.error('URL tentato:', getVideoUrl(playingItem));
               if(videoRef.current?.error){
                 console.error('Codice errore:', videoRef.current.error.code);
                 console.error('Messaggio:', videoRef.current.error.message);
