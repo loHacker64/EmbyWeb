@@ -59,6 +59,7 @@ export default function App() {
   const movieGridRef = useRef(null);
   const seriesGridRef = useRef(null);
   const progressIntervalRef = useRef(null);
+  const seekToTimeRef = useRef(null);
 
   useEffect(() => {
     if (featuredItems.length > 0) {
@@ -456,28 +457,11 @@ export default function App() {
         setDuration(player.duration());
         console.log('✅ Video.js caricato - Durata:', Math.floor(player.duration()/60), 'min');
 
-        // Auto-seleziona traccia italiana
-        const audioTracks = player.audioTracks();
-        if (audioTracks && audioTracks.length > 0) {
-          console.log('🎵 Tracce audio disponibili:', audioTracks.length);
-
-          // Cerca traccia italiana
-          for (let i = 0; i < audioTracks.length; i++) {
-            const track = audioTracks[i];
-            console.log(`  Track ${i}: ${track.label || track.language || 'Unknown'}`);
-
-            if (track.language === 'ita' || track.language === 'it' ||
-                (track.label && track.label.toLowerCase().includes('ita'))) {
-              // Disabilita tutte
-              for (let j = 0; j < audioTracks.length; j++) {
-                audioTracks[j].enabled = false;
-              }
-              // Abilita italiana
-              track.enabled = true;
-              console.log('✅ Audio italiano auto-selezionato:', track.label || track.language);
-              break;
-            }
-          }
+        // Ripristina posizione se stavamo cambiando traccia audio
+        if (seekToTimeRef.current !== null) {
+          player.currentTime(seekToTimeRef.current);
+          console.log('▶️ Ripristinata posizione:', seekToTimeRef.current, 's');
+          seekToTimeRef.current = null;
         }
 
         // Notifica Emby
@@ -533,6 +517,9 @@ export default function App() {
       playerRef.current.dispose();
       playerRef.current = null;
     }
+
+    // Reset seek position
+    seekToTimeRef.current = null;
 
     setPlayingItem(null);
     setIsPlaying(false);
@@ -625,9 +612,18 @@ export default function App() {
   const changeAudioTrack = (trackIndex) => {
     console.log('🎵 Cambio traccia audio a index:', trackIndex);
 
+    // Se è già la traccia selezionata, non fare nulla
+    if (trackIndex === selectedAudioTrack) {
+      console.log('ℹ️ Traccia già selezionata, nessun cambio necessario');
+      setShowAudioMenu(false);
+      return;
+    }
+
     if (playerRef.current && playingItem) {
+      // Salva la posizione corrente
       const currentTime = playerRef.current.currentTime();
       console.log('⏸️ Salvo posizione corrente:', currentTime, 's');
+      seekToTimeRef.current = currentTime;
 
       // Distruggi il player corrente
       playerRef.current.dispose();
@@ -636,14 +632,6 @@ export default function App() {
       // Aggiorna la traccia selezionata - questo farà triggerare il useEffect che ricreerà il player
       setSelectedAudioTrack(trackIndex);
       setShowAudioMenu(false);
-
-      // Dopo che React ha aggiornato, ripristina la posizione
-      setTimeout(() => {
-        if (playerRef.current) {
-          playerRef.current.currentTime(currentTime);
-          console.log('▶️ Ripristinata posizione:', currentTime, 's');
-        }
-      }, 500);
     } else {
       setSelectedAudioTrack(trackIndex);
       setShowAudioMenu(false);
