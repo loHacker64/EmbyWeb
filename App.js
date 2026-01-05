@@ -527,16 +527,12 @@ export default function App() {
   const getVideoUrl = (item, audioStreamIndex = null) => {
     if (!item || !user) return '';
 
-    // Endpoint streaming Emby semplificato
-    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream?api_key=${API_KEY}`;
+    // Endpoint Emby: usa Download per ottenere il file originale
+    // Questo bypassa il transcoding e permette al browser di gestire le tracce
+    let url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
 
-    // Aggiungi la traccia audio selezionata se disponibile
-    if (audioStreamIndex !== null) {
-      url += `&AudioStreamIndex=${audioStreamIndex}`;
-    }
-
-    console.log('🎬 Video URL:', url);
-    console.log('📋 Item:', item.Name, '| 🎵 Audio Track:', audioStreamIndex);
+    console.log('🎬 Video URL (Download):', url);
+    console.log('📋 Item:', item.Name);
     return url;
   };
 
