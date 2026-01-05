@@ -395,7 +395,7 @@ export default function App() {
       const defaultTrack = italianTrack || audioStreams.find(t => t.isDefault) || audioStreams[0];
 
       if (defaultTrack) {
-        console.log('🎵 Traccia audio selezionata:', defaultTrack.displayLanguage);
+        console.log('🎵 Traccia audio selezionata:', defaultTrack.displayLanguage, '(index:', defaultTrack.index, ')');
         setSelectedAudioTrack(defaultTrack.index);
       } else {
         setSelectedAudioTrack(null);
@@ -409,6 +409,10 @@ export default function App() {
       } else {
         setSelectedSubtitleTrack(null);
       }
+
+      // IMPORTANTE: Aspetta che React aggiorni lo stato prima di aprire il player
+      // Questo assicura che il video parta con la traccia corretta
+      await new Promise(resolve => setTimeout(resolve, 100));
 
     } catch (error) {
       console.error('❌ Errore caricamento tracce:', error);
@@ -524,81 +528,49 @@ export default function App() {
     if (row) row.scrollBy({left: dir === 'left' ? -1000 : 1000, behavior:'smooth'});
   };
 
-  const getVideoUrl = (item) => {
+  const getVideoUrl = (item, audioIndex) => {
     if (!item || !user) return '';
 
-    // Usa stream con Static=true per ottenere il file originale senza transcoding
-    // Questo mantiene tutte le tracce audio/video intatte
-    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream?api_key=${API_KEY}&Static=true`;
+    // Costruisci URL base
+    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream.mkv?api_key=${API_KEY}`;
+
+    // Parametri per Direct Stream (no transcoding)
+    url += `&Static=true`;
+    url += `&MediaSourceId=${mediaSourceId || item.Id}`;
+    url += `&DeviceId=emby-web-player`;
+    url += `&PlaySessionId=emby-web-${item.Id}-${Date.now()}`;
+
+    // Specifica la traccia audio
+    if (audioIndex !== null && audioIndex !== undefined) {
+      url += `&AudioStreamIndex=${audioIndex}`;
+    }
+
+    console.log('🎬 Video URL:', url);
+    console.log('🎵 Audio index:', audioIndex);
 
     return url;
   };
 
   const changeAudioTrack = (trackIndex) => {
-    console.log('🎵 Cambio traccia audio a index:', trackIndex);
+    if (!videoRef.current) return;
 
-    if (!videoRef.current) {
-      console.warn('Video ref non disponibile');
-      return;
-    }
+    console.log('🎵 Cambio traccia audio da', selectedAudioTrack, 'a', trackIndex);
 
+    // Salva la posizione corrente
+    const savedTime = videoRef.current.currentTime;
+    const wasPaused = videoRef.current.paused;
+
+    // Aggiorna lo stato - questo ricaricherà il video con la nuova traccia
     setSelectedAudioTrack(trackIndex);
 
-    // Aspetta che il browser carichi le tracce audio
+    // Aspetta che React aggiorni e poi ripristina la posizione
     setTimeout(() => {
-      if (videoRef.current && videoRef.current.audioTracks) {
-        const totalTracks = videoRef.current.audioTracks.length;
-        console.log('🎵 Tracce audio HTML5 disponibili:', totalTracks);
-
-        if (totalTracks === 0) {
-          console.warn('❌ Nessuna traccia audio HTML5 trovata');
-          setShowAudioMenu(false);
-          return;
+      if (videoRef.current) {
+        videoRef.current.currentTime = savedTime;
+        if (!wasPaused) {
+          videoRef.current.play().catch(e => console.log('Autoplay bloccato:', e));
         }
-
-        // Trova la traccia Emby corrispondente
-        const embyTrack = audioTracks.find(t => t.index === trackIndex);
-        if (!embyTrack) {
-          console.warn('❌ Traccia Emby non trovata:', trackIndex);
-          setShowAudioMenu(false);
-          return;
-        }
-
-        // Prova a trovare la traccia HTML5 per lingua
-        let trackFound = false;
-        for (let i = 0; i < totalTracks; i++) {
-          const htmlTrack = videoRef.current.audioTracks[i];
-
-          // Match per lingua
-          if (htmlTrack.language && embyTrack.language &&
-              htmlTrack.language.toLowerCase().includes(embyTrack.language.toLowerCase())) {
-            // Disabilita tutte
-            for (let j = 0; j < totalTracks; j++) {
-              videoRef.current.audioTracks[j].enabled = false;
-            }
-            // Abilita questa
-            htmlTrack.enabled = true;
-            console.log('✅ Traccia audio cambiata:', embyTrack.displayLanguage, '(match lingua)');
-            trackFound = true;
-            break;
-          }
-        }
-
-        // Se non trovata per lingua, usa l'indice
-        if (!trackFound) {
-          const trackIndex = audioTracks.indexOf(embyTrack);
-          if (trackIndex >= 0 && trackIndex < totalTracks) {
-            for (let j = 0; j < totalTracks; j++) {
-              videoRef.current.audioTracks[j].enabled = false;
-            }
-            videoRef.current.audioTracks[trackIndex].enabled = true;
-            console.log('✅ Traccia audio cambiata:', embyTrack.displayLanguage, '(match indice)');
-          } else {
-            console.warn('❌ Indice traccia non valido:', trackIndex, '/', totalTracks);
-          }
-        }
-      } else {
-        console.warn('❌ API audioTracks non disponibile nel browser');
+        console.log('✅ Traccia cambiata, ripristinato a', Math.floor(savedTime), 's');
       }
     }, 500);
 
@@ -1015,9 +987,10 @@ export default function App() {
         <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
           {/* Video Element - Completamente riscritto */}
           <video
+            key={`video-${playingItem.Id}-audio-${selectedAudioTrack}`}
             ref={videoRef}
             className="w-full h-full object-contain"
-            src={getVideoUrl(playingItem)}
+            src={getVideoUrl(playingItem, selectedAudioTrack)}
             autoPlay
             onClick={togglePlay}
             onTimeUpdate={()=>{
@@ -1026,36 +999,13 @@ export default function App() {
             onLoadedMetadata={()=>{
               if(videoRef.current){
                 setDuration(videoRef.current.duration);
-                console.log('✅ Video caricato:', playingItem.Name);
+                console.log('✅ Video caricato con audio index:', selectedAudioTrack);
                 console.log('⏱️ Durata:', Math.floor(videoRef.current.duration/60), 'minuti');
-
-                // Auto-seleziona la traccia italiana
-                if (videoRef.current.audioTracks && videoRef.current.audioTracks.length > 0) {
-                  console.log('🎵 Tracce audio HTML5 rilevate:', videoRef.current.audioTracks.length);
-
-                  const italianTrack = audioTracks.find(t => t.language === 'ita' || t.language === 'it');
-                  if (italianTrack) {
-                    const italianIndex = audioTracks.indexOf(italianTrack);
-
-                    // Disabilita tutte le tracce
-                    for (let i = 0; i < videoRef.current.audioTracks.length; i++) {
-                      videoRef.current.audioTracks[i].enabled = false;
-                    }
-
-                    // Abilita la traccia italiana
-                    if (videoRef.current.audioTracks[italianIndex]) {
-                      videoRef.current.audioTracks[italianIndex].enabled = true;
-                      console.log('✅ Audio italiano auto-selezionato');
-                    }
-                  }
-                } else {
-                  console.warn('⚠️ API audioTracks non disponibile - audio non modificabile');
-                }
               }
             }}
             onError={(e)=>{
               console.error('❌ ERRORE RIPRODUZIONE');
-              console.error('URL tentato:', getVideoUrl(playingItem));
+              console.error('URL tentato:', getVideoUrl(playingItem, selectedAudioTrack));
               if(videoRef.current?.error){
                 console.error('Codice errore:', videoRef.current.error.code);
                 console.error('Messaggio:', videoRef.current.error.message);
