@@ -6,19 +6,28 @@ import 'video.js/dist/video-js.css';
 const EMBY_SERVER = 'http://192.168.1.100:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
 
+// Genera UUID compatibile con tutti i browser
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 // Genera o recupera DeviceId persistente
 const getDeviceId = () => {
   let deviceId = localStorage.getItem('emby_device_id');
   if (!deviceId) {
-    deviceId = crypto.randomUUID();
+    deviceId = generateUUID();
     localStorage.setItem('emby_device_id', deviceId);
   }
   return deviceId;
 };
 
-// Genera nuovo PlaySessionId per ogni playback
+// Genera nuovo PlaySessionId per ogni playback (senza trattini)
 const generatePlaySessionId = () => {
-  return crypto.randomUUID().replace(/-/g, '');
+  return generateUUID().replace(/-/g, '');
 };
 
 const DEVICE_ID = getDeviceId();
