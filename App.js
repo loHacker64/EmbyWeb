@@ -527,9 +527,9 @@ export default function App() {
   const getVideoUrl = (item) => {
     if (!item || !user) return '';
 
-    // Usa l'endpoint Download che fornisce il file originale
-    // Il browser gestirà le tracce audio/video nativamente
-    let url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
+    // Usa stream con Static=true per ottenere il file originale senza transcoding
+    // Questo mantiene tutte le tracce audio/video intatte
+    let url = `${EMBY_SERVER}/Videos/${item.Id}/stream?api_key=${API_KEY}&Static=true`;
 
     return url;
   };
