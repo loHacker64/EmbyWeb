@@ -80,6 +80,7 @@ export default function App() {
   const [mediaSourceId, setMediaSourceId] = useState(null);
   const [playSessionId, setPlaySessionId] = useState(null);
   const [isDraggingTimeline, setIsDraggingTimeline] = useState(false);
+  const [startTimeTicks, setStartTimeTicks] = useState(0); // Per seeking fluido e cambio traccia
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
@@ -373,11 +374,48 @@ export default function App() {
     setEpisodes([]);
   };
 
-  const startPlay = async (item) => {
+  const startPlay = async (item, resumePositionTicks = 0) => {
     console.log('🎬 Starting playback for:', item.Name);
 
-    // Carica le tracce audio dal server Emby
+    // STEP 1: Chiama PlaybackInfo API per ottenere MediaSourceId e info transcodifica
     try {
+      const playbackInfoRes = await fetch(
+        `${EMBY_SERVER}/Items/${item.Id}/PlaybackInfo?UserId=${user.User.Id}&api_key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Emby-Token': user.AccessToken
+          },
+          body: JSON.stringify({
+            DeviceProfile: {
+              MaxStreamingBitrate: 199680000,
+              MaxStaticBitrate: 199680000,
+              MusicStreamingTranscodingBitrate: 320000,
+              DirectPlayProfiles: [
+                { Container: 'mp4,m4v', Type: 'Video', VideoCodec: 'h264,hevc,av1', AudioCodec: 'aac,mp3,ac3,eac3' },
+                { Container: 'mkv', Type: 'Video', VideoCodec: 'h264,hevc,av1', AudioCodec: 'aac,mp3,ac3,eac3,dts' }
+              ],
+              TranscodingProfiles: [
+                { Container: 'ts', Type: 'Video', VideoCodec: 'h264,hevc', AudioCodec: 'aac,mp3,ac3', Protocol: 'hls' }
+              ],
+              CodecProfiles: [],
+              SubtitleProfiles: []
+            }
+          })
+        }
+      );
+      const playbackInfo = await playbackInfoRes.json();
+      console.log('📊 PlaybackInfo ricevuto:', playbackInfo);
+
+      // Ottieni il MediaSource dalla risposta
+      const mediaSource = playbackInfo.MediaSources?.[0];
+      if (mediaSource) {
+        setMediaSourceId(mediaSource.Id);
+        console.log('✅ MediaSourceId:', mediaSource.Id);
+      }
+
+      // STEP 2: Carica le tracce audio dal server Emby
       const res = await fetch(
         `${EMBY_SERVER}/Users/${user.User.Id}/Items/${item.Id}?Fields=MediaSources,MediaStreams&api_key=${API_KEY}`,
         { headers: { 'X-Emby-Token': user.AccessToken } }
@@ -455,6 +493,10 @@ export default function App() {
       setSelectedSubtitleTrack(null);
     }
 
+    // Imposta StartTimeTicks per seeking fluido (se vogliamo riprendere da una posizione specifica)
+    setStartTimeTicks(resumePositionTicks);
+    console.log('⏱️ StartTimeTicks impostato a:', resumePositionTicks, '(', resumePositionTicks / 10000000, 's)');
+
     setPlayingItem(item);
     setIsPlaying(true);
   };
@@ -482,11 +524,17 @@ export default function App() {
         TranscodingMaxAudioChannels: '2',
         SegmentContainer: 'ts',
         MinSegments: '1',
-        BreakOnNonKeyFrames: 'False',
+        BreakOnNonKeyFrames: 'True', // TRUE per seeking fluido!
         'h264-profile': 'high,main,baseline,constrainedbaseline,high10',
         'h264-level': '62',
         'hevc-codectag': 'hvc1,hev1,hevc,hdmv'
       });
+
+      // Aggiungi StartTimeTicks se vogliamo iniziare da una posizione specifica
+      if (startTimeTicks > 0) {
+        params.set('StartTimeTicks', startTimeTicks.toString());
+        console.log('⏱️ HLS con StartTimeTicks:', startTimeTicks, '(', startTimeTicks / 10000000, 's)');
+      }
 
       const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/master.m3u8?${params.toString()}`;
       console.log('🎬 HLS COMPLETO come Emby ufficiale');
@@ -519,15 +567,13 @@ export default function App() {
         setDuration(durationFromEmby);
         console.log('✅ Video.js caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
 
-        // Con Direct Play + AudioStreamIndex, Emby demultiplexa solo la traccia richiesta
-        // Il file avrà già l'audio corretto (italiano se selectedAudioTrack=2)
-        console.log('✅ Stream caricato con AudioStreamIndex:', selectedAudioTrack);
-
-        // Ripristina posizione se stavamo cambiando traccia audio
-        if (seekToTimeRef.current !== null) {
-          player.currentTime(seekToTimeRef.current);
-          console.log('▶️ Ripristinata posizione:', seekToTimeRef.current, 's');
-          seekToTimeRef.current = null;
+        // Con HLS + AudioStreamIndex + StartTimeTicks:
+        // - Emby genera segmenti HLS con solo la traccia audio richiesta
+        // - Il video parte già dalla posizione corretta (StartTimeTicks)
+        // - Nessun seeking lato client necessario!
+        console.log('✅ Stream HLS caricato con AudioStreamIndex:', selectedAudioTrack);
+        if (startTimeTicks > 0) {
+          console.log('✅ Video ripreso da StartTimeTicks:', startTimeTicks / 10000000, 's');
         }
 
         // Notifica Emby
@@ -599,6 +645,7 @@ export default function App() {
     setShowSubtitleMenu(false);
     setMediaSourceId(null);
     setPlaySessionId(null);
+    setStartTimeTicks(0); // Reset StartTimeTicks per il prossimo video
   };
 
   const togglePlay = () => {
@@ -688,19 +735,24 @@ export default function App() {
     }
 
     if (playerRef.current && playingItem) {
-      // Con Direct Play + AudioStreamIndex, dobbiamo ricaricare il player
-      // per ottenere un nuovo stream con la traccia audio diversa
+      // PROTOCOLLO EMBY: Seamless Audio Track Switching con StartTimeTicks
 
-      // Salva la posizione corrente
-      const currentTime = playerRef.current.currentTime();
-      console.log('⏸️ Salvo posizione corrente:', currentTime, 's');
-      seekToTimeRef.current = currentTime;
+      // Salva la posizione corrente e convertila in Ticks (1 secondo = 10,000,000 ticks)
+      const currentTimeSeconds = playerRef.current.currentTime();
+      const resumePositionTicks = Math.floor(currentTimeSeconds * 10000000);
+      console.log('⏸️ Salvo posizione corrente:', currentTimeSeconds, 's (', resumePositionTicks, 'ticks)');
+
+      // Imposta StartTimeTicks per riprendere dalla stessa posizione con la nuova traccia
+      setStartTimeTicks(resumePositionTicks);
 
       // Distruggi il player corrente
       playerRef.current.dispose();
       playerRef.current = null;
 
-      // Aggiorna la traccia selezionata - questo farà triggerare il useEffect che ricreerà il player
+      // Aggiorna la traccia selezionata - il useEffect ricreerà il player con:
+      // - Nuovo AudioStreamIndex
+      // - StartTimeTicks dalla posizione corrente
+      // - Nuovo PlaySessionId
       setSelectedAudioTrack(trackIndex);
       setShowAudioMenu(false);
     } else {
@@ -746,7 +798,7 @@ export default function App() {
 
   // Notifica Emby dell'inizio della riproduzione
   const reportPlaybackStart = async (item) => {
-    if (!user || !item) return;
+    if (!user || !item || !playSessionId) return;
 
     try {
       const response = await fetch(`${EMBY_SERVER}/Sessions/Playing`, {
@@ -758,13 +810,13 @@ export default function App() {
         body: JSON.stringify({
           ItemId: item.Id,
           MediaSourceId: mediaSourceId || item.Id,
-          PositionTicks: 0,
+          PositionTicks: startTimeTicks,
           IsPaused: false,
           IsMuted: false,
           AudioStreamIndex: selectedAudioTrack,
           SubtitleStreamIndex: selectedSubtitleTrack,
-          PlayMethod: 'DirectPlay',
-          PlaySessionId: `web-${item.Id}-${Date.now()}`
+          PlayMethod: 'Transcode', // HLS è sempre Transcode
+          PlaySessionId: playSessionId // Usa lo stesso PlaySessionId dell'HLS!
         })
       });
 
@@ -780,7 +832,7 @@ export default function App() {
 
   // Aggiorna il progresso di riproduzione
   const reportPlaybackProgress = async (item, positionMs) => {
-    if (!user || !item) return;
+    if (!user || !item || !playSessionId) return;
 
     const positionTicks = Math.floor(positionMs * 10000); // Converti ms in ticks (1ms = 10000 ticks)
 
@@ -799,8 +851,8 @@ export default function App() {
           IsMuted: isMuted,
           AudioStreamIndex: selectedAudioTrack,
           SubtitleStreamIndex: selectedSubtitleTrack,
-          PlayMethod: 'DirectStream',
-          PlaySessionId: `web-${Date.now()}`
+          PlayMethod: 'Transcode', // HLS è sempre Transcode
+          PlaySessionId: playSessionId // Usa lo stesso PlaySessionId dell'HLS!
         })
       });
       console.log('📊 Progresso aggiornato:', Math.floor(positionMs / 1000), 's');
