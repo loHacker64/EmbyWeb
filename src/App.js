@@ -681,12 +681,18 @@ export default function App() {
   };
 
   const toggleFull = () => {
-    if (playerRef.current) {
-      if (playerRef.current.isFullscreen()) {
-        playerRef.current.exitFullscreen();
-      } else {
-        playerRef.current.requestFullscreen();
-      }
+    const container = document.getElementById('player-container');
+    if (!container) return;
+
+    if (document.fullscreenElement) {
+      // Esci da fullscreen
+      document.exitFullscreen();
+    } else {
+      // Entra in fullscreen sul container (non sul video!)
+      // Questo nasconde i controlli nativi del browser
+      container.requestFullscreen().catch(err => {
+        console.error('Errore fullscreen:', err);
+      });
     }
   };
 
@@ -1170,69 +1176,96 @@ export default function App() {
       )}
 
       {playingItem && (
-        <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
+        <div
+          id="player-container"
+          className="fixed inset-0 z-[200] bg-black flex items-center justify-center"
+          onMouseMove={showCtrls}
+        >
           {/* Video.js Player */}
-          <div data-vjs-player className="w-full h-full">
+          <div data-vjs-player className="w-full h-full relative">
             <video
               ref={videoRef}
-              className="video-js vjs-big-play-centered w-full h-full"
+              className="video-js vjs-big-play-centered w-full h-full object-contain"
               onClick={togglePlay}
+              playsInline
+              disablePictureInPicture
             >
             </video>
           </div>
 
-          {/* Indicatore Skip +10/-10 secondi */}
+          {/* Indicatore Skip +10/-10 secondi - Premium */}
           {showSkipIndicator && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-black/90 backdrop-blur-2xl rounded-2xl px-8 py-6 border border-emerald-500/30">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+              <div className="bg-black/80 backdrop-blur-3xl rounded-3xl px-10 py-8 border border-emerald-500/40 shadow-2xl shadow-emerald-500/30 animate-pulse">
                 {showSkipIndicator > 0 ? (
-                  <div className="flex items-center gap-4">
-                    <RotateCw className="w-10 h-10 text-emerald-400"/>
-                    <span className="text-2xl font-bold text-white">+10s</span>
+                  <div className="flex items-center gap-5">
+                    <div className="relative">
+                      <RotateCw className="w-14 h-14 text-emerald-400"/>
+                      <div className="absolute inset-0 bg-emerald-400 blur-2xl opacity-50"></div>
+                    </div>
+                    <span className="text-4xl font-black text-white drop-shadow-2xl">+10s</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-4">
-                    <RotateCcw className="w-10 h-10 text-emerald-400"/>
-                    <span className="text-2xl font-bold text-white">-10s</span>
+                  <div className="flex items-center gap-5">
+                    <div className="relative">
+                      <RotateCcw className="w-14 h-14 text-emerald-400"/>
+                      <div className="absolute inset-0 bg-emerald-400 blur-2xl opacity-50"></div>
+                    </div>
+                    <span className="text-4xl font-black text-white drop-shadow-2xl">-10s</span>
                   </div>
                 )}
               </div>
             </div>
           )}
 
-          {/* Controlli Video - Design completamente nuovo */}
-          <div className={`absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/95 transition-opacity duration-500 ${showControls?'opacity-100':'opacity-0 pointer-events-none'}`}>
+          {/* Controlli Video - Design Premium Glassmorphism */}
+          <div className={`absolute inset-0 bg-gradient-to-b from-black/90 via-transparent via-50% to-black/95 transition-all duration-700 ${showControls?'opacity-100':'opacity-0 pointer-events-none'}`}>
 
             {/* Header - Titolo e chiudi */}
-            <div className="absolute top-0 left-0 right-0 p-8">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-white drop-shadow-2xl mb-2">
+            <div className="absolute top-0 left-0 right-0 p-6 md:p-10">
+              <div className="flex items-start justify-between backdrop-blur-md bg-black/20 rounded-3xl p-6 border border-white/10 shadow-2xl">
+                <div className="flex-1 pr-4">
+                  <h2 className="text-2xl md:text-4xl font-black text-white drop-shadow-2xl mb-2 tracking-tight">
                     {playingItem.SeriesName || playingItem.Name}
                   </h2>
                   {playingItem.SeriesName && (
-                    <p className="text-lg text-gray-300 drop-shadow-lg">
-                      S{playingItem.ParentIndexNumber} · E{playingItem.IndexNumber} · {playingItem.Name}
+                    <p className="text-base md:text-xl text-gray-200/90 drop-shadow-lg font-medium">
+                      <span className="text-emerald-400">S{playingItem.ParentIndexNumber}</span>
+                      <span className="mx-2 text-emerald-400/50">·</span>
+                      <span className="text-emerald-400">E{playingItem.IndexNumber}</span>
+                      <span className="mx-2 text-emerald-400/50">·</span>
+                      <span>{playingItem.Name}</span>
                     </p>
                   )}
                 </div>
                 <button
                   onClick={closePlayer}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                  className="bg-white/5 hover:bg-red-500/20 backdrop-blur-2xl rounded-2xl p-4 transition-all duration-300 hover:scale-110 border border-white/10 hover:border-red-500/30 group shadow-xl"
                 >
-                  <X className="w-7 h-7"/>
+                  <X className="w-7 h-7 group-hover:text-red-400 transition-colors"/>
                 </button>
               </div>
             </div>
 
             {/* Footer - Controlli completi */}
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <div className="space-y-6">
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+              <div className="backdrop-blur-2xl bg-black/30 rounded-3xl p-6 md:p-8 border border-white/10 shadow-2xl space-y-6">
 
-                {/* Progress Bar */}
+                {/* Progress Bar Premium */}
                 <div className="relative group/progress">
+                  {/* Time Display sopra la barra */}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm md:text-base font-bold text-white tabular-nums bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">
+                      {formatTime(currentTime)}
+                    </span>
+                    <span className="text-sm md:text-base font-bold text-gray-400 tabular-nums bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">
+                      {formatTime(duration)}
+                    </span>
+                  </div>
+
+                  {/* Barra di progresso */}
                   <div
-                    className="h-2 bg-white/20 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden"
+                    className="h-3 bg-white/10 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden transition-all duration-300 group-hover/progress:h-4 shadow-inner"
                     onMouseDown={e => {
                       setIsDraggingTimeline(true);
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -1256,57 +1289,59 @@ export default function App() {
                     onMouseLeave={() => setIsDraggingTimeline(false)}
                   >
                     <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-full relative transition-all"
+                      className="h-full bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400 rounded-full relative transition-all shadow-lg shadow-emerald-500/50"
                       style={{width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`}}
                     >
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-xl opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
+                      {/* Thumb */}
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-2xl opacity-0 group-hover/progress:opacity-100 transition-all duration-300 ring-4 ring-emerald-400/50 scale-0 group-hover/progress:scale-100"></div>
+                      {/* Glow effect */}
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 bg-emerald-400 rounded-full blur-xl opacity-0 group-hover/progress:opacity-60 transition-opacity"></div>
                     </div>
-                  </div>
-
-                  {/* Time Display */}
-                  <div className="flex justify-between items-center mt-3">
-                    <span className="text-sm font-medium text-gray-300">{formatTime(currentTime)}</span>
-                    <span className="text-sm font-medium text-gray-300">{formatTime(duration)}</span>
                   </div>
                 </div>
 
                 {/* Controlli principali */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-4">
 
                   {/* Lato sinistro - Play/Pause e Skip */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 md:gap-4">
 
-                    {/* Play/Pause - Grande e centrale */}
+                    {/* Play/Pause - Premium con glow */}
                     <button
                       onClick={togglePlay}
-                      className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 rounded-full p-4 transition-all transform hover:scale-110 shadow-2xl"
+                      className="relative bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 rounded-full p-5 transition-all transform hover:scale-110 shadow-2xl shadow-emerald-500/50 group"
                     >
+                      {/* Glow ring */}
+                      <div className="absolute inset-0 rounded-full bg-emerald-400 blur-xl opacity-0 group-hover:opacity-60 transition-opacity -z-10"></div>
                       {isPlaying ?
-                        <Pause className="w-8 h-8 text-white"/> :
-                        <Play className="w-8 h-8 text-white fill-current"/>
+                        <Pause className="w-7 h-7 md:w-9 md:h-9 text-white"/> :
+                        <Play className="w-7 h-7 md:w-9 md:h-9 text-white fill-current ml-1"/>
                       }
                     </button>
 
                     {/* Skip -10s */}
                     <button
                       onClick={()=>skip(-10)}
-                      className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                      className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                     >
-                      <RotateCcw className="w-6 h-6"/>
+                      <RotateCcw className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                     </button>
 
                     {/* Skip +10s */}
                     <button
                       onClick={()=>skip(10)}
-                      className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                      className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                     >
-                      <RotateCw className="w-6 h-6"/>
+                      <RotateCw className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                     </button>
 
                     {/* Volume Controls */}
-                    <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl rounded-full px-4 py-2 border border-white/20">
-                      <button onClick={toggleMute} className="hover:text-emerald-400 transition-colors">
-                        {isMuted ? <VolumeX className="w-5 h-5"/> : <Volume2 className="w-5 h-5"/>}
+                    <div className="flex items-center gap-3 bg-white/5 backdrop-blur-xl rounded-2xl px-5 py-3 border border-white/10 shadow-xl">
+                      <button onClick={toggleMute} className="hover:text-emerald-400 transition-colors group">
+                        {isMuted ?
+                          <VolumeX className="w-5 h-5 md:w-6 md:h-6"/> :
+                          <Volume2 className="w-5 h-5 md:w-6 md:h-6"/>
+                        }
                       </button>
                       <input
                         type="range"
@@ -1315,21 +1350,24 @@ export default function App() {
                         step="0.01"
                         value={volume}
                         onChange={handleVolume}
-                        className="w-24 accent-emerald-500 cursor-pointer"
+                        className="w-20 md:w-28 h-2 accent-emerald-500 cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, rgb(16 185 129) 0%, rgb(16 185 129) ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%, rgba(255,255,255,0.1) 100%)`
+                        }}
                       />
                     </div>
                   </div>
 
                   {/* Lato destro - Audio e Fullscreen */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 md:gap-4">
                     {/* Selezione traccia audio */}
                     {audioTracks.length > 1 && (
                       <div className="relative">
                         <button
                           onClick={() => setShowAudioMenu(!showAudioMenu)}
-                          className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20 flex items-center gap-2"
+                          className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                         >
-                          <Languages className="w-6 h-6"/>
+                          <Languages className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                         </button>
 
                         {/* Menu dropdown tracce audio */}
@@ -1376,9 +1414,9 @@ export default function App() {
                       <div className="relative">
                         <button
                           onClick={() => setShowSubtitleMenu(!showSubtitleMenu)}
-                          className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20 flex items-center gap-2"
+                          className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                         >
-                          <Subtitles className="w-6 h-6"/>
+                          <Subtitles className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                         </button>
 
                         {/* Menu dropdown sottotitoli */}
@@ -1443,9 +1481,9 @@ export default function App() {
                     {/* Fullscreen */}
                     <button
                       onClick={toggleFull}
-                      className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full p-3 transition-all hover:scale-110 border border-white/20"
+                      className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                     >
-                      <Maximize className="w-6 h-6"/>
+                      <Maximize className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                     </button>
                   </div>
                 </div>

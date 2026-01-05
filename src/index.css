@@ -32,3 +32,97 @@ body {
 .hero-transition {
   transition: opacity 1000ms ease-in-out, transform 1000ms ease-in-out;
 }
+
+/* Nasconde COMPLETAMENTE i controlli nativi del video in tutti i browser */
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-timeline {
+  display: none !important;
+}
+
+video::-webkit-media-controls-current-time-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-time-remaining-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+}
+
+video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+}
+
+/* Nasconde controlli nativi anche in fullscreen */
+video::-webkit-full-page-media::-webkit-media-controls {
+  display: none !important;
+}
+
+/* Disabilita il context menu del video */
+video {
+  pointer-events: auto;
+}
+
+video::cue {
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+/* Video.js custom styling per un look premium */
+.video-js {
+  background-color: #000 !important;
+}
+
+.video-js .vjs-big-play-button {
+  display: none !important; /* Nascondi il pulsante play centrale di Video.js */
+}
+
+.video-js .vjs-control-bar {
+  display: none !important; /* Nascondi completamente la barra dei controlli di Video.js */
+}
+
+.video-js .vjs-loading-spinner {
+  border-color: rgba(16, 185, 129, 0.8) rgba(16, 185, 129, 0.2) rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
