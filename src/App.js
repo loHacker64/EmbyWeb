@@ -435,18 +435,21 @@ export default function App() {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Video.js player con audio track:', selectedAudioTrack);
 
-      // Usa endpoint stream con transcode SOLO audio (video in copy)
-      // Questo permette di selezionare la traccia audio corretta
+      // Usa HLS streaming per supportare seeking con transcode audio
+      // HLS crea segmenti che permettono il seeking anche con transcode
       const params = new URLSearchParams({
         MediaSourceId: mediaSourceId || playingItem.Id,
         AudioStreamIndex: selectedAudioTrack,
         VideoCodec: 'copy',
         AudioCodec: 'aac',
         AudioBitrate: '192000',
+        SegmentContainer: 'ts',
+        MinSegments: 2,
+        BreakOnNonKeyFrames: true,
         api_key: API_KEY
       });
-      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
-      console.log('🎬 Stream URL con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/master.m3u8?${params.toString()}`;
+      console.log('🎬 HLS Stream URL con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
       console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
@@ -454,9 +457,16 @@ export default function App() {
         autoplay: true,
         preload: 'auto',
         fluid: true,
+        html5: {
+          vhs: {
+            overrideNative: true
+          },
+          nativeAudioTracks: false,
+          nativeVideoTracks: false
+        },
         sources: [{
           src: videoUrl,
-          type: 'video/mp4'
+          type: 'application/x-mpegURL'
         }]
       });
 
