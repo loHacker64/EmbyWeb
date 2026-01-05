@@ -1129,37 +1129,9 @@ export default function App() {
                       const percentage = x / rect.width;
                       const seekToTime = percentage * duration;
 
-                      if(playerRef.current && duration && seekToTime) {
+                      if(playerRef.current && duration && seekToTime >= 0) {
                         console.log('🎯 Seeking a:', Math.floor(seekToTime), 's (' + Math.floor(seekToTime/60) + ' min)');
-
-                        // Con stream transcodato, dobbiamo riavviare lo stream dalla nuova posizione
-                        // Salva la posizione corrente
-                        const wasPlaying = !playerRef.current.paused();
-
-                        // Riavvia lo stream con StartTimeTicks per partire dalla posizione corretta
-                        const startTimeTicks = Math.floor(seekToTime * 10000000);
-                        const params = new URLSearchParams({
-                          MediaSourceId: mediaSourceId || playingItem.Id,
-                          AudioStreamIndex: selectedAudioTrack,
-                          VideoCodec: 'copy',
-                          AudioCodec: 'aac',
-                          AudioBitrate: '192000',
-                          StartTimeTicks: startTimeTicks,
-                          api_key: API_KEY
-                        });
-                        const newUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
-
-                        console.log('🔄 Riavvio stream da posizione:', Math.floor(seekToTime/60), 'min', Math.floor(seekToTime%60), 's');
-
-                        // Cambia sorgente del player
-                        playerRef.current.src({
-                          src: newUrl,
-                          type: 'video/mp4'
-                        });
-
-                        if (wasPlaying) {
-                          playerRef.current.play();
-                        }
+                        playerRef.current.currentTime(seekToTime);
                       }
                     }}
                   >
