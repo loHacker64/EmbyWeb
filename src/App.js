@@ -60,6 +60,7 @@ export default function App() {
   const seriesGridRef = useRef(null);
   const progressIntervalRef = useRef(null);
   const seekToTimeRef = useRef(null);
+  const streamStartTimeRef = useRef(0); // Traccia il tempo di inizio dello stream per il seeking
 
   useEffect(() => {
     if (featuredItems.length > 0) {
@@ -435,15 +436,21 @@ export default function App() {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Video.js player per direct play');
 
-      // AudioStreamIndex senza Static: Emby usa ffmpeg per demux della traccia corretta
-      // Nessun transcode (solo remux), seeking dovrebbe funzionare
+      // Resetta l'offset di tempo all'inizio del playback
+      streamStartTimeRef.current = 0;
+
+      // Audio transcodato per selezione traccia italiana
+      // Video in copy per massima qualità e velocità
       const params = new URLSearchParams({
         MediaSourceId: mediaSourceId || playingItem.Id,
         AudioStreamIndex: selectedAudioTrack,
+        VideoCodec: 'copy',
+        AudioCodec: 'aac',
+        AudioBitrate: '192000',
         api_key: API_KEY
       });
-      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?${params.toString()}`;
-      console.log('🎬 Stream URL con AudioIndex (remux):', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
+      console.log('🎬 Stream URL (.mp4) con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
       console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
@@ -481,7 +488,9 @@ export default function App() {
       });
 
       player.on('timeupdate', () => {
-        setCurrentTime(player.currentTime());
+        // Somma l'offset di inizio stream per mostrare il tempo assoluto
+        const absoluteTime = player.currentTime() + streamStartTimeRef.current;
+        setCurrentTime(absoluteTime);
       });
 
       player.on('error', (e) => {
@@ -555,9 +564,33 @@ export default function App() {
   };
 
   const skip = (sec) => {
-    if (playerRef.current) {
-      const newTime = playerRef.current.currentTime() + sec;
-      playerRef.current.currentTime(newTime);
+    if (playerRef.current && playingItem) {
+      // Calcola il nuovo tempo assoluto nel video
+      const currentAbsoluteTime = playerRef.current.currentTime() + streamStartTimeRef.current;
+      const newAbsoluteTime = Math.max(0, Math.min(currentAbsoluteTime + sec, duration));
+
+      console.log('⏩ Skip', sec, 's - da', Math.floor(currentAbsoluteTime), 's a', Math.floor(newAbsoluteTime), 's');
+
+      // Riavvia lo stream dalla nuova posizione
+      const startTimeTicks = Math.floor(newAbsoluteTime * 10000000);
+      const params = new URLSearchParams({
+        MediaSourceId: mediaSourceId || playingItem.Id,
+        AudioStreamIndex: selectedAudioTrack,
+        VideoCodec: 'copy',
+        AudioCodec: 'aac',
+        AudioBitrate: '192000',
+        StartTimeTicks: startTimeTicks,
+        api_key: API_KEY
+      });
+      const newUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
+
+      streamStartTimeRef.current = newAbsoluteTime;
+      playerRef.current.src({
+        src: newUrl,
+        type: 'video/mp4'
+      });
+      playerRef.current.play();
+
       setShowSkipIndicator(sec);
       if (skipTimeoutRef.current) clearTimeout(skipTimeoutRef.current);
       skipTimeoutRef.current = setTimeout(() => setShowSkipIndicator(null), 2000);
@@ -1131,9 +1164,31 @@ export default function App() {
                       const percentage = x / rect.width;
                       const seekToTime = percentage * duration;
 
-                      if(playerRef.current && duration && seekToTime >= 0) {
+                      if(playerRef.current && playingItem && duration && seekToTime >= 0) {
                         console.log('🎯 Seeking a:', Math.floor(seekToTime), 's (' + Math.floor(seekToTime/60) + ' min)');
-                        playerRef.current.currentTime(seekToTime);
+
+                        // Con stream transcodato, riavvia lo stream dalla nuova posizione
+                        const startTimeTicks = Math.floor(seekToTime * 10000000);
+                        const params = new URLSearchParams({
+                          MediaSourceId: mediaSourceId || playingItem.Id,
+                          AudioStreamIndex: selectedAudioTrack,
+                          VideoCodec: 'copy',
+                          AudioCodec: 'aac',
+                          AudioBitrate: '192000',
+                          StartTimeTicks: startTimeTicks,
+                          api_key: API_KEY
+                        });
+                        const newUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
+
+                        console.log('🔄 Riavvio stream da:', Math.floor(seekToTime/60), 'min', Math.floor(seekToTime%60), 's');
+                        streamStartTimeRef.current = seekToTime;
+
+                        // Cambia sorgente del player
+                        playerRef.current.src({
+                          src: newUrl,
+                          type: 'video/mp4'
+                        });
+                        playerRef.current.play();
                       }
                     }}
                   >
