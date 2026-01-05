@@ -467,30 +467,18 @@ export default function App() {
       const newPlaySessionId = generatePlaySessionId();
       setPlaySessionId(newPlaySessionId);
 
-      // HLS con configurazione completa come Emby ufficiale
+      // HLS parametri essenziali - lascia che Emby decida il transcode
       const params = new URLSearchParams({
         DeviceId: DEVICE_ID,
         MediaSourceId: mediaSourceId || `mediasource_${playingItem.Id}`,
         PlaySessionId: newPlaySessionId,
-        api_key: API_KEY,
-        VideoCodec: 'hevc,h264,av1',
-        AudioCodec: 'ac3,mp3,aac',
-        VideoBitrate: '199680000',
-        AudioBitrate: '320000',
         AudioStreamIndex: selectedAudioTrack,
-        TranscodingMaxAudioChannels: '2',
-        SegmentContainer: 'ts',
-        MinSegments: '1',
-        BreakOnNonKeyFrames: 'False',
-        'h264-profile': 'high,main,baseline,constrainedbaseline,high10',
-        'h264-level': '62',
-        'hevc-codectag': 'hvc1,hev1,hevc,hdmv',
-        TranscodeReasons: 'SecondaryAudioNotSupported'
+        api_key: API_KEY
       });
 
       const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/master.m3u8?${params.toString()}`;
-      console.log('🎬 HLS URL completo con PlaySessionId:', newPlaySessionId);
-      console.log('🎬 AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      console.log('🎬 HLS URL semplificato - Emby deciderà il transcode');
+      console.log('🎬 PlaySessionId:', newPlaySessionId, 'AudioIndex:', selectedAudioTrack);
       console.log('🎬 URL:', videoUrl);
 
       const player = videojs(videoRef.current, {
