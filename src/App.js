@@ -431,8 +431,12 @@ export default function App() {
 
   // Inizializza video.js quando il player si apre
   useEffect(() => {
-    if (playingItem && videoRef.current && !playerRef.current) {
-      console.log('🎬 Inizializzo Video.js player');
+    if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
+      console.log('🎬 Inizializzo Video.js player con audio track:', selectedAudioTrack);
+
+      // Costruisci URL con la traccia audio corretta
+      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?Static=true&AudioStreamIndex=${selectedAudioTrack}&api_key=${API_KEY}`;
+      console.log('🎬 Video URL:', videoUrl);
 
       const player = videojs(videoRef.current, {
         controls: false,
@@ -440,7 +444,7 @@ export default function App() {
         preload: 'auto',
         fluid: true,
         sources: [{
-          src: getVideoUrl(playingItem),
+          src: videoUrl,
           type: 'video/mp4'
         }]
       });
@@ -510,7 +514,7 @@ export default function App() {
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [playingItem]);
+  }, [playingItem, selectedAudioTrack]);
 
   const closePlayer = () => {
     // Notifica Emby della fine della riproduzione
@@ -614,42 +618,36 @@ export default function App() {
 
   const getVideoUrl = (item) => {
     if (!item || !user) return '';
-
-    // URL semplice per download diretto - il browser userà la traccia default
-    const url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
-
-    return url;
+    // Funzione deprecata - l'URL viene costruito direttamente nel useEffect
+    return '';
   };
 
   const changeAudioTrack = (trackIndex) => {
     console.log('🎵 Cambio traccia audio a index:', trackIndex);
 
-    if (playerRef.current) {
-      const player = playerRef.current;
-      const audioTracks = player.audioTracks();
+    if (playerRef.current && playingItem) {
+      const currentTime = playerRef.current.currentTime();
+      console.log('⏸️ Salvo posizione corrente:', currentTime, 's');
 
-      if (audioTracks && audioTracks.length > 0) {
-        // Trova la traccia corrispondente
-        const embyTrack = audioTracks.find(t => t.language === 'ita' || t.language === 'it' || t.label.includes('Italian'));
+      // Distruggi il player corrente
+      playerRef.current.dispose();
+      playerRef.current = null;
 
-        // Disabilita tutte le tracce
-        for (let i = 0; i < audioTracks.length; i++) {
-          audioTracks[i].enabled = false;
+      // Aggiorna la traccia selezionata - questo farà triggerare il useEffect che ricreerà il player
+      setSelectedAudioTrack(trackIndex);
+      setShowAudioMenu(false);
+
+      // Dopo che React ha aggiornato, ripristina la posizione
+      setTimeout(() => {
+        if (playerRef.current) {
+          playerRef.current.currentTime(currentTime);
+          console.log('▶️ Ripristinata posizione:', currentTime, 's');
         }
-
-        // Trova l'indice corretto basandosi sull'index Emby
-        const targetIndex = audioTracks.indexOf(embyTrack) >= 0 ? audioTracks.indexOf(embyTrack) :
-                           (trackIndex === 2 ? 1 : 0); // Fallback
-
-        if (audioTracks[targetIndex]) {
-          audioTracks[targetIndex].enabled = true;
-          console.log('✅ Traccia audio cambiata a:', audioTracks[targetIndex].label || audioTracks[targetIndex].language);
-        }
-      }
+      }, 500);
+    } else {
+      setSelectedAudioTrack(trackIndex);
+      setShowAudioMenu(false);
     }
-
-    setSelectedAudioTrack(trackIndex);
-    setShowAudioMenu(false);
   };
 
   const changeSubtitleTrack = (trackIndex) => {
