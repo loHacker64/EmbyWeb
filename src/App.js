@@ -79,6 +79,7 @@ export default function App() {
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
   const [mediaSourceId, setMediaSourceId] = useState(null);
   const [playSessionId, setPlaySessionId] = useState(null);
+  const [isDraggingTimeline, setIsDraggingTimeline] = useState(false);
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
@@ -467,17 +468,28 @@ export default function App() {
       const newPlaySessionId = generatePlaySessionId();
       setPlaySessionId(newPlaySessionId);
 
-      // HLS parametri essenziali - lascia che Emby decida il transcode
+      // HLS COMPLETO esattamente come Emby ufficiale
       const params = new URLSearchParams({
         DeviceId: DEVICE_ID,
         MediaSourceId: mediaSourceId || `mediasource_${playingItem.Id}`,
         PlaySessionId: newPlaySessionId,
+        api_key: API_KEY,
+        VideoCodec: 'hevc,h264,av1',
+        AudioCodec: 'ac3,mp3,aac',
+        VideoBitrate: '199680000',
+        AudioBitrate: '320000',
         AudioStreamIndex: selectedAudioTrack,
-        api_key: API_KEY
+        TranscodingMaxAudioChannels: '2',
+        SegmentContainer: 'ts',
+        MinSegments: '1',
+        BreakOnNonKeyFrames: 'False',
+        'h264-profile': 'high,main,baseline,constrainedbaseline,high10',
+        'h264-level': '62',
+        'hevc-codectag': 'hvc1,hev1,hevc,hdmv'
       });
 
       const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/master.m3u8?${params.toString()}`;
-      console.log('🎬 HLS URL semplificato - Emby deciderà il transcode');
+      console.log('🎬 HLS COMPLETO come Emby ufficiale');
       console.log('🎬 PlaySessionId:', newPlaySessionId, 'AudioIndex:', selectedAudioTrack);
       console.log('🎬 URL:', videoUrl);
 
@@ -1169,18 +1181,27 @@ export default function App() {
                 <div className="relative group/progress">
                   <div
                     className="h-2 bg-white/20 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden"
-                    onClick={e=>{
+                    onMouseDown={e => {
+                      setIsDraggingTimeline(true);
                       const rect = e.currentTarget.getBoundingClientRect();
                       const x = e.clientX - rect.left;
-                      const percentage = x / rect.width;
+                      const percentage = Math.max(0, Math.min(1, x / rect.width));
                       const seekToTime = percentage * duration;
-
-                      if(playerRef.current && duration && seekToTime >= 0) {
-                        console.log('🎯 Seeking a:', Math.floor(seekToTime), 's (' + Math.floor(seekToTime/60) + ' min)');
-                        // Con HLS, Video.js gestisce il seeking automaticamente
+                      if(playerRef.current && duration) {
                         playerRef.current.currentTime(seekToTime);
                       }
                     }}
+                    onMouseMove={e => {
+                      if(isDraggingTimeline && playerRef.current && duration) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const percentage = Math.max(0, Math.min(1, x / rect.width));
+                        const seekToTime = percentage * duration;
+                        playerRef.current.currentTime(seekToTime);
+                      }
+                    }}
+                    onMouseUp={() => setIsDraggingTimeline(false)}
+                    onMouseLeave={() => setIsDraggingTimeline(false)}
                   >
                     <div
                       className="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-full relative transition-all"
