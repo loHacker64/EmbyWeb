@@ -433,20 +433,18 @@ export default function App() {
   // Inizializza video.js quando il player si apre
   useEffect(() => {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
-      console.log('🎬 Inizializzo Video.js player con audio track:', selectedAudioTrack);
+      console.log('🎬 Inizializzo Video.js player per direct play');
 
-      // Usa stream.mp4 con audio transcodato - funziona perfettamente
-      // Video in copy (massima qualità), solo audio transcodato in AAC
+      // Direct Play: serve il file originale senza transcode
+      // Tutte le tracce audio restano disponibili nel file
+      // Questo permette il seeking e il cambio traccia senza ricaricare
       const params = new URLSearchParams({
         MediaSourceId: mediaSourceId || playingItem.Id,
-        AudioStreamIndex: selectedAudioTrack,
-        VideoCodec: 'copy',
-        AudioCodec: 'aac',
-        AudioBitrate: '192000',
+        Static: true,
         api_key: API_KEY
       });
-      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
-      console.log('🎬 Stream URL (.mp4) con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?${params.toString()}`;
+      console.log('🎬 Direct Play URL - MediaSourceId:', mediaSourceId);
       console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
@@ -454,6 +452,10 @@ export default function App() {
         autoplay: true,
         preload: 'auto',
         fluid: true,
+        html5: {
+          nativeAudioTracks: false,
+          nativeVideoTracks: false
+        },
         sources: [{
           src: videoUrl,
           type: 'video/mp4'
@@ -464,11 +466,29 @@ export default function App() {
 
       // Eventi del player
       player.on('loadedmetadata', () => {
-        // Usa la durata da Emby invece di player.duration() perché con lo streaming
-        // transcodato il player potrebbe non avere la durata corretta subito
         const durationFromEmby = playingItem.RunTimeTicks ? playingItem.RunTimeTicks / 10000000 : player.duration();
         setDuration(durationFromEmby);
         console.log('✅ Video.js caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
+
+        // Seleziona la traccia audio italiana dalle tracce native del file
+        const audioTracks = player.audioTracks();
+        console.log('🎵 Tracce audio disponibili nel player:', audioTracks.length);
+
+        if (audioTracks.length > 0) {
+          // Mappa le tracce Video.js con gli indici Emby
+          for (let i = 0; i < audioTracks.length; i++) {
+            const track = audioTracks[i];
+            console.log(`  Track ${i}:`, track.label || track.language || 'Unknown', 'enabled:', track.enabled);
+
+            // Attiva la traccia selezionata (corrispondente all'indice Emby)
+            if (i === selectedAudioTrack) {
+              track.enabled = true;
+              console.log('✅ Attivata traccia audio:', i, track.label || track.language);
+            } else {
+              track.enabled = false;
+            }
+          }
+        }
 
         // Ripristina posizione se stavamo cambiando traccia audio
         if (seekToTimeRef.current !== null) {
@@ -633,17 +653,23 @@ export default function App() {
     }
 
     if (playerRef.current && playingItem) {
-      // Salva la posizione corrente
-      const currentTime = playerRef.current.currentTime();
-      console.log('⏸️ Salvo posizione corrente:', currentTime, 's');
-      seekToTimeRef.current = currentTime;
+      // Con direct play, possiamo cambiare traccia senza ricaricare
+      const audioTracks = playerRef.current.audioTracks();
 
-      // Distruggi il player corrente
-      playerRef.current.dispose();
-      playerRef.current = null;
+      if (audioTracks && audioTracks.length > trackIndex) {
+        console.log('🔄 Cambio traccia da', selectedAudioTrack, 'a', trackIndex);
 
-      // Aggiorna la traccia selezionata - questo farà triggerare il useEffect che ricreerà il player
-      setSelectedAudioTrack(trackIndex);
+        // Disabilita tutte le tracce e abilita quella selezionata
+        for (let i = 0; i < audioTracks.length; i++) {
+          audioTracks[i].enabled = (i === trackIndex);
+        }
+
+        setSelectedAudioTrack(trackIndex);
+        console.log('✅ Traccia audio cambiata:', audioTracks[trackIndex].label || audioTracks[trackIndex].language);
+      } else {
+        console.warn('⚠️ Traccia audio non trovata, index:', trackIndex);
+      }
+
       setShowAudioMenu(false);
     } else {
       setSelectedAudioTrack(trackIndex);
