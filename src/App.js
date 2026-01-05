@@ -435,8 +435,8 @@ export default function App() {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Video.js player con audio track:', selectedAudioTrack);
 
-      // Usa streaming con HTTP Range requests per supportare seeking
-      // L'endpoint /stream supporta range requests anche con audio transcodato
+      // Usa stream.mp4 con audio transcodato - funziona perfettamente
+      // Video in copy (massima qualità), solo audio transcodato in AAC
       const params = new URLSearchParams({
         MediaSourceId: mediaSourceId || playingItem.Id,
         AudioStreamIndex: selectedAudioTrack,
@@ -445,8 +445,8 @@ export default function App() {
         AudioBitrate: '192000',
         api_key: API_KEY
       });
-      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?${params.toString()}`;
-      console.log('🎬 Stream URL con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
+      console.log('🎬 Stream URL (.mp4) con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
       console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
