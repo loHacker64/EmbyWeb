@@ -435,17 +435,15 @@ export default function App() {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Video.js player per direct play');
 
-      // Direct Play con AudioStreamIndex: Emby demultiplexa solo la traccia richiesta
-      // Il file viene servito direttamente (seeking funziona)
-      // Ma con una sola traccia audio (quella selezionata)
+      // AudioStreamIndex senza Static: Emby usa ffmpeg per demux della traccia corretta
+      // Nessun transcode (solo remux), seeking dovrebbe funzionare
       const params = new URLSearchParams({
         MediaSourceId: mediaSourceId || playingItem.Id,
-        Static: true,
         AudioStreamIndex: selectedAudioTrack,
         api_key: API_KEY
       });
       const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?${params.toString()}`;
-      console.log('🎬 Direct Play URL con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      console.log('🎬 Stream URL con AudioIndex (remux):', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
       console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
