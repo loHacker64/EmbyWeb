@@ -540,29 +540,22 @@ export default function App() {
   };
 
   const changeAudioTrack = (trackIndex) => {
-    if (!videoRef.current) return;
+    console.log('🎵 Cambio traccia audio a index:', trackIndex);
 
-    const savedTime = videoRef.current.currentTime;
-    const wasPaused = videoRef.current.paused;
+    // Salva la posizione corrente se il video sta riproducendo
+    const savedTime = videoRef.current ? videoRef.current.currentTime : 0;
 
-    console.log('🎵 Cambio traccia audio a index:', trackIndex, '(tempo salvato:', Math.floor(savedTime), 's)');
-
-    // Aggiorna lo stato - questo farà ricaricare il video con la nuova traccia
+    // Aggiorna lo stato - la key sul video element forzerà React a rimontarlo
     setSelectedAudioTrack(trackIndex);
 
-    // Quando il video si ricarica, ripristina la posizione
-    const handleLoadedMetadata = () => {
-      if (videoRef.current) {
+    // Dopo che React ha aggiornato il DOM, ripristina la posizione
+    setTimeout(() => {
+      if (videoRef.current && savedTime > 0) {
         videoRef.current.currentTime = savedTime;
-        if (!wasPaused) {
-          videoRef.current.play().catch(err => console.error('Play error:', err));
-        }
-        console.log('✅ Traccia audio cambiata e posizione ripristinata');
-        videoRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        console.log('✅ Traccia audio cambiata, posizione ripristinata a', Math.floor(savedTime), 's');
       }
-    };
+    }, 100);
 
-    videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
     setShowAudioMenu(false);
   };
 
@@ -976,6 +969,7 @@ export default function App() {
         <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
           {/* Video Element - Completamente riscritto */}
           <video
+            key={`video-${playingItem.Id}-${selectedAudioTrack || 'default'}`}
             ref={videoRef}
             className="w-full h-full object-contain"
             src={getVideoUrl(playingItem, selectedAudioTrack)}
