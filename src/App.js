@@ -464,8 +464,11 @@ export default function App() {
 
       // Eventi del player
       player.on('loadedmetadata', () => {
-        setDuration(player.duration());
-        console.log('✅ Video.js caricato - Durata:', Math.floor(player.duration()/60), 'min');
+        // Usa la durata da Emby invece di player.duration() perché con lo streaming
+        // transcodato il player potrebbe non avere la durata corretta subito
+        const durationFromEmby = playingItem.RunTimeTicks ? playingItem.RunTimeTicks / 10000000 : player.duration();
+        setDuration(durationFromEmby);
+        console.log('✅ Video.js caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
 
         // Ripristina posizione se stavamo cambiando traccia audio
         if (seekToTimeRef.current !== null) {
@@ -480,6 +483,15 @@ export default function App() {
 
       player.on('timeupdate', () => {
         setCurrentTime(player.currentTime());
+      });
+
+      player.on('durationchange', () => {
+        const playerDuration = player.duration();
+        // Aggiorna solo se la durata è valida (non 0, non Infinity)
+        if (playerDuration && isFinite(playerDuration) && playerDuration > 0) {
+          setDuration(playerDuration);
+          console.log('📏 Durata aggiornata dal player:', Math.floor(playerDuration/60), 'min');
+        }
       });
 
       player.on('error', (e) => {
