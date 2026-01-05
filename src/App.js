@@ -394,13 +394,51 @@ export default function App() {
               MusicStreamingTranscodingBitrate: 320000,
               DirectPlayProfiles: [
                 { Container: 'mp4,m4v', Type: 'Video', VideoCodec: 'h264,hevc,av1', AudioCodec: 'aac,mp3,ac3,eac3' },
-                { Container: 'mkv', Type: 'Video', VideoCodec: 'h264,hevc,av1', AudioCodec: 'aac,mp3,ac3,eac3,dts' }
+                { Container: 'mkv', Type: 'Video', VideoCodec: 'h264,hevc,av1', AudioCodec: 'aac,mp3,ac3,eac3,dts' },
+                { Container: 'webm', Type: 'Video', VideoCodec: 'vp8,vp9,av1', AudioCodec: 'vorbis,opus' }
               ],
               TranscodingProfiles: [
-                { Container: 'ts', Type: 'Video', VideoCodec: 'h264,hevc', AudioCodec: 'aac,mp3,ac3', Protocol: 'hls' }
+                {
+                  Container: 'ts',
+                  Type: 'Video',
+                  VideoCodec: 'h264,hevc',
+                  AudioCodec: 'aac,mp3,ac3',
+                  Protocol: 'hls',
+                  EstimateContentLength: false,
+                  EnableMpegtsM2TsMode: false,
+                  TranscodeSeekInfo: 'Auto',
+                  CopyTimestamps: false,
+                  Context: 'Streaming',
+                  EnableSubtitlesInManifest: true,
+                  MinSegments: 1,
+                  BreakOnNonKeyFrames: true
+                }
               ],
-              CodecProfiles: [],
-              SubtitleProfiles: []
+              CodecProfiles: [
+                {
+                  Type: 'Video',
+                  Codec: 'h264',
+                  Conditions: [
+                    { Condition: 'LessThanEqual', Property: 'Width', Value: '1920' },
+                    { Condition: 'LessThanEqual', Property: 'Height', Value: '1080' },
+                    { Condition: 'LessThanEqual', Property: 'VideoLevel', Value: '62' }
+                  ]
+                },
+                {
+                  Type: 'Video',
+                  Codec: 'hevc',
+                  Conditions: [
+                    { Condition: 'LessThanEqual', Property: 'Width', Value: '3840' },
+                    { Condition: 'LessThanEqual', Property: 'Height', Value: '2160' }
+                  ]
+                }
+              ],
+              SubtitleProfiles: [
+                { Format: 'vtt', Method: 'External' },
+                { Format: 'ass', Method: 'External' },
+                { Format: 'ssa', Method: 'External' },
+                { Format: 'srt', Method: 'External' }
+              ]
             }
           })
         }
@@ -612,10 +650,25 @@ export default function App() {
     };
   }, [playingItem, selectedAudioTrack]);
 
-  const closePlayer = () => {
-    // Notifica Emby della fine della riproduzione
+  const closePlayer = async () => {
+    // CRITICAL: Prima termina FFmpeg sul server, POI notifica la fine
+    // Se non facciamo questo, FFmpeg continuerà a consumare risorse!
+    try {
+      // 1. DELETE ActiveEncodings - Termina il processo FFmpeg sul server
+      await fetch(`${EMBY_SERVER}/Videos/ActiveEncodings?DeviceId=${DEVICE_ID}`, {
+        method: 'DELETE',
+        headers: {
+          'X-Emby-Token': user?.AccessToken || ''
+        }
+      });
+      console.log('🛑 FFmpeg process terminato sul server');
+    } catch (error) {
+      console.error('❌ Errore terminazione FFmpeg:', error);
+    }
+
+    // 2. Notifica Emby della fine della riproduzione
     if (playingItem && playerRef.current) {
-      reportPlaybackStopped(playingItem, playerRef.current.currentTime() * 1000);
+      await reportPlaybackStopped(playingItem, playerRef.current.currentTime() * 1000);
     }
 
     // Ferma l'aggiornamento del progresso
@@ -650,9 +703,21 @@ export default function App() {
 
   const togglePlay = () => {
     if (playerRef.current) {
-      if (isPlaying) playerRef.current.pause();
-      else playerRef.current.play();
-      setIsPlaying(!isPlaying);
+      const willBePlaying = !isPlaying;
+
+      if (isPlaying) {
+        playerRef.current.pause();
+      } else {
+        playerRef.current.play();
+      }
+
+      setIsPlaying(willBePlaying);
+
+      // EVENT-BASED REPORTING: Invia report immediato quando cambia lo stato play/pause
+      if (playingItem) {
+        reportPlaybackProgress(playingItem, playerRef.current.currentTime() * 1000);
+        console.log('⏯️ Event report:', willBePlaying ? 'Unpause' : 'Pause');
+      }
     }
   };
 
@@ -677,7 +742,15 @@ export default function App() {
   const handleVolume = (e) => {
     const vol = parseFloat(e.target.value);
     setVolume(vol);
-    if (playerRef.current) playerRef.current.volume(vol);
+    if (playerRef.current) {
+      playerRef.current.volume(vol);
+
+      // EVENT-BASED REPORTING: Invia report quando l'utente cambia il volume
+      if (playingItem) {
+        reportPlaybackProgress(playingItem, playerRef.current.currentTime() * 1000);
+        console.log('🔊 Event report: VolumeChange to', Math.round(vol * 100) + '%');
+      }
+    }
   };
 
   const toggleFull = () => {
