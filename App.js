@@ -34,7 +34,6 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  const [playSessionId, setPlaySessionId] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
