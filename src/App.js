@@ -453,8 +453,8 @@ export default function App() {
         preload: 'auto',
         fluid: true,
         html5: {
-          nativeAudioTracks: false,
-          nativeVideoTracks: false
+          nativeAudioTracks: true,
+          nativeVideoTracks: true
         },
         sources: [{
           src: videoUrl,
@@ -471,11 +471,22 @@ export default function App() {
         console.log('✅ Video.js caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
 
         // Seleziona la traccia audio italiana dalle tracce native del file
-        const audioTracks = player.audioTracks();
-        console.log('🎵 Tracce audio disponibili nel player:', audioTracks.length);
+        // Prova prima l'API Video.js
+        let audioTracks = player.audioTracks();
+        console.log('🎵 Tracce audio Video.js:', audioTracks ? audioTracks.length : 0);
 
-        if (audioTracks.length > 0) {
-          // Mappa le tracce Video.js con gli indici Emby
+        // Se Video.js non trova tracce, prova l'API HTML5 nativa
+        if (!audioTracks || audioTracks.length === 0) {
+          const videoElement = player.el().querySelector('video');
+          if (videoElement && videoElement.audioTracks) {
+            audioTracks = videoElement.audioTracks;
+            console.log('🎵 Tracce audio HTML5 native:', audioTracks.length);
+          }
+        }
+
+        if (audioTracks && audioTracks.length > 0) {
+          console.log('📋 Trovate', audioTracks.length, 'tracce audio nel file');
+          // Mappa le tracce con gli indici Emby
           for (let i = 0; i < audioTracks.length; i++) {
             const track = audioTracks[i];
             console.log(`  Track ${i}:`, track.label || track.language || 'Unknown', 'enabled:', track.enabled);
@@ -488,6 +499,8 @@ export default function App() {
               track.enabled = false;
             }
           }
+        } else {
+          console.warn('⚠️ Nessuna traccia audio trovata nel file - Direct Play potrebbe non supportare selezione audio');
         }
 
         // Ripristina posizione se stavamo cambiando traccia audio
@@ -654,7 +667,17 @@ export default function App() {
 
     if (playerRef.current && playingItem) {
       // Con direct play, possiamo cambiare traccia senza ricaricare
-      const audioTracks = playerRef.current.audioTracks();
+      // Prova prima l'API Video.js
+      let audioTracks = playerRef.current.audioTracks();
+
+      // Se Video.js non trova tracce, prova l'API HTML5 nativa
+      if (!audioTracks || audioTracks.length === 0) {
+        const videoElement = playerRef.current.el().querySelector('video');
+        if (videoElement && videoElement.audioTracks) {
+          audioTracks = videoElement.audioTracks;
+          console.log('🎵 Uso tracce audio HTML5 native per il cambio');
+        }
+      }
 
       if (audioTracks && audioTracks.length > trackIndex) {
         console.log('🔄 Cambio traccia da', selectedAudioTrack, 'a', trackIndex);
@@ -667,7 +690,7 @@ export default function App() {
         setSelectedAudioTrack(trackIndex);
         console.log('✅ Traccia audio cambiata:', audioTracks[trackIndex].label || audioTracks[trackIndex].language);
       } else {
-        console.warn('⚠️ Traccia audio non trovata, index:', trackIndex);
+        console.warn('⚠️ Traccia audio non trovata, index:', trackIndex, 'tracce disponibili:', audioTracks ? audioTracks.length : 0);
       }
 
       setShowAudioMenu(false);
