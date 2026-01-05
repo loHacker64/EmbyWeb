@@ -435,9 +435,18 @@ export default function App() {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Video.js player con audio track:', selectedAudioTrack);
 
-      // Costruisci URL con la traccia audio corretta
-      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?Static=true&AudioStreamIndex=${selectedAudioTrack}&api_key=${API_KEY}`;
-      console.log('🎬 Video URL:', videoUrl);
+      // Usa endpoint stream senza Static, forza codec copy per evitare transcode
+      // MediaSourceId + AudioStreamIndex dovrebbero forzare la traccia corretta
+      const params = new URLSearchParams({
+        MediaSourceId: mediaSourceId || playingItem.Id,
+        AudioStreamIndex: selectedAudioTrack,
+        VideoCodec: 'copy',
+        AudioCodec: 'copy',
+        api_key: API_KEY
+      });
+      const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?${params.toString()}`;
+      console.log('🎬 Stream URL con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
+      console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
         controls: false,
