@@ -435,16 +435,17 @@ export default function App() {
     if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Video.js player per direct play');
 
-      // Direct Play: serve il file originale senza transcode
-      // Tutte le tracce audio restano disponibili nel file
-      // Questo permette il seeking e il cambio traccia senza ricaricare
+      // Direct Play con AudioStreamIndex: Emby demultiplexa solo la traccia richiesta
+      // Il file viene servito direttamente (seeking funziona)
+      // Ma con una sola traccia audio (quella selezionata)
       const params = new URLSearchParams({
         MediaSourceId: mediaSourceId || playingItem.Id,
         Static: true,
+        AudioStreamIndex: selectedAudioTrack,
         api_key: API_KEY
       });
       const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream?${params.toString()}`;
-      console.log('🎬 Direct Play URL - MediaSourceId:', mediaSourceId);
+      console.log('🎬 Direct Play URL con AudioIndex:', selectedAudioTrack, 'MediaSourceId:', mediaSourceId);
       console.log('🎬 URL completo:', videoUrl);
 
       const player = videojs(videoRef.current, {
@@ -452,10 +453,6 @@ export default function App() {
         autoplay: true,
         preload: 'auto',
         fluid: true,
-        html5: {
-          nativeAudioTracks: true,
-          nativeVideoTracks: true
-        },
         sources: [{
           src: videoUrl,
           type: 'video/mp4'
@@ -470,38 +467,9 @@ export default function App() {
         setDuration(durationFromEmby);
         console.log('✅ Video.js caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
 
-        // Seleziona la traccia audio italiana dalle tracce native del file
-        // Prova prima l'API Video.js
-        let audioTracks = player.audioTracks();
-        console.log('🎵 Tracce audio Video.js:', audioTracks ? audioTracks.length : 0);
-
-        // Se Video.js non trova tracce, prova l'API HTML5 nativa
-        if (!audioTracks || audioTracks.length === 0) {
-          const videoElement = player.el().querySelector('video');
-          if (videoElement && videoElement.audioTracks) {
-            audioTracks = videoElement.audioTracks;
-            console.log('🎵 Tracce audio HTML5 native:', audioTracks.length);
-          }
-        }
-
-        if (audioTracks && audioTracks.length > 0) {
-          console.log('📋 Trovate', audioTracks.length, 'tracce audio nel file');
-          // Mappa le tracce con gli indici Emby
-          for (let i = 0; i < audioTracks.length; i++) {
-            const track = audioTracks[i];
-            console.log(`  Track ${i}:`, track.label || track.language || 'Unknown', 'enabled:', track.enabled);
-
-            // Attiva la traccia selezionata (corrispondente all'indice Emby)
-            if (i === selectedAudioTrack) {
-              track.enabled = true;
-              console.log('✅ Attivata traccia audio:', i, track.label || track.language);
-            } else {
-              track.enabled = false;
-            }
-          }
-        } else {
-          console.warn('⚠️ Nessuna traccia audio trovata nel file - Direct Play potrebbe non supportare selezione audio');
-        }
+        // Con Direct Play + AudioStreamIndex, Emby demultiplexa solo la traccia richiesta
+        // Il file avrà già l'audio corretto (italiano se selectedAudioTrack=2)
+        console.log('✅ Stream caricato con AudioStreamIndex:', selectedAudioTrack);
 
         // Ripristina posizione se stavamo cambiando traccia audio
         if (seekToTimeRef.current !== null) {
@@ -666,33 +634,20 @@ export default function App() {
     }
 
     if (playerRef.current && playingItem) {
-      // Con direct play, possiamo cambiare traccia senza ricaricare
-      // Prova prima l'API Video.js
-      let audioTracks = playerRef.current.audioTracks();
+      // Con Direct Play + AudioStreamIndex, dobbiamo ricaricare il player
+      // per ottenere un nuovo stream con la traccia audio diversa
 
-      // Se Video.js non trova tracce, prova l'API HTML5 nativa
-      if (!audioTracks || audioTracks.length === 0) {
-        const videoElement = playerRef.current.el().querySelector('video');
-        if (videoElement && videoElement.audioTracks) {
-          audioTracks = videoElement.audioTracks;
-          console.log('🎵 Uso tracce audio HTML5 native per il cambio');
-        }
-      }
+      // Salva la posizione corrente
+      const currentTime = playerRef.current.currentTime();
+      console.log('⏸️ Salvo posizione corrente:', currentTime, 's');
+      seekToTimeRef.current = currentTime;
 
-      if (audioTracks && audioTracks.length > trackIndex) {
-        console.log('🔄 Cambio traccia da', selectedAudioTrack, 'a', trackIndex);
+      // Distruggi il player corrente
+      playerRef.current.dispose();
+      playerRef.current = null;
 
-        // Disabilita tutte le tracce e abilita quella selezionata
-        for (let i = 0; i < audioTracks.length; i++) {
-          audioTracks[i].enabled = (i === trackIndex);
-        }
-
-        setSelectedAudioTrack(trackIndex);
-        console.log('✅ Traccia audio cambiata:', audioTracks[trackIndex].label || audioTracks[trackIndex].language);
-      } else {
-        console.warn('⚠️ Traccia audio non trovata, index:', trackIndex, 'tracce disponibili:', audioTracks ? audioTracks.length : 0);
-      }
-
+      // Aggiorna la traccia selezionata - questo farà triggerare il useEffect che ricreerà il player
+      setSelectedAudioTrack(trackIndex);
       setShowAudioMenu(false);
     } else {
       setSelectedAudioTrack(trackIndex);
