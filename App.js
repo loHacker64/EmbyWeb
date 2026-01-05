@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
 
 const EMBY_SERVER = 'http://192.168.1.100:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
@@ -51,6 +53,7 @@ export default function App() {
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
   const [mediaSourceId, setMediaSourceId] = useState(null);
   const videoRef = useRef(null);
+  const playerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
   const skipTimeoutRef = useRef(null);
   const movieGridRef = useRef(null);
@@ -424,25 +427,95 @@ export default function App() {
 
     setPlayingItem(item);
     setIsPlaying(true);
-
-    // Notifica Emby dell'inizio della riproduzione
-    setTimeout(() => reportPlaybackStart(item), 1000);
-
-    // Avvia l'aggiornamento periodico del progresso (ogni 10 secondi)
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-    progressIntervalRef.current = setInterval(() => {
-      if (videoRef.current && item) {
-        reportPlaybackProgress(item, videoRef.current.currentTime * 1000);
-      }
-    }, 10000);
   };
+
+  // Inizializza video.js quando il player si apre
+  useEffect(() => {
+    if (playingItem && videoRef.current && !playerRef.current) {
+      console.log('🎬 Inizializzo Video.js player');
+
+      const player = videojs(videoRef.current, {
+        controls: false,
+        autoplay: true,
+        preload: 'auto',
+        fluid: true,
+        sources: [{
+          src: getVideoUrl(playingItem),
+          type: 'video/mp4'
+        }]
+      });
+
+      playerRef.current = player;
+
+      // Eventi del player
+      player.on('loadedmetadata', () => {
+        setDuration(player.duration());
+        console.log('✅ Video.js caricato - Durata:', Math.floor(player.duration()/60), 'min');
+
+        // Auto-seleziona traccia italiana
+        const audioTracks = player.audioTracks();
+        if (audioTracks && audioTracks.length > 0) {
+          console.log('🎵 Tracce audio disponibili:', audioTracks.length);
+
+          // Cerca traccia italiana
+          for (let i = 0; i < audioTracks.length; i++) {
+            const track = audioTracks[i];
+            console.log(`  Track ${i}: ${track.label || track.language || 'Unknown'}`);
+
+            if (track.language === 'ita' || track.language === 'it' ||
+                (track.label && track.label.toLowerCase().includes('ita'))) {
+              // Disabilita tutte
+              for (let j = 0; j < audioTracks.length; j++) {
+                audioTracks[j].enabled = false;
+              }
+              // Abilita italiana
+              track.enabled = true;
+              console.log('✅ Audio italiano auto-selezionato:', track.label || track.language);
+              break;
+            }
+          }
+        }
+
+        // Notifica Emby
+        reportPlaybackStart(playingItem);
+      });
+
+      player.on('timeupdate', () => {
+        setCurrentTime(player.currentTime());
+      });
+
+      player.on('error', (e) => {
+        console.error('❌ Video.js error:', player.error());
+      });
+
+      // Avvia tracking Emby
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+      progressIntervalRef.current = setInterval(() => {
+        if (player && playingItem) {
+          reportPlaybackProgress(playingItem, player.currentTime() * 1000);
+        }
+      }, 10000);
+    }
+
+    // Cleanup
+    return () => {
+      if (playerRef.current) {
+        console.log('🧹 Cleanup Video.js player');
+        playerRef.current.dispose();
+        playerRef.current = null;
+      }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [playingItem]);
 
   const closePlayer = () => {
     // Notifica Emby della fine della riproduzione
-    if (playingItem && videoRef.current) {
-      reportPlaybackStopped(playingItem, videoRef.current.currentTime * 1000);
+    if (playingItem && playerRef.current) {
+      reportPlaybackStopped(playingItem, playerRef.current.currentTime() * 1000);
     }
 
     // Ferma l'aggiornamento del progresso
@@ -451,9 +524,16 @@ export default function App() {
       progressIntervalRef.current = null;
     }
 
+    // Distruggi il player
+    if (playerRef.current) {
+      playerRef.current.dispose();
+      playerRef.current = null;
+    }
+
     setPlayingItem(null);
     setIsPlaying(false);
     setCurrentTime(0);
+    setDuration(0);
     setAudioTracks([]);
     setSelectedAudioTrack(null);
     setShowAudioMenu(false);
@@ -464,16 +544,17 @@ export default function App() {
   };
 
   const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) videoRef.current.pause();
-      else videoRef.current.play();
+    if (playerRef.current) {
+      if (isPlaying) playerRef.current.pause();
+      else playerRef.current.play();
       setIsPlaying(!isPlaying);
     }
   };
 
   const skip = (sec) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime += sec;
+    if (playerRef.current) {
+      const newTime = playerRef.current.currentTime() + sec;
+      playerRef.current.currentTime(newTime);
       setShowSkipIndicator(sec);
       if (skipTimeoutRef.current) clearTimeout(skipTimeoutRef.current);
       skipTimeoutRef.current = setTimeout(() => setShowSkipIndicator(null), 2000);
@@ -481,8 +562,8 @@ export default function App() {
   };
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
+    if (playerRef.current) {
+      playerRef.current.muted(!isMuted);
       setIsMuted(!isMuted);
     }
   };
@@ -490,13 +571,16 @@ export default function App() {
   const handleVolume = (e) => {
     const vol = parseFloat(e.target.value);
     setVolume(vol);
-    if (videoRef.current) videoRef.current.volume = vol;
+    if (playerRef.current) playerRef.current.volume(vol);
   };
 
   const toggleFull = () => {
-    if (videoRef.current) {
-      if (document.fullscreenElement) document.exitFullscreen();
-      else videoRef.current.requestFullscreen();
+    if (playerRef.current) {
+      if (playerRef.current.isFullscreen()) {
+        playerRef.current.exitFullscreen();
+      } else {
+        playerRef.current.requestFullscreen();
+      }
     }
   };
 
@@ -538,8 +622,32 @@ export default function App() {
   };
 
   const changeAudioTrack = (trackIndex) => {
-    console.log('⚠️  Cambio traccia audio non supportato con l\'endpoint attuale');
-    console.log('ℹ️  Il browser usa automaticamente la prima traccia audio del file');
+    console.log('🎵 Cambio traccia audio a index:', trackIndex);
+
+    if (playerRef.current) {
+      const player = playerRef.current;
+      const audioTracks = player.audioTracks();
+
+      if (audioTracks && audioTracks.length > 0) {
+        // Trova la traccia corrispondente
+        const embyTrack = audioTracks.find(t => t.language === 'ita' || t.language === 'it' || t.label.includes('Italian'));
+
+        // Disabilita tutte le tracce
+        for (let i = 0; i < audioTracks.length; i++) {
+          audioTracks[i].enabled = false;
+        }
+
+        // Trova l'indice corretto basandosi sull'index Emby
+        const targetIndex = audioTracks.indexOf(embyTrack) >= 0 ? audioTracks.indexOf(embyTrack) :
+                           (trackIndex === 2 ? 1 : 0); // Fallback
+
+        if (audioTracks[targetIndex]) {
+          audioTracks[targetIndex].enabled = true;
+          console.log('✅ Traccia audio cambiata a:', audioTracks[targetIndex].label || audioTracks[targetIndex].language);
+        }
+      }
+    }
+
     setSelectedAudioTrack(trackIndex);
     setShowAudioMenu(false);
   };
@@ -550,16 +658,18 @@ export default function App() {
 
     // Aspetta che il React ri-renderizzi con il nuovo selectedSubtitleTrack
     setTimeout(() => {
-      if (videoRef.current && videoRef.current.textTracks) {
+      if (playerRef.current) {
+        const textTracks = playerRef.current.textTracks();
+
         // Disabilita tutti i sottotitoli
-        for (let i = 0; i < videoRef.current.textTracks.length; i++) {
-          videoRef.current.textTracks[i].mode = 'disabled';
+        for (let i = 0; i < textTracks.length; i++) {
+          textTracks[i].mode = 'disabled';
         }
 
         // Abilita il sottotitolo selezionato
         if (trackIndex !== null) {
-          for (let i = 0; i < videoRef.current.textTracks.length; i++) {
-            const track = videoRef.current.textTracks[i];
+          for (let i = 0; i < textTracks.length; i++) {
+            const track = textTracks[i];
             // Cerca la traccia corrispondente all'indice selezionato
             const matchingTrack = subtitleTracks.find((st, idx) => idx === i);
             if (matchingTrack && matchingTrack.index === trackIndex) {
@@ -952,44 +1062,15 @@ export default function App() {
 
       {playingItem && (
         <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
-          {/* Video Element - Completamente riscritto */}
-          <video
-            ref={videoRef}
-            className="w-full h-full object-contain"
-            src={getVideoUrl(playingItem)}
-            autoPlay
-            onClick={togglePlay}
-            onTimeUpdate={()=>{
-              if(videoRef.current) setCurrentTime(videoRef.current.currentTime);
-            }}
-            onLoadedMetadata={()=>{
-              if(videoRef.current){
-                setDuration(videoRef.current.duration);
-                console.log('✅ Video caricato - Durata:', Math.floor(videoRef.current.duration/60), 'min');
-                console.log('ℹ️  L\'audio sarà quello di default del file (solitamente la prima traccia)');
-              }
-            }}
-            onError={(e)=>{
-              console.error('❌ ERRORE RIPRODUZIONE');
-              console.error('URL tentato:', getVideoUrl(playingItem));
-              if(videoRef.current?.error){
-                console.error('Codice errore:', videoRef.current.error.code);
-                console.error('Messaggio:', videoRef.current.error.message);
-              }
-            }}
-          >
-            {/* Tracce sottotitoli */}
-            {subtitleTracks.map(track => (
-              <track
-                key={track.index}
-                kind="subtitles"
-                src={`${EMBY_SERVER}/Videos/${playingItem.Id}/${mediaSourceId}/Subtitles/${track.index}/Stream.vtt?api_key=${API_KEY}`}
-                srcLang={track.language}
-                label={track.displayLanguage + (track.title ? ` - ${track.title}` : '')}
-                default={track.index === selectedSubtitleTrack}
-              />
-            ))}
-          </video>
+          {/* Video.js Player */}
+          <div data-vjs-player className="w-full h-full">
+            <video
+              ref={videoRef}
+              className="video-js vjs-big-play-centered w-full h-full"
+              onClick={togglePlay}
+            >
+            </video>
+          </div>
 
           {/* Indicatore Skip +10/-10 secondi */}
           {showSkipIndicator && (
@@ -1047,8 +1128,8 @@ export default function App() {
                       const rect = e.currentTarget.getBoundingClientRect();
                       const x = e.clientX - rect.left;
                       const percentage = x / rect.width;
-                      if(videoRef.current && duration) {
-                        videoRef.current.currentTime = percentage * duration;
+                      if(playerRef.current && duration) {
+                        playerRef.current.currentTime(percentage * duration);
                       }
                     }}
                   >
