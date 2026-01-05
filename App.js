@@ -524,39 +524,45 @@ export default function App() {
     if (row) row.scrollBy({left: dir === 'left' ? -1000 : 1000, behavior:'smooth'});
   };
 
-  const getVideoUrl = (item, audioStreamIndex = null) => {
+  const getVideoUrl = (item) => {
     if (!item || !user) return '';
 
     // Endpoint Emby: usa Download per ottenere il file originale
     // Questo bypassa il transcoding e permette al browser di gestire le tracce
     let url = `${EMBY_SERVER}/Items/${item.Id}/Download?api_key=${API_KEY}`;
 
-    console.log('🎬 Video URL (Download):', url);
-    console.log('📋 Item:', item.Name);
     return url;
   };
 
   const changeAudioTrack = (trackIndex) => {
     if (!videoRef.current) return;
 
-    // Salva il tempo corrente
-    const savedTime = videoRef.current.currentTime;
     console.log('🎵 Cambio traccia audio a index:', trackIndex);
-
-    // Cambia la traccia audio (il video si ricaricherà automaticamente)
     setSelectedAudioTrack(trackIndex);
 
-    // Ripristina il tempo quando il video si ricarica
-    const handleLoadedMetadata = () => {
-      if (videoRef.current) {
-        videoRef.current.currentTime = savedTime;
-        videoRef.current.play();
-        videoRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      }
-    };
+    // Usa l'API HTML5 audioTracks per cambiare la traccia senza ricaricare il video
+    if (videoRef.current.audioTracks && videoRef.current.audioTracks.length > 0) {
+      // Trova la traccia corrispondente all'index Emby
+      const embyTrack = audioTracks.find(t => t.index === trackIndex);
 
-    if (videoRef.current) {
-      videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+      if (embyTrack) {
+        // Cerca la traccia HTML5 corrispondente alla lingua
+        for (let i = 0; i < videoRef.current.audioTracks.length; i++) {
+          const htmlTrack = videoRef.current.audioTracks[i];
+
+          // Confronta la lingua o l'indice
+          if (htmlTrack.language === embyTrack.language || i === audioTracks.indexOf(embyTrack)) {
+            // Disabilita tutte le tracce
+            for (let j = 0; j < videoRef.current.audioTracks.length; j++) {
+              videoRef.current.audioTracks[j].enabled = false;
+            }
+            // Abilita solo quella selezionata
+            htmlTrack.enabled = true;
+            console.log('✅ Traccia audio cambiata:', embyTrack.displayLanguage);
+            break;
+          }
+        }
+      }
     }
 
     setShowAudioMenu(false);
@@ -600,7 +606,7 @@ export default function App() {
     if (!user || !item) return;
 
     try {
-      await fetch(`${EMBY_SERVER}/Sessions/Playing`, {
+      const response = await fetch(`${EMBY_SERVER}/Sessions/Playing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -608,14 +614,22 @@ export default function App() {
         },
         body: JSON.stringify({
           ItemId: item.Id,
+          MediaSourceId: mediaSourceId || item.Id,
           PositionTicks: 0,
           IsPaused: false,
           IsMuted: false,
           AudioStreamIndex: selectedAudioTrack,
-          SubtitleStreamIndex: selectedSubtitleTrack
+          SubtitleStreamIndex: selectedSubtitleTrack,
+          PlayMethod: 'DirectPlay',
+          PlaySessionId: `web-${item.Id}-${Date.now()}`
         })
       });
-      console.log('📊 Riproduzione iniziata notificata a Emby');
+
+      if (response.ok) {
+        console.log('📊 Riproduzione iniziata notificata a Emby');
+      } else {
+        console.error('❌ Errore notifica:', response.status, await response.text());
+      }
     } catch (error) {
       console.error('❌ Errore notifica inizio riproduzione:', error);
     }
@@ -966,7 +980,7 @@ export default function App() {
           <video
             ref={videoRef}
             className="w-full h-full object-contain"
-            src={getVideoUrl(playingItem, selectedAudioTrack)}
+            src={getVideoUrl(playingItem)}
             autoPlay
             onClick={togglePlay}
             onTimeUpdate={()=>{
@@ -977,6 +991,29 @@ export default function App() {
                 setDuration(videoRef.current.duration);
                 console.log('✅ Video caricato:', playingItem.Name);
                 console.log('⏱️ Durata:', Math.floor(videoRef.current.duration/60), 'minuti');
+
+                // Seleziona automaticamente la traccia audio italiana se disponibile
+                if (videoRef.current.audioTracks && videoRef.current.audioTracks.length > 0) {
+                  console.log('🎵 Tracce audio HTML5 disponibili:', videoRef.current.audioTracks.length);
+
+                  // Trova la traccia italiana
+                  const italianTrack = audioTracks.find(t => t.language === 'ita' || t.language === 'it');
+
+                  if (italianTrack) {
+                    const italianIndex = audioTracks.indexOf(italianTrack);
+
+                    // Disabilita tutte le tracce
+                    for (let i = 0; i < videoRef.current.audioTracks.length; i++) {
+                      videoRef.current.audioTracks[i].enabled = false;
+                    }
+
+                    // Abilita la traccia italiana
+                    if (videoRef.current.audioTracks[italianIndex]) {
+                      videoRef.current.audioTracks[italianIndex].enabled = true;
+                      console.log('✅ Traccia italiana auto-selezionata:', italianTrack.displayLanguage);
+                    }
+                  }
+                }
               }
             }}
             onError={(e)=>{
