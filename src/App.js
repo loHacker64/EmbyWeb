@@ -1127,8 +1127,39 @@ export default function App() {
                       const rect = e.currentTarget.getBoundingClientRect();
                       const x = e.clientX - rect.left;
                       const percentage = x / rect.width;
-                      if(playerRef.current && duration) {
-                        playerRef.current.currentTime(percentage * duration);
+                      const seekToTime = percentage * duration;
+
+                      if(playerRef.current && duration && seekToTime) {
+                        console.log('🎯 Seeking a:', Math.floor(seekToTime), 's (' + Math.floor(seekToTime/60) + ' min)');
+
+                        // Con stream transcodato, dobbiamo riavviare lo stream dalla nuova posizione
+                        // Salva la posizione corrente
+                        const wasPlaying = !playerRef.current.paused();
+
+                        // Riavvia lo stream con StartTimeTicks per partire dalla posizione corretta
+                        const startTimeTicks = Math.floor(seekToTime * 10000000);
+                        const params = new URLSearchParams({
+                          MediaSourceId: mediaSourceId || playingItem.Id,
+                          AudioStreamIndex: selectedAudioTrack,
+                          VideoCodec: 'copy',
+                          AudioCodec: 'aac',
+                          AudioBitrate: '192000',
+                          StartTimeTicks: startTimeTicks,
+                          api_key: API_KEY
+                        });
+                        const newUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/stream.mp4?${params.toString()}`;
+
+                        console.log('🔄 Riavvio stream da posizione:', Math.floor(seekToTime/60), 'min', Math.floor(seekToTime%60), 's');
+
+                        // Cambia sorgente del player
+                        playerRef.current.src({
+                          src: newUrl,
+                          type: 'video/mp4'
+                        });
+
+                        if (wasPlaying) {
+                          playerRef.current.play();
+                        }
                       }
                     }}
                   >
