@@ -34,6 +34,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [playSessionId, setPlaySessionId] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
@@ -422,6 +423,10 @@ export default function App() {
       setSelectedSubtitleTrack(null);
     }
 
+    // Genera un PlaySessionId unico per questa sessione di riproduzione
+    const sessionId = `emby-web-${item.Id}-${Date.now()}`;
+    setPlaySessionId(sessionId);
+
     setPlayingItem(item);
     setIsPlaying(true);
 
@@ -538,15 +543,16 @@ export default function App() {
     url += `&Static=true`;
     url += `&MediaSourceId=${mediaSourceId || item.Id}`;
     url += `&DeviceId=emby-web-player`;
-    url += `&PlaySessionId=emby-web-${item.Id}-${Date.now()}`;
+
+    // Usa il PlaySessionId salvato nello state (generato una sola volta)
+    if (playSessionId) {
+      url += `&PlaySessionId=${playSessionId}`;
+    }
 
     // Specifica la traccia audio
     if (audioIndex !== null && audioIndex !== undefined) {
       url += `&AudioStreamIndex=${audioIndex}`;
     }
-
-    console.log('🎬 Video URL:', url);
-    console.log('🎵 Audio index:', audioIndex);
 
     return url;
   };
@@ -987,7 +993,7 @@ export default function App() {
         <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center" onMouseMove={showCtrls}>
           {/* Video Element - Completamente riscritto */}
           <video
-            key={`video-${playingItem.Id}-audio-${selectedAudioTrack}`}
+            key={`video-${playingItem.Id}-${selectedAudioTrack}`}
             ref={videoRef}
             className="w-full h-full object-contain"
             src={getVideoUrl(playingItem, selectedAudioTrack)}
@@ -999,7 +1005,7 @@ export default function App() {
             onLoadedMetadata={()=>{
               if(videoRef.current){
                 setDuration(videoRef.current.duration);
-                console.log('✅ Video caricato con audio index:', selectedAudioTrack);
+                console.log('✅ Video caricato - Audio ITA:', selectedAudioTrack === 2 ? 'SÌ' : 'NO', '(index:', selectedAudioTrack, ')');
                 console.log('⏱️ Durata:', Math.floor(videoRef.current.duration/60), 'minuti');
               }
             }}
