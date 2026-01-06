@@ -94,23 +94,6 @@ video::cue {
   color: white;
 }
 
-/* Video.js custom styling per un look premium */
-.video-js {
-  background-color: #000 !important;
-}
-
-.video-js .vjs-big-play-button {
-  display: none !important; /* Nascondi il pulsante play centrale di Video.js */
-}
-
-.video-js .vjs-control-bar {
-  display: none !important; /* Nascondi completamente la barra dei controlli di Video.js */
-}
-
-.video-js .vjs-loading-spinner {
-  border-color: rgba(16, 185, 129, 0.8) rgba(16, 185, 129, 0.2) rgba(16, 185, 129, 0.2) !important;
-}
-
 /* Smooth animations */
 @keyframes fadeIn {
   from {

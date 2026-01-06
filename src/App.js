@@ -860,20 +860,22 @@ export default function App() {
       return;
     }
 
-    if (playerRef.current && playingItem) {
+    if (videoRef.current && playingItem) {
       // PROTOCOLLO EMBY: Seamless Audio Track Switching con StartTimeTicks
 
-      // Salva la posizione corrente e convertila in Ticks (1 secondo = 10,000,000 ticks)
-      const currentTimeSeconds = playerRef.current.currentTime();
+      // Salva la posizione corrente e convertila in Ticks
+      const currentTimeSeconds = videoRef.current.currentTime;
       const resumePositionTicks = Math.floor(currentTimeSeconds * 10000000);
       console.log('⏸️ Salvo posizione corrente:', currentTimeSeconds, 's (', resumePositionTicks, 'ticks)');
 
       // Imposta StartTimeTicks per riprendere dalla stessa posizione con la nuova traccia
       setStartTimeTicks(resumePositionTicks);
 
-      // Distruggi il player corrente
-      playerRef.current.dispose();
-      playerRef.current = null;
+      // Distruggi Hls.js corrente
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
 
       // Aggiorna la traccia selezionata - il useEffect ricreerà il player con:
       // - Nuovo AudioStreamIndex
@@ -891,10 +893,10 @@ export default function App() {
     console.log('📝 Cambio sottotitoli a index:', trackIndex);
     setSelectedSubtitleTrack(trackIndex);
 
-    // Aspetta che il React ri-renderizzi con il nuovo selectedSubtitleTrack
+    // HTML5 Video textTracks gestiti nativamente
     setTimeout(() => {
-      if (playerRef.current) {
-        const textTracks = playerRef.current.textTracks();
+      if (videoRef.current) {
+        const textTracks = videoRef.current.textTracks;
 
         // Disabilita tutti i sottotitoli
         for (let i = 0; i < textTracks.length; i++) {
@@ -1301,14 +1303,15 @@ export default function App() {
           className="fixed inset-0 z-[200] bg-black flex items-center justify-center"
           onMouseMove={showCtrls}
         >
-          {/* Video.js Player */}
-          <div data-vjs-player className="w-full h-full relative">
+          {/* HTML5 Video Player con Hls.js */}
+          <div className="w-full h-full relative">
             <video
               ref={videoRef}
-              className="video-js vjs-big-play-centered w-full h-full object-contain"
+              className="w-full h-full object-contain bg-black"
               onClick={togglePlay}
               playsInline
               disablePictureInPicture
+              crossOrigin="anonymous"
             >
             </video>
           </div>
@@ -1392,17 +1395,17 @@ export default function App() {
                       const x = e.clientX - rect.left;
                       const percentage = Math.max(0, Math.min(1, x / rect.width));
                       const seekToTime = percentage * duration;
-                      if(playerRef.current && duration) {
-                        playerRef.current.currentTime(seekToTime);
+                      if(videoRef.current && duration) {
+                        videoRef.current.currentTime = seekToTime;
                       }
                     }}
                     onMouseMove={e => {
-                      if(isDraggingTimeline && playerRef.current && duration) {
+                      if(isDraggingTimeline && videoRef.current && duration) {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const x = e.clientX - rect.left;
                         const percentage = Math.max(0, Math.min(1, x / rect.width));
                         const seekToTime = percentage * duration;
-                        playerRef.current.currentTime(seekToTime);
+                        videoRef.current.currentTime = seekToTime;
                       }
                     }}
                     onMouseUp={() => setIsDraggingTimeline(false)}
