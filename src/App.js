@@ -1097,14 +1097,21 @@ export default function App() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
           </div>
           <div className={`relative h-full flex items-end ${isMobile ? 'px-4 pb-16' : 'px-8 md:px-16 pb-20'} transition-all duration-1000 ${heroFade?'opacity-100 translate-y-0':'opacity-0 translate-y-4'}`}>
-            <div className={isMobile ? "space-y-3 w-full" : "max-w-3xl space-y-5"}>
-              <h2 className={isMobile ? "text-2xl font-bold drop-shadow-2xl" : "text-5xl md:text-7xl font-bold drop-shadow-2xl"}>{curr.Name}</h2>
-              {!isMobile && (
-                <div className="backdrop-blur-sm bg-black/30 rounded-xl p-4 inline-block">
-                  <p className="text-lg text-gray-200 leading-relaxed">{curr.Overview?(expandedOverview?curr.Overview:truncate(curr.Overview,35)):'Nessuna descrizione.'}</p>
-                  {curr.Overview && curr.Overview.split(' ').length>35 && <button onClick={()=>setExpandedOverview(!expandedOverview)} className="text-emerald-400 hover:text-emerald-300 text-sm mt-2 font-medium">{expandedOverview?'Mostra meno':'Continua a leggere...'}</button>}
-                </div>
-              )}
+            <div className={isMobile ? "space-y-2 w-full" : "max-w-3xl space-y-5"}>
+              <h2 className={isMobile ? "text-4xl font-bold drop-shadow-2xl" : "text-5xl md:text-7xl font-bold drop-shadow-2xl"}>{curr.Name}</h2>
+              <div className={isMobile ? "backdrop-blur-md bg-black/40 rounded-xl p-3" : "backdrop-blur-sm bg-black/30 rounded-xl p-4 inline-block"}>
+                <p className={isMobile ? "text-sm text-gray-200 leading-relaxed" : "text-lg text-gray-200 leading-relaxed"}>
+                  {curr.Overview?(expandedOverview?curr.Overview:truncate(curr.Overview,35)):'Nessuna descrizione.'}
+                </p>
+                {curr.Overview && curr.Overview.split(' ').length>35 && (
+                  <button
+                    onClick={()=>setExpandedOverview(!expandedOverview)}
+                    className={isMobile ? "text-emerald-400 hover:text-emerald-300 text-xs mt-1.5 font-medium" : "text-emerald-400 hover:text-emerald-300 text-sm mt-2 font-medium"}
+                  >
+                    {expandedOverview?'Mostra meno':'Continua a leggere...'}
+                  </button>
+                )}
+              </div>
               <div className={isMobile ? "flex gap-2 pt-1" : "flex gap-4 pt-2"}>
                 <button onClick={()=>startPlay(curr)} className={isMobile ? "flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-semibold text-sm transition shadow-2xl" : "flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transition transform hover:scale-105 shadow-2xl"}><Play className={isMobile ? "w-5 h-5 fill-current" : "w-6 h-6 fill-current"}/>{isMobile ? "Play" : "Riproduci"}</button>
                 <button onClick={()=>openDetails(curr)} className={isMobile ? "flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 px-5 py-3 rounded-xl font-semibold text-sm transition shadow-xl" : "flex items-center gap-3 bg-white/20 backdrop-blur-md hover:bg-white/30 px-10 py-4 rounded-xl font-semibold text-lg transition shadow-xl"}><Info className={isMobile ? "w-5 h-5" : "w-6 h-6"}/>{isMobile ? "Info" : "Più info"}</button>
