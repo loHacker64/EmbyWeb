@@ -52,8 +52,14 @@ export default function App() {
   const [itemDetails, setItemDetails] = useState(null);
   const [seasons, setSeasons] = useState([]);
 
-  // Rileva dispositivo mobile
-  const [isMobile] = useState(() => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+  // Rileva dispositivo mobile (solo phone, non tablet)
+  // Phone: touch device CON schermo piccolo (<768px) → UI mobile
+  // Tablet: touch device con schermo grande → UI desktop
+  const [isMobile] = useState(() => {
+    const isTouch = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isSmallScreen = window.innerWidth < 768;
+    return isTouch && isSmallScreen; // Solo phone = mobile
+  });
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -1082,28 +1088,49 @@ export default function App() {
       )}
 
       {curr && (
-        <div className="relative h-[75vh]">
+        <div className={isMobile ? "relative h-[50vh]" : "relative h-[75vh]"}>
           <div className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ${heroFade?'opacity-100 scale-100':'opacity-0 scale-105'}`} style={{backgroundImage:`url(${getBackdrop(curr)||getImg(curr)})`}}>
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20"></div>
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
           </div>
-          <div className={`relative h-full flex items-end px-8 md:px-16 pb-20 transition-all duration-1000 ${heroFade?'opacity-100 translate-y-0':'opacity-0 translate-y-4'}`}>
-            <div className="max-w-3xl space-y-5">
-              <h2 className="text-5xl md:text-7xl font-bold drop-shadow-2xl">{curr.Name}</h2>
-              <div className="backdrop-blur-sm bg-black/30 rounded-xl p-4 inline-block">
-                <p className="text-lg text-gray-200 leading-relaxed">{curr.Overview?(expandedOverview?curr.Overview:truncate(curr.Overview,35)):'Nessuna descrizione.'}</p>
-                {curr.Overview && curr.Overview.split(' ').length>35 && <button onClick={()=>setExpandedOverview(!expandedOverview)} className="text-emerald-400 hover:text-emerald-300 text-sm mt-2 font-medium">{expandedOverview?'Mostra meno':'Continua a leggere...'}</button>}
-              </div>
-              <div className="flex gap-4 pt-2">
-                <button onClick={()=>startPlay(curr)} className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transition transform hover:scale-105 shadow-2xl"><Play className="w-6 h-6 fill-current"/>Riproduci</button>
-                <button onClick={()=>openDetails(curr)} className="flex items-center gap-3 bg-white/20 backdrop-blur-md hover:bg-white/30 px-10 py-4 rounded-xl font-semibold text-lg transition shadow-xl"><Info className="w-6 h-6"/>Più info</button>
+          <div className={`relative h-full flex items-end ${isMobile ? 'px-4 pb-16' : 'px-8 md:px-16 pb-20'} transition-all duration-1000 ${heroFade?'opacity-100 translate-y-0':'opacity-0 translate-y-4'}`}>
+            <div className={isMobile ? "space-y-3 w-full" : "max-w-3xl space-y-5"}>
+              <h2 className={isMobile ? "text-2xl font-bold drop-shadow-2xl" : "text-5xl md:text-7xl font-bold drop-shadow-2xl"}>{curr.Name}</h2>
+              {!isMobile && (
+                <div className="backdrop-blur-sm bg-black/30 rounded-xl p-4 inline-block">
+                  <p className="text-lg text-gray-200 leading-relaxed">{curr.Overview?(expandedOverview?curr.Overview:truncate(curr.Overview,35)):'Nessuna descrizione.'}</p>
+                  {curr.Overview && curr.Overview.split(' ').length>35 && <button onClick={()=>setExpandedOverview(!expandedOverview)} className="text-emerald-400 hover:text-emerald-300 text-sm mt-2 font-medium">{expandedOverview?'Mostra meno':'Continua a leggere...'}</button>}
+                </div>
+              )}
+              <div className={isMobile ? "flex gap-2 pt-1" : "flex gap-4 pt-2"}>
+                <button onClick={()=>startPlay(curr)} className={isMobile ? "flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-semibold text-sm transition shadow-2xl" : "flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transition transform hover:scale-105 shadow-2xl"}><Play className={isMobile ? "w-5 h-5 fill-current" : "w-6 h-6 fill-current"}/>{isMobile ? "Play" : "Riproduci"}</button>
+                <button onClick={()=>openDetails(curr)} className={isMobile ? "flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 px-5 py-3 rounded-xl font-semibold text-sm transition shadow-xl" : "flex items-center gap-3 bg-white/20 backdrop-blur-md hover:bg-white/30 px-10 py-4 rounded-xl font-semibold text-lg transition shadow-xl"}><Info className={isMobile ? "w-5 h-5" : "w-6 h-6"}/>{isMobile ? "Info" : "Più info"}</button>
               </div>
             </div>
           </div>
-          <button onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero-1+featuredItems.length)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"><ChevronLeft className="w-8 h-8"/></button>
-          <button onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero+1)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"><ChevronRight className="w-8 h-8"/></button>
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-            {featuredItems.map((_,i)=><button key={i} onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero(i);setExpandedOverview(false);setHeroFade(true);},800);}} className={`h-1 rounded-full transition-all duration-300 ${i===currentHero?'bg-emerald-500 w-12':'bg-white/50 w-8 hover:bg-white/70'}`}/>)}
+          {/* Frecce navigazione - In basso su mobile */}
+          <button
+            onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero-1+featuredItems.length)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}}
+            className={isMobile
+              ? "absolute left-2 bottom-3 bg-emerald-600/80 hover:bg-emerald-600 backdrop-blur-md border border-emerald-500/30 p-2 rounded-full transition shadow-xl z-10"
+              : "absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"
+            }>
+            <ChevronLeft className={isMobile ? "w-6 h-6 text-white" : "w-8 h-8"}/>
+          </button>
+          <button
+            onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero+1)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}}
+            className={isMobile
+              ? "absolute right-2 bottom-3 bg-emerald-600/80 hover:bg-emerald-600 backdrop-blur-md border border-emerald-500/30 p-2 rounded-full transition shadow-xl z-10"
+              : "absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"
+            }>
+            <ChevronRight className={isMobile ? "w-6 h-6 text-white" : "w-8 h-8"}/>
+          </button>
+          {/* Dots indicator - Più in alto su mobile */}
+          <div className={isMobile ? "absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5" : "absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2"}>
+            {featuredItems.map((_,i)=><button key={i} onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero(i);setExpandedOverview(false);setHeroFade(true);},800);}} className={isMobile
+              ? `h-1.5 rounded-full transition-all duration-300 ${i===currentHero?'bg-emerald-500 w-8':'bg-white/50 w-6'}`
+              : `h-1 rounded-full transition-all duration-300 ${i===currentHero?'bg-emerald-500 w-12':'bg-white/50 w-8 hover:bg-white/70'}`
+            }/>)}
           </div>
         </div>
       )}
@@ -1315,7 +1342,7 @@ export default function App() {
             <video
               ref={videoRef}
               className="w-full h-full object-contain bg-black"
-              onClick={togglePlay}
+              onClick={isMobile ? () => setShowControls(!showControls) : togglePlay}
               playsInline
               disablePictureInPicture
               crossOrigin="anonymous"
