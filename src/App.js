@@ -1103,33 +1103,41 @@ export default function App() {
       <div className="relative -mt-20 px-8 md:px-16 pb-16 space-y-16">
         {activeView==='home' && continueWatching.length>0 &&(
           <div className="pt-12">
-            <h3 className="text-2xl font-bold mb-6 flex items-center gap-2"><Play className="w-6 h-6 text-emerald-500"/>Continua a guardare</h3>
+            {/* Titolo sezione premium con badge */}
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 to-transparent px-4 py-2 rounded-full border-l-4 border-emerald-500 backdrop-blur-sm">
+                <Play className="w-5 h-5 text-emerald-400 fill-emerald-400"/>
+                <h3 className="text-2xl font-bold">Continua a guardare</h3>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/30 to-transparent"></div>
+            </div>
+
             <div className="relative group">
-              <button onClick={()=>scroll('continue','left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-6 h-6"/></button>
-              <div id="continue" className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
+              <button onClick={()=>scroll('continue','left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-emerald-600/20 hover:bg-emerald-600/40 backdrop-blur-md border border-emerald-500/30 p-3 rounded-full opacity-0 group-hover:opacity-100 transition shadow-xl shadow-emerald-500/20"><ChevronLeft className="w-6 h-6 text-emerald-400"/></button>
+              <div id="continue" className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
                 {continueWatching.map(item=>{
                   if(item.Type==='Episode'){
-                    return <div key={item.Id} className="flex-none w-64 cursor-pointer" onClick={()=>startPlay(item)}>
+                    return <div key={item.Id} className="flex-none w-56 cursor-pointer group/card" onClick={()=>startPlay(item)}>
                       <div className="relative">
-                        <img src={`${EMBY_SERVER}/Items/${item.SeriesId}/Images/Primary?api_key=${API_KEY}`} alt={item.SeriesName} className="w-full aspect-video object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/>
-                        <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center rounded-lg"><div className="bg-emerald-600 rounded-full p-3"><Play className="w-6 h-6 fill-white"/></div></div>
-                        {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-700 rounded-b-lg"><div className="h-full bg-emerald-500 rounded-bl-lg" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
+                        <img src={`${EMBY_SERVER}/Items/${item.SeriesId}/Images/Primary?api_key=${API_KEY}`} alt={item.SeriesName} className="w-full aspect-video object-cover rounded-xl group-hover/card:ring-4 group-hover/card:ring-emerald-500/60 group-hover/card:brightness-110 transition-all duration-300 shadow-xl group-hover/card:shadow-2xl group-hover/card:shadow-emerald-500/40"/>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition flex items-center justify-center rounded-xl"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl"><Play className="w-6 h-6 fill-white"/></div></div>
+                        {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-800/80 rounded-b-xl backdrop-blur-sm"><div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-bl-xl transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
                       </div>
-                      <p className="mt-2 text-sm font-semibold text-center line-clamp-2">{item.SeriesName}</p>
-                      <p className="text-xs text-gray-400 text-center">S{item.ParentIndexNumber} E{item.IndexNumber}</p>
+                      <p className="mt-3 text-sm font-semibold text-center line-clamp-2">{item.SeriesName}</p>
+                      <p className="text-xs text-emerald-400/80 text-center font-medium">S{item.ParentIndexNumber} E{item.IndexNumber}</p>
                     </div>;
                   }
-                  return <div key={item.Id} className="flex-none w-64 cursor-pointer" onClick={()=>startPlay(item)}>
+                  return <div key={item.Id} className="flex-none w-56 cursor-pointer group/card" onClick={()=>startPlay(item)}>
                     <div className="relative">
-                      <img src={getImg(item)} alt={item.Name} className="w-full aspect-video object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/>
-                      <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center rounded-lg"><div className="bg-emerald-600 rounded-full p-3"><Play className="w-6 h-6 fill-white"/></div></div>
-                      {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-700 rounded-b-lg"><div className="h-full bg-emerald-500 rounded-bl-lg" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
+                      <img src={getImg(item)} alt={item.Name} className="w-full aspect-video object-cover rounded-xl group-hover/card:ring-4 group-hover/card:ring-emerald-500/60 group-hover/card:brightness-110 transition-all duration-300 shadow-xl group-hover/card:shadow-2xl group-hover/card:shadow-emerald-500/40"/>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition flex items-center justify-center rounded-xl"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl"><Play className="w-6 h-6 fill-white"/></div></div>
+                      {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-800/80 rounded-b-xl backdrop-blur-sm"><div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-bl-xl transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
                     </div>
-                    <p className="mt-2 text-sm font-semibold text-center line-clamp-2">{item.Name}</p>
+                    <p className="mt-3 text-sm font-semibold text-center line-clamp-2">{item.Name}</p>
                   </div>;
                 })}
               </div>
-              <button onClick={()=>scroll('continue','right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-6 h-6"/></button>
+              <button onClick={()=>scroll('continue','right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-emerald-600/20 hover:bg-emerald-600/40 backdrop-blur-md border border-emerald-500/30 p-3 rounded-full opacity-0 group-hover:opacity-100 transition shadow-xl shadow-emerald-500/20"><ChevronRight className="w-6 h-6 text-emerald-400"/></button>
             </div>
           </div>
         )}
@@ -1338,7 +1346,12 @@ export default function App() {
             {/* Header - Titolo centrato elegante */}
             <div className="absolute top-0 left-0 right-0 p-6 md:p-10 flex justify-center">
               <div className="backdrop-blur-2xl bg-gradient-to-r from-black/40 via-black/30 to-black/40 rounded-3xl px-8 md:px-12 py-6 md:py-8 border border-white/10 shadow-2xl max-w-4xl text-center">
-                <h2 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-white via-emerald-200 to-white bg-clip-text text-transparent drop-shadow-2xl mb-2 tracking-tight leading-tight">
+                <h2
+                  className="text-3xl md:text-5xl font-black text-white mb-2 tracking-tight leading-tight"
+                  style={{
+                    textShadow: '0 0 20px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.3), 0 4px 8px rgba(0, 0, 0, 0.8)'
+                  }}
+                >
                   {playingItem.SeriesName || playingItem.Name}
                 </h2>
                 {playingItem.SeriesName && (
