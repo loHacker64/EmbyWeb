@@ -51,6 +51,9 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemDetails, setItemDetails] = useState(null);
   const [seasons, setSeasons] = useState([]);
+
+  // Rileva dispositivo mobile
+  const [isMobile] = useState(() => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -542,9 +545,6 @@ export default function App() {
   useEffect(() => {
     if (playingItem && videoRef.current && !hlsRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Hls.js player');
-
-      // Rileva se siamo su mobile
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       console.log('📱 Dispositivo mobile:', isMobile);
 
       // Genera nuovo PlaySessionId per questa sessione
@@ -1398,9 +1398,9 @@ export default function App() {
                     </span>
                   </div>
 
-                  {/* Barra di progresso */}
+                  {/* Barra di progresso - con supporto touch */}
                   <div
-                    className="h-3 bg-white/10 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden transition-all duration-300 group-hover/progress:h-4 shadow-inner"
+                    className={isMobile ? "h-6 bg-white/10 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden shadow-inner" : "h-3 bg-white/10 rounded-full cursor-pointer backdrop-blur-sm overflow-hidden transition-all duration-300 group-hover/progress:h-4 shadow-inner"}
                     onMouseDown={e => {
                       setIsDraggingTimeline(true);
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -1422,6 +1422,26 @@ export default function App() {
                     }}
                     onMouseUp={() => setIsDraggingTimeline(false)}
                     onMouseLeave={() => setIsDraggingTimeline(false)}
+                    onTouchStart={e => {
+                      setIsDraggingTimeline(true);
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const x = e.touches[0].clientX - rect.left;
+                      const percentage = Math.max(0, Math.min(1, x / rect.width));
+                      const seekToTime = percentage * duration;
+                      if(videoRef.current && duration) {
+                        videoRef.current.currentTime = seekToTime;
+                      }
+                    }}
+                    onTouchMove={e => {
+                      if(isDraggingTimeline && videoRef.current && duration) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.touches[0].clientX - rect.left;
+                        const percentage = Math.max(0, Math.min(1, x / rect.width));
+                        const seekToTime = percentage * duration;
+                        videoRef.current.currentTime = seekToTime;
+                      }
+                    }}
+                    onTouchEnd={() => setIsDraggingTimeline(false)}
                   >
                     <div
                       className="h-full bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400 rounded-full relative transition-all shadow-lg shadow-emerald-500/50"
@@ -1470,27 +1490,29 @@ export default function App() {
                       <RotateCw className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                     </button>
 
-                    {/* Volume Controls */}
-                    <div className="flex items-center gap-3 bg-white/5 backdrop-blur-xl rounded-2xl px-5 py-3 border border-white/10 shadow-xl">
-                      <button onClick={toggleMute} className="hover:text-emerald-400 transition-colors group">
-                        {isMuted ?
-                          <VolumeX className="w-5 h-5 md:w-6 md:h-6"/> :
-                          <Volume2 className="w-5 h-5 md:w-6 md:h-6"/>
-                        }
-                      </button>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={volume}
-                        onChange={handleVolume}
-                        className="w-20 md:w-28 h-2 accent-emerald-500 cursor-pointer"
-                        style={{
-                          background: `linear-gradient(to right, rgb(16 185 129) 0%, rgb(16 185 129) ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%, rgba(255,255,255,0.1) 100%)`
-                        }}
-                      />
-                    </div>
+                    {/* Volume Controls - Solo desktop */}
+                    {!isMobile && (
+                      <div className="flex items-center gap-3 bg-white/5 backdrop-blur-xl rounded-2xl px-5 py-3 border border-white/10 shadow-xl">
+                        <button onClick={toggleMute} className="hover:text-emerald-400 transition-colors group">
+                          {isMuted ?
+                            <VolumeX className="w-5 h-5 md:w-6 md:h-6"/> :
+                            <Volume2 className="w-5 h-5 md:w-6 md:h-6"/>
+                          }
+                        </button>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={volume}
+                          onChange={handleVolume}
+                          className="w-20 md:w-28 h-2 accent-emerald-500 cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, rgb(16 185 129) 0%, rgb(16 185 129) ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%, rgba(255,255,255,0.1) 100%)`
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Lato destro - Audio e Fullscreen */}
@@ -1505,18 +1527,28 @@ export default function App() {
                           <Languages className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                         </button>
 
-                        {/* Menu dropdown tracce audio */}
+                        {/* Menu tracce audio - Desktop dropdown / Mobile full-screen */}
                         {showAudioMenu && (
-                          <div className="absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]">
-                            <div className="p-3 border-b border-white/10">
-                              <h4 className="text-sm font-bold text-white">Traccia Audio</h4>
+                          <div className={isMobile
+                            ? "fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex flex-col"
+                            : "absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
+                          }>
+                            <div className={isMobile ? "p-6 border-b border-white/10 flex items-center justify-between" : "p-3 border-b border-white/10"}>
+                              <h4 className={isMobile ? "text-2xl font-bold text-white" : "text-sm font-bold text-white"}>Traccia Audio</h4>
+                              {isMobile && (
+                                <button onClick={() => setShowAudioMenu(false)} className="text-white">
+                                  <X className="w-8 h-8"/>
+                                </button>
+                              )}
                             </div>
-                            <div className="max-h-[300px] overflow-y-auto">
+                            <div className={isMobile ? "flex-1 overflow-y-auto" : "max-h-[300px] overflow-y-auto"}>
                               {audioTracks.map(track => (
                                 <button
                                   key={track.index}
                                   onClick={() => changeAudioTrack(track.index)}
-                                  className={`w-full text-left px-4 py-3 transition-colors ${
+                                  className={`w-full text-left transition-colors ${
+                                    isMobile ? 'px-6 py-6' : 'px-4 py-3'
+                                  } ${
                                     selectedAudioTrack === track.index
                                       ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
                                       : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
@@ -1524,16 +1556,16 @@ export default function App() {
                                 >
                                   <div className="flex items-center justify-between">
                                     <div>
-                                      <div className="font-medium text-sm">
+                                      <div className={isMobile ? "font-medium text-xl" : "font-medium text-sm"}>
                                         {track.displayLanguage}
                                         {track.title && ` - ${track.title}`}
                                       </div>
-                                      <div className="text-xs text-gray-500 mt-1">
+                                      <div className={isMobile ? "text-base text-gray-400 mt-2" : "text-xs text-gray-500 mt-1"}>
                                         {track.codec.toUpperCase()}
                                       </div>
                                     </div>
                                     {selectedAudioTrack === track.index && (
-                                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                      <div className={isMobile ? "w-4 h-4 bg-emerald-500 rounded-full" : "w-2 h-2 bg-emerald-500 rounded-full"}></div>
                                     )}
                                   </div>
                                 </button>
@@ -1554,17 +1586,27 @@ export default function App() {
                           <Subtitles className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
                         </button>
 
-                        {/* Menu dropdown sottotitoli */}
+                        {/* Menu sottotitoli - Desktop dropdown / Mobile full-screen */}
                         {showSubtitleMenu && (
-                          <div className="absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]">
-                            <div className="p-3 border-b border-white/10">
-                              <h4 className="text-sm font-bold text-white">Sottotitoli</h4>
+                          <div className={isMobile
+                            ? "fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex flex-col"
+                            : "absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
+                          }>
+                            <div className={isMobile ? "p-6 border-b border-white/10 flex items-center justify-between" : "p-3 border-b border-white/10"}>
+                              <h4 className={isMobile ? "text-2xl font-bold text-white" : "text-sm font-bold text-white"}>Sottotitoli</h4>
+                              {isMobile && (
+                                <button onClick={() => setShowSubtitleMenu(false)} className="text-white">
+                                  <X className="w-8 h-8"/>
+                                </button>
+                              )}
                             </div>
-                            <div className="max-h-[300px] overflow-y-auto">
+                            <div className={isMobile ? "flex-1 overflow-y-auto" : "max-h-[300px] overflow-y-auto"}>
                               {/* Opzione Nessuno */}
                               <button
                                 onClick={() => changeSubtitleTrack(null)}
-                                className={`w-full text-left px-4 py-3 transition-colors ${
+                                className={`w-full text-left transition-colors ${
+                                  isMobile ? 'px-6 py-6' : 'px-4 py-3'
+                                } ${
                                   selectedSubtitleTrack === null
                                     ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
                                     : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
@@ -1572,10 +1614,10 @@ export default function App() {
                               >
                                 <div className="flex items-center justify-between">
                                   <div>
-                                    <div className="font-medium text-sm">Nessuno</div>
+                                    <div className={isMobile ? "font-medium text-xl" : "font-medium text-sm"}>Nessuno</div>
                                   </div>
                                   {selectedSubtitleTrack === null && (
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    <div className={isMobile ? "w-4 h-4 bg-emerald-500 rounded-full" : "w-2 h-2 bg-emerald-500 rounded-full"}></div>
                                   )}
                                 </div>
                               </button>
@@ -1585,7 +1627,9 @@ export default function App() {
                                 <button
                                   key={track.index}
                                   onClick={() => changeSubtitleTrack(track.index)}
-                                  className={`w-full text-left px-4 py-3 transition-colors ${
+                                  className={`w-full text-left transition-colors ${
+                                    isMobile ? 'px-6 py-6' : 'px-4 py-3'
+                                  } ${
                                     selectedSubtitleTrack === track.index
                                       ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
                                       : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
@@ -1593,16 +1637,16 @@ export default function App() {
                                 >
                                   <div className="flex items-center justify-between">
                                     <div>
-                                      <div className="font-medium text-sm">
+                                      <div className={isMobile ? "font-medium text-xl" : "font-medium text-sm"}>
                                         {track.displayLanguage}
                                         {track.title && ` - ${track.title}`}
                                       </div>
-                                      <div className="text-xs text-gray-500 mt-1">
+                                      <div className={isMobile ? "text-base text-gray-400 mt-2" : "text-xs text-gray-500 mt-1"}>
                                         {track.codec.toUpperCase()}
                                       </div>
                                     </div>
                                     {selectedSubtitleTrack === track.index && (
-                                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                      <div className={isMobile ? "w-4 h-4 bg-emerald-500 rounded-full" : "w-2 h-2 bg-emerald-500 rounded-full"}></div>
                                     )}
                                   </div>
                                 </button>
