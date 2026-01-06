@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
-import videojs from 'video.js';
-import 'video.js/dist/video-js.css';
+import Hls from 'hls.js';
 
 const EMBY_SERVER = 'http://192.168.1.100:8096';
 const API_KEY = '9d8b1d7f8e8a4ef488dff0a7e894b862';
@@ -82,7 +81,7 @@ export default function App() {
   const [isDraggingTimeline, setIsDraggingTimeline] = useState(false);
   const [startTimeTicks, setStartTimeTicks] = useState(0); // Per seeking fluido e cambio traccia
   const videoRef = useRef(null);
-  const playerRef = useRef(null);
+  const hlsRef = useRef(null); // Hls.js instance
   const controlsTimeoutRef = useRef(null);
   const skipTimeoutRef = useRef(null);
   const movieGridRef = useRef(null);
@@ -539,10 +538,10 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  // Inizializza video.js quando il player si apre
+  // Inizializza Hls.js quando il player si apre
   useEffect(() => {
-    if (playingItem && videoRef.current && !playerRef.current && selectedAudioTrack !== null) {
-      console.log('🎬 Inizializzo Video.js player con HLS');
+    if (playingItem && videoRef.current && !hlsRef.current && selectedAudioTrack !== null) {
+      console.log('🎬 Inizializzo Hls.js player');
 
       // Genera nuovo PlaySessionId per questa sessione
       const newPlaySessionId = generatePlaySessionId();
@@ -562,7 +561,7 @@ export default function App() {
         TranscodingMaxAudioChannels: '2',
         SegmentContainer: 'ts',
         MinSegments: '1',
-        BreakOnNonKeyFrames: 'True', // TRUE per seeking fluido!
+        BreakOnNonKeyFrames: 'True',
         'h264-profile': 'high,main,baseline,constrainedbaseline,high10',
         'h264-level': '62',
         'hevc-codectag': 'hvc1,hev1,hevc,hdmv'
@@ -575,74 +574,120 @@ export default function App() {
       }
 
       const videoUrl = `${EMBY_SERVER}/Videos/${playingItem.Id}/master.m3u8?${params.toString()}`;
-      console.log('🎬 HLS COMPLETO come Emby ufficiale');
+      console.log('🎬 HLS URL:', videoUrl);
       console.log('🎬 PlaySessionId:', newPlaySessionId, 'AudioIndex:', selectedAudioTrack);
-      console.log('🎬 URL:', videoUrl);
 
-      const player = videojs(videoRef.current, {
-        controls: false,
-        autoplay: true,
-        preload: 'auto',
-        fluid: true,
-        html5: {
-          vhs: {
-            overrideNative: true
-          },
-          nativeAudioTracks: false,
-          nativeVideoTracks: false
-        },
-        sources: [{
-          src: videoUrl,
-          type: 'application/x-mpegURL'
-        }]
+      const video = videoRef.current;
+
+      // Check se il browser supporta HLS nativamente (Safari)
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        console.log('✅ Browser supporta HLS nativo (Safari)');
+        video.src = videoUrl;
+        video.addEventListener('loadedmetadata', () => {
+          const durationFromEmby = playingItem.RunTimeTicks ? playingItem.RunTimeTicks / 10000000 : video.duration;
+          setDuration(durationFromEmby);
+          console.log('✅ HLS nativo caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
+          reportPlaybackStart(playingItem);
+        });
+      }
+      // Altrimenti usa Hls.js
+      else if (Hls.isSupported()) {
+        console.log('✅ Hls.js supportato, inizializzo...');
+
+        const hls = new Hls({
+          debug: false,
+          enableWorker: true,
+          lowLatencyMode: false,
+          backBufferLength: 90
+        });
+
+        hlsRef.current = hls;
+
+        // Carica il manifest
+        hls.loadSource(videoUrl);
+        hls.attachMedia(video);
+
+        // EVENTO: Manifest parsato
+        hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+          console.log('✅ Manifest HLS parsato');
+          console.log('📊 Livelli disponibili:', data.levels.length);
+          console.log('🎵 Tracce audio disponibili:', data.audioTracks?.length || 0);
+
+          // Imposta durata
+          const durationFromEmby = playingItem.RunTimeTicks ? playingItem.RunTimeTicks / 10000000 : video.duration;
+          setDuration(durationFromEmby);
+          console.log('✅ Durata:', Math.floor(durationFromEmby/60), 'min');
+
+          // Auto-play
+          video.play().catch(e => console.error('❌ Errore autoplay:', e));
+
+          // Notifica Emby
+          reportPlaybackStart(playingItem);
+        });
+
+        // EVENTO: Errori
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error('❌ Hls.js Error:', data.type, data.details);
+          if (data.fatal) {
+            switch(data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.error('💔 Errore di rete fatale, tento recovery...');
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.error('💔 Errore media fatale, tento recovery...');
+                hls.recoverMediaError();
+                break;
+              default:
+                console.error('💔 Errore irrecuperabile, distruggo player');
+                hls.destroy();
+                hlsRef.current = null;
+                break;
+            }
+          }
+        });
+
+      } else {
+        console.error('❌ HLS non supportato in questo browser!');
+      }
+
+      // Eventi video HTML5
+      video.addEventListener('timeupdate', () => {
+        setCurrentTime(video.currentTime);
       });
 
-      playerRef.current = player;
-
-      // Eventi del player
-      player.on('loadedmetadata', () => {
-        const durationFromEmby = playingItem.RunTimeTicks ? playingItem.RunTimeTicks / 10000000 : player.duration();
-        setDuration(durationFromEmby);
-        console.log('✅ Video.js caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
-
-        // Con HLS + AudioStreamIndex + StartTimeTicks:
-        // - Emby genera segmenti HLS con solo la traccia audio richiesta
-        // - Il video parte già dalla posizione corretta (StartTimeTicks)
-        // - Nessun seeking lato client necessario!
-        console.log('✅ Stream HLS caricato con AudioStreamIndex:', selectedAudioTrack);
+      video.addEventListener('loadedmetadata', () => {
+        console.log('✅ Metadata caricati');
         if (startTimeTicks > 0) {
           console.log('✅ Video ripreso da StartTimeTicks:', startTimeTicks / 10000000, 's');
         }
-
-        // Notifica Emby
-        reportPlaybackStart(playingItem);
       });
 
-      player.on('timeupdate', () => {
-        setCurrentTime(player.currentTime());
+      video.addEventListener('play', () => {
+        setIsPlaying(true);
       });
 
-      player.on('error', (e) => {
-        console.error('❌ Video.js error:', player.error());
+      video.addEventListener('pause', () => {
+        setIsPlaying(false);
       });
 
-      // Avvia tracking Emby
+      // Avvia tracking Emby ogni 10s
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
       }
       progressIntervalRef.current = setInterval(() => {
-        if (player && playingItem) {
-          reportPlaybackProgress(playingItem, player.currentTime() * 1000);
+        if (video && playingItem) {
+          reportPlaybackProgress(playingItem, video.currentTime * 1000);
         }
       }, 10000);
     }
 
     // Cleanup
     return () => {
-      if (playerRef.current) {
-        console.log('🧹 Cleanup Video.js player');
-        playerRef.current.dispose();
-        playerRef.current = null;
+      if (hlsRef.current) {
+        console.log('🧹 Cleanup Hls.js player');
+        hlsRef.current.destroy();
+        hlsRef.current = null;
       }
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
@@ -652,7 +697,6 @@ export default function App() {
 
   const closePlayer = async () => {
     // CRITICAL: Prima termina FFmpeg sul server, POI notifica la fine
-    // Se non facciamo questo, FFmpeg continuerà a consumare risorse!
     try {
       // 1. DELETE ActiveEncodings - Termina il processo FFmpeg sul server
       await fetch(`${EMBY_SERVER}/Videos/ActiveEncodings?DeviceId=${DEVICE_ID}`, {
@@ -667,8 +711,8 @@ export default function App() {
     }
 
     // 2. Notifica Emby della fine della riproduzione
-    if (playingItem && playerRef.current) {
-      await reportPlaybackStopped(playingItem, playerRef.current.currentTime() * 1000);
+    if (playingItem && videoRef.current) {
+      await reportPlaybackStopped(playingItem, videoRef.current.currentTime * 1000);
     }
 
     // Ferma l'aggiornamento del progresso
@@ -677,14 +721,17 @@ export default function App() {
       progressIntervalRef.current = null;
     }
 
-    // Distruggi il player
-    if (playerRef.current) {
-      playerRef.current.dispose();
-      playerRef.current = null;
+    // Distruggi Hls.js
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
 
-    // Reset seek position
-    seekToTimeRef.current = null;
+    // Reset video element
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.src = '';
+    }
 
     setPlayingItem(null);
     setIsPlaying(false);
@@ -698,34 +745,34 @@ export default function App() {
     setShowSubtitleMenu(false);
     setMediaSourceId(null);
     setPlaySessionId(null);
-    setStartTimeTicks(0); // Reset StartTimeTicks per il prossimo video
+    setStartTimeTicks(0);
   };
 
   const togglePlay = () => {
-    if (playerRef.current) {
+    if (videoRef.current) {
       const willBePlaying = !isPlaying;
 
       if (isPlaying) {
-        playerRef.current.pause();
+        videoRef.current.pause();
       } else {
-        playerRef.current.play();
+        videoRef.current.play();
       }
 
       setIsPlaying(willBePlaying);
 
       // EVENT-BASED REPORTING: Invia report immediato quando cambia lo stato play/pause
       if (playingItem) {
-        reportPlaybackProgress(playingItem, playerRef.current.currentTime() * 1000);
+        reportPlaybackProgress(playingItem, videoRef.current.currentTime * 1000);
         console.log('⏯️ Event report:', willBePlaying ? 'Unpause' : 'Pause');
       }
     }
   };
 
   const skip = (sec) => {
-    if (playerRef.current) {
-      const newTime = playerRef.current.currentTime() + sec;
+    if (videoRef.current) {
+      const newTime = videoRef.current.currentTime + sec;
       console.log('⏩ Skip', sec, 's - nuovo tempo:', Math.floor(newTime), 's');
-      playerRef.current.currentTime(newTime);
+      videoRef.current.currentTime = newTime;
       setShowSkipIndicator(sec);
       if (skipTimeoutRef.current) clearTimeout(skipTimeoutRef.current);
       skipTimeoutRef.current = setTimeout(() => setShowSkipIndicator(null), 2000);
@@ -733,8 +780,8 @@ export default function App() {
   };
 
   const toggleMute = () => {
-    if (playerRef.current) {
-      playerRef.current.muted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
     }
   };
@@ -742,12 +789,12 @@ export default function App() {
   const handleVolume = (e) => {
     const vol = parseFloat(e.target.value);
     setVolume(vol);
-    if (playerRef.current) {
-      playerRef.current.volume(vol);
+    if (videoRef.current) {
+      videoRef.current.volume = vol;
 
       // EVENT-BASED REPORTING: Invia report quando l'utente cambia il volume
       if (playingItem) {
-        reportPlaybackProgress(playingItem, playerRef.current.currentTime() * 1000);
+        reportPlaybackProgress(playingItem, videoRef.current.currentTime * 1000);
         console.log('🔊 Event report: VolumeChange to', Math.round(vol * 100) + '%');
       }
     }
