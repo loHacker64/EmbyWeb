@@ -99,10 +99,10 @@ export default function App() {
           setExpandedOverview(false);
           setHeroFade(true);
         }, 800);
-      }, 6000);
+      }, expandedOverview ? 12000 : 6000); // 12 secondi quando espanso, 6 secondi normale
       return () => clearInterval(interval);
     }
-  }, [featuredItems.length]);
+  }, [featuredItems.length, expandedOverview]);
 
   useEffect(() => {
     if (user) loadHeroByView();
@@ -1067,7 +1067,7 @@ export default function App() {
               </button>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-              {searchResults.map(item=><div key={item.Id} className="group cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg group-hover:scale-105 group-hover:ring-2 group-hover:ring-emerald-500 transition shadow-xl"/><p className="text-sm mt-2 truncate text-center font-medium">{item.Name}</p><p className="text-xs text-gray-400 text-center">{item.Type==='Movie'?'Film':'Serie TV'}</p></div>)}
+              {searchResults.map(item=><div key={item.Id} className="group cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg group-hover:ring-4 group-hover:ring-emerald-500/60 group-hover:brightness-110 transition-all shadow-xl group-hover:shadow-2xl group-hover:shadow-emerald-500/30"/><p className="text-sm mt-2 truncate text-center font-medium">{item.Name}</p><p className="text-xs text-gray-400 text-center">{item.Type==='Movie'?'Film':'Serie TV'}</p></div>)}
             </div>
           </div>
         </div>
@@ -1111,7 +1111,7 @@ export default function App() {
                   if(item.Type==='Episode'){
                     return <div key={item.Id} className="flex-none w-64 cursor-pointer" onClick={()=>startPlay(item)}>
                       <div className="relative">
-                        <img src={`${EMBY_SERVER}/Items/${item.SeriesId}/Images/Primary?api_key=${API_KEY}`} alt={item.SeriesName} className="w-full aspect-video object-cover rounded-lg hover:scale-105 transition-transform duration-300 shadow-xl"/>
+                        <img src={`${EMBY_SERVER}/Items/${item.SeriesId}/Images/Primary?api_key=${API_KEY}`} alt={item.SeriesName} className="w-full aspect-video object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/>
                         <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center rounded-lg"><div className="bg-emerald-600 rounded-full p-3"><Play className="w-6 h-6 fill-white"/></div></div>
                         {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-700 rounded-b-lg"><div className="h-full bg-emerald-500 rounded-bl-lg" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
                       </div>
@@ -1121,7 +1121,7 @@ export default function App() {
                   }
                   return <div key={item.Id} className="flex-none w-64 cursor-pointer" onClick={()=>startPlay(item)}>
                     <div className="relative">
-                      <img src={getImg(item)} alt={item.Name} className="w-full aspect-video object-cover rounded-lg hover:scale-105 transition-transform duration-300 shadow-xl"/>
+                      <img src={getImg(item)} alt={item.Name} className="w-full aspect-video object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/>
                       <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center rounded-lg"><div className="bg-emerald-600 rounded-full p-3"><Play className="w-6 h-6 fill-white"/></div></div>
                       {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-700 rounded-b-lg"><div className="h-full bg-emerald-500 rounded-bl-lg" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
                     </div>
@@ -1140,7 +1140,7 @@ export default function App() {
             <div className="relative group">
               <button onClick={()=>scroll(`row-${lib.Id}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-6 h-6"/></button>
               <div id={`row-${lib.Id}`} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
-                {(lib.CollectionType==='movies'?movieLibrary:lib.CollectionType==='tvshows'?seriesLibrary:featuredItems).slice(0,20).map(item=><div key={item.Id} className="flex-none w-48 cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:scale-110 transition-transform duration-500 shadow-xl"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
+                {(lib.CollectionType==='movies'?movieLibrary:lib.CollectionType==='tvshows'?seriesLibrary:featuredItems).slice(0,20).map(item=><div key={item.Id} className="flex-none w-48 cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
               </div>
               <button onClick={()=>scroll(`row-${lib.Id}`,'right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-6 h-6"/></button>
             </div>
@@ -1159,7 +1159,7 @@ export default function App() {
               </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-              {movieLibrary.map(item=><div key={item.Id} className="cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:scale-110 transition-transform duration-500 shadow-xl"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
+              {movieLibrary.map(item=><div key={item.Id} className="cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
             </div>
             {loadingMore && <div className="text-center py-8"><div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}
             {!hasMoreMovies && movieLibrary.length > 0 && <div className="text-center py-8 text-gray-400">Tutti i film caricati</div>}
@@ -1178,7 +1178,7 @@ export default function App() {
               </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-              {seriesLibrary.map(item=><div key={item.Id} className="cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:scale-110 transition-transform duration-500 shadow-xl"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
+              {seriesLibrary.map(item=><div key={item.Id} className="cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
             </div>
             {loadingMore && <div className="text-center py-8"><div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}
             {!hasMoreSeries && seriesLibrary.length > 0 && <div className="text-center py-8 text-gray-400">Tutte le serie caricate</div>}
@@ -1335,30 +1335,30 @@ export default function App() {
           {/* Controlli Video - Design Premium Glassmorphism */}
           <div className={`absolute inset-0 bg-gradient-to-b from-black/90 via-transparent via-50% to-black/95 transition-all duration-700 ${showControls?'opacity-100':'opacity-0 pointer-events-none'}`}>
 
-            {/* Header - Titolo e chiudi */}
-            <div className="absolute top-0 left-0 right-0 p-6 md:p-10">
-              <div className="flex items-start justify-between backdrop-blur-md bg-black/20 rounded-3xl p-6 border border-white/10 shadow-2xl">
-                <div className="flex-1 pr-4">
-                  <h2 className="text-2xl md:text-4xl font-black text-white drop-shadow-2xl mb-2 tracking-tight">
-                    {playingItem.SeriesName || playingItem.Name}
-                  </h2>
-                  {playingItem.SeriesName && (
-                    <p className="text-base md:text-xl text-gray-200/90 drop-shadow-lg font-medium">
-                      <span className="text-emerald-400">S{playingItem.ParentIndexNumber}</span>
-                      <span className="mx-2 text-emerald-400/50">·</span>
-                      <span className="text-emerald-400">E{playingItem.IndexNumber}</span>
-                      <span className="mx-2 text-emerald-400/50">·</span>
-                      <span>{playingItem.Name}</span>
-                    </p>
-                  )}
-                </div>
-                <button
-                  onClick={closePlayer}
-                  className="bg-white/5 hover:bg-red-500/20 backdrop-blur-2xl rounded-2xl p-4 transition-all duration-300 hover:scale-110 border border-white/10 hover:border-red-500/30 group shadow-xl"
-                >
-                  <X className="w-7 h-7 group-hover:text-red-400 transition-colors"/>
-                </button>
+            {/* Header - Titolo centrato elegante */}
+            <div className="absolute top-0 left-0 right-0 p-6 md:p-10 flex justify-center">
+              <div className="backdrop-blur-2xl bg-gradient-to-r from-black/40 via-black/30 to-black/40 rounded-3xl px-8 md:px-12 py-6 md:py-8 border border-white/10 shadow-2xl max-w-4xl text-center">
+                <h2 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-white via-emerald-200 to-white bg-clip-text text-transparent drop-shadow-2xl mb-2 tracking-tight leading-tight">
+                  {playingItem.SeriesName || playingItem.Name}
+                </h2>
+                {playingItem.SeriesName && (
+                  <p className="text-lg md:text-2xl text-gray-100 drop-shadow-lg font-semibold flex items-center justify-center gap-3">
+                    <span className="px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-400/30 text-emerald-300">S{playingItem.ParentIndexNumber}</span>
+                    <span className="text-emerald-400/50">·</span>
+                    <span className="px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-400/30 text-emerald-300">E{playingItem.IndexNumber}</span>
+                    <span className="text-emerald-400/50">·</span>
+                    <span className="text-white/90">{playingItem.Name}</span>
+                  </p>
+                )}
               </div>
+
+              {/* Pulsante chiudi separato */}
+              <button
+                onClick={closePlayer}
+                className="absolute top-6 md:top-10 right-6 md:right-10 bg-black/40 hover:bg-red-500/30 backdrop-blur-2xl rounded-2xl p-4 transition-all duration-300 hover:scale-110 border border-white/10 hover:border-red-500/50 group shadow-2xl"
+              >
+                <X className="w-7 h-7 text-white group-hover:text-red-400 transition-colors drop-shadow-lg"/>
+              </button>
             </div>
 
             {/* Footer - Controlli completi */}
