@@ -543,18 +543,24 @@ export default function App() {
     if (playingItem && videoRef.current && !hlsRef.current && selectedAudioTrack !== null) {
       console.log('🎬 Inizializzo Hls.js player');
 
+      // Rileva se siamo su mobile
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      console.log('📱 Dispositivo mobile:', isMobile);
+
       // Genera nuovo PlaySessionId per questa sessione
       const newPlaySessionId = generatePlaySessionId();
       setPlaySessionId(newPlaySessionId);
 
       // HLS COMPLETO esattamente come Emby ufficiale
+      // Su mobile: AAC/MP3 (AC3 non supportato su Android Chrome)
+      // Su desktop: AC3/MP3/AAC (pieno supporto)
       const params = new URLSearchParams({
         DeviceId: DEVICE_ID,
         MediaSourceId: mediaSourceId || `mediasource_${playingItem.Id}`,
         PlaySessionId: newPlaySessionId,
         api_key: API_KEY,
         VideoCodec: 'hevc,h264,av1',
-        AudioCodec: 'ac3,mp3,aac',
+        AudioCodec: isMobile ? 'aac,mp3' : 'ac3,mp3,aac',
         VideoBitrate: '199680000',
         AudioBitrate: '320000',
         AudioStreamIndex: selectedAudioTrack,
@@ -566,6 +572,8 @@ export default function App() {
         'h264-level': '62',
         'hevc-codectag': 'hvc1,hev1,hevc,hdmv'
       });
+
+      console.log('🎵 Codec audio:', params.get('AudioCodec'));
 
       // Aggiungi StartTimeTicks se vogliamo iniziare da una posizione specifica
       if (startTimeTicks > 0) {
