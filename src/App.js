@@ -579,16 +579,28 @@ export default function App() {
 
       const video = videoRef.current;
 
-      // Check se il browser supporta HLS nativamente (Safari)
+      // Check se il browser supporta HLS nativamente (Safari/Edge)
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        console.log('✅ Browser supporta HLS nativo (Safari)');
-        video.src = videoUrl;
-        video.addEventListener('loadedmetadata', () => {
+        console.log('✅ Browser supporta HLS nativo');
+
+        // IMPORTANTE: Aggiungi listener PRIMA di impostare src!
+        const handleLoadedMetadata = () => {
           const durationFromEmby = playingItem.RunTimeTicks ? playingItem.RunTimeTicks / 10000000 : video.duration;
           setDuration(durationFromEmby);
           console.log('✅ HLS nativo caricato - Durata:', Math.floor(durationFromEmby/60), 'min');
+
+          // Auto-play
+          video.play().catch(e => console.error('❌ Errore autoplay:', e));
+
+          // Notifica Emby
           reportPlaybackStart(playingItem);
-        });
+        };
+
+        video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+        // ADESSO imposta src (triggererà loadedmetadata)
+        video.src = videoUrl;
+        video.load();
       }
       // Altrimenti usa Hls.js
       else if (Hls.isSupported()) {
