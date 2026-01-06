@@ -822,11 +822,14 @@ export default function App() {
   };
 
   const showCtrls = () => {
-    setShowControls(true);
-    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    controlsTimeoutRef.current = setTimeout(() => {
-      if (isPlaying) setShowControls(false);
-    }, 3000);
+    if (!isMobile) {
+      // Solo desktop: mostra controlli con timeout auto-hide
+      setShowControls(true);
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = setTimeout(() => {
+        if (isPlaying) setShowControls(false);
+      }, 3000);
+    }
   };
 
   const formatTime = (sec) => {
@@ -1108,30 +1111,23 @@ export default function App() {
               </div>
             </div>
           </div>
-          {/* Frecce navigazione - In basso su mobile */}
-          <button
-            onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero-1+featuredItems.length)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}}
-            className={isMobile
-              ? "absolute left-2 bottom-3 bg-emerald-600/80 hover:bg-emerald-600 backdrop-blur-md border border-emerald-500/30 p-2 rounded-full transition shadow-xl z-10"
-              : "absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"
-            }>
-            <ChevronLeft className={isMobile ? "w-6 h-6 text-white" : "w-8 h-8"}/>
-          </button>
-          <button
-            onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero+1)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}}
-            className={isMobile
-              ? "absolute right-2 bottom-3 bg-emerald-600/80 hover:bg-emerald-600 backdrop-blur-md border border-emerald-500/30 p-2 rounded-full transition shadow-xl z-10"
-              : "absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"
-            }>
-            <ChevronRight className={isMobile ? "w-6 h-6 text-white" : "w-8 h-8"}/>
-          </button>
-          {/* Dots indicator - Più in alto su mobile */}
-          <div className={isMobile ? "absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5" : "absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2"}>
-            {featuredItems.map((_,i)=><button key={i} onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero(i);setExpandedOverview(false);setHeroFade(true);},800);}} className={isMobile
-              ? `h-1.5 rounded-full transition-all duration-300 ${i===currentHero?'bg-emerald-500 w-8':'bg-white/50 w-6'}`
-              : `h-1 rounded-full transition-all duration-300 ${i===currentHero?'bg-emerald-500 w-12':'bg-white/50 w-8 hover:bg-white/70'}`
-            }/>)}
-          </div>
+          {/* Frecce navigazione - Solo desktop */}
+          {!isMobile && (
+            <>
+              <button
+                onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero-1+featuredItems.length)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"
+              >
+                <ChevronLeft className="w-8 h-8"/>
+              </button>
+              <button
+                onClick={()=>{setHeroFade(false);setTimeout(()=>{setCurrentHero((currentHero+1)%featuredItems.length);setExpandedOverview(false);setHeroFade(true);},800);}}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-3 rounded-full transition backdrop-blur-sm"
+              >
+                <ChevronRight className="w-8 h-8"/>
+              </button>
+            </>
+          )}
         </div>
       )}
 
@@ -1334,8 +1330,17 @@ export default function App() {
       {playingItem && (
         <div
           id="player-container"
-          className="fixed inset-0 z-[200] bg-black flex items-center justify-center"
-          onMouseMove={showCtrls}
+          className="fixed inset-0 z-[200] bg-black flex items-center justify-center overflow-hidden"
+          onMouseMove={!isMobile ? showCtrls : undefined}
+          style={{
+            // Nasconde scrollbar browser su mobile
+            overflow: 'hidden',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
         >
           {/* HTML5 Video Player con Hls.js */}
           <div className="w-full h-full relative">
