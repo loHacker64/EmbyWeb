@@ -45,6 +45,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false); // Per mobile: controlla se search bar è espansa
   const [activeView, setActiveView] = useState('home');
   const [expandedOverview, setExpandedOverview] = useState(false);
   const [heroFade, setHeroFade] = useState(true);
@@ -270,6 +271,7 @@ export default function App() {
     setSearchQuery('');
     setSearchResults([]);
     setShowSearch(false);
+    setSearchExpanded(false); // Chiudi anche l'espansione mobile
   };
 
   const getImg = (item, type='Primary') => {
@@ -1048,29 +1050,76 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/90 via-black/70 to-transparent px-8 py-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/90 via-black/70 to-transparent px-4 md:px-8 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <h1 className="text-3xl font-bold text-emerald-500">EMBY</h1>
-            <nav className="flex gap-6">
-              {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-base font-semibold transition px-3 py-2 rounded-lg ${activeView===v?'text-white bg-white/10':'text-gray-400 hover:text-white hover:bg-white/5'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
-            </nav>
-          </div>
-          <div className="flex-1 max-w-2xl mx-8">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input type="text" placeholder="Cerca film o serie TV..." value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);handleSearch(e.target.value);setShowSearch(e.target.value.length>0);}} className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-full pl-12 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:bg-white/20 focus:border-emerald-500 transition" />
-              {searchQuery && (
-                <button onClick={closeSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
-                  <X className="w-5 h-5" />
+          {/* Mobile: Search espansa copre tutto */}
+          {isMobile && searchExpanded ? (
+            <div className="flex-1 flex items-center gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Cerca film o serie TV..."
+                  value={searchQuery}
+                  onChange={e=>{setSearchQuery(e.target.value);handleSearch(e.target.value);setShowSearch(e.target.value.length>0);}}
+                  className="w-full bg-emerald-600/20 backdrop-blur-xl border border-emerald-500/50 rounded-full pl-12 pr-12 py-3 text-white placeholder-gray-300 focus:outline-none focus:bg-emerald-600/30 focus:border-emerald-400 transition"
+                  autoFocus
+                />
+                <button onClick={closeSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 hover:text-white transition">
+                  <X className="w-6 h-6" />
                 </button>
-              )}
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="https://ilmioserver.diskstattion.me:8096" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LayoutGrid className="w-4 h-4" /><span className="text-sm">Versione classica</span></a>
-            <button onClick={()=>setUser(null)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LogOut className="w-4 h-4" /></button>
-          </div>
+          ) : (
+            <>
+              {/* Desktop o Mobile normale */}
+              <div className={isMobile ? "flex items-center gap-4" : "flex items-center gap-8"}>
+                <h1 className={isMobile ? "text-2xl font-bold text-emerald-500" : "text-3xl font-bold text-emerald-500"}>EMBY</h1>
+                {!isMobile && (
+                  <nav className="flex gap-6">
+                    {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-base font-semibold transition px-3 py-2 rounded-lg ${activeView===v?'text-white bg-white/10':'text-gray-400 hover:text-white hover:bg-white/5'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
+                  </nav>
+                )}
+              </div>
+
+              {/* Mobile: Pulsanti HOME/FILM/SERIE solo quando search non espansa */}
+              {isMobile && !searchExpanded && (
+                <nav className="flex gap-2">
+                  {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-xs font-semibold transition px-2 py-1.5 rounded-lg ${activeView===v?'text-white bg-emerald-600':'text-gray-400'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
+                </nav>
+              )}
+
+              {/* Search Bar - Desktop sempre visibile, Mobile icona */}
+              {isMobile ? (
+                <button
+                  onClick={() => setSearchExpanded(true)}
+                  className="bg-emerald-600/20 hover:bg-emerald-600/30 backdrop-blur-xl border border-emerald-500/50 rounded-full p-3 transition-all hover:scale-110 shadow-lg shadow-emerald-500/20"
+                >
+                  <Search className="w-5 h-5 text-emerald-400" />
+                </button>
+              ) : (
+                <div className="flex-1 max-w-2xl mx-8">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input type="text" placeholder="Cerca film o serie TV..." value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);handleSearch(e.target.value);setShowSearch(e.target.value.length>0);}} className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-full pl-12 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:bg-white/20 focus:border-emerald-500 transition" />
+                    {searchQuery && (
+                      <button onClick={closeSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
+                        <X className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Link e logout - Nascosti su mobile quando search espansa */}
+              {!isMobile && (
+                <div className="flex items-center gap-4">
+                  <a href="https://ilmioserver.diskstattion.me:8096" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LayoutGrid className="w-4 h-4" /><span className="text-sm">Versione classica</span></a>
+                  <button onClick={()=>setUser(null)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LogOut className="w-4 h-4" /></button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </header>
 
