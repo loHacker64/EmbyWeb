@@ -56,7 +56,8 @@ export default function App() {
   // Rileva dispositivo mobile (solo phone, non tablet)
   // Phone: touch device CON schermo piccolo (<768px) → UI mobile
   // Tablet: touch device con schermo grande → UI desktop
-  const [isMobile] = useState(() => {
+  // REATTIVO: si aggiorna con resize/rotazione schermo
+  const [isMobile, setIsMobile] = useState(() => {
     const isTouch = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isSmallScreen = window.innerWidth < 768;
     return isTouch && isSmallScreen; // Solo phone = mobile
@@ -139,6 +140,35 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
     // eslint-disable-next-line
   }, [activeView, hasMoreMovies, hasMoreSeries, loadingMore, movieOffset, seriesOffset]);
+
+  // CRITICO: Monitora resize/rotazione per aggiornare isMobile in tempo reale
+  // Evita bug quando l'utente ruota il telefono da portrait (360px) a landscape (800px)
+  useEffect(() => {
+    const handleResize = () => {
+      const isTouch = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isSmallScreen = window.innerWidth < 768;
+      const shouldBeMobile = isTouch && isSmallScreen;
+
+      if (shouldBeMobile !== isMobile) {
+        setIsMobile(shouldBeMobile);
+        // Chiudi search se passa da mobile a desktop
+        if (!shouldBeMobile && searchExpanded) {
+          setSearchQuery('');
+          setSearchResults([]);
+          setShowSearch(false);
+          setSearchExpanded(false);
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, [isMobile, searchExpanded]);
 
   const handleLogin = async () => {
     setLoginError('');
