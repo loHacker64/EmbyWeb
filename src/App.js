@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
+import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles, Home, Cloud, Settings } from 'lucide-react';
 import Hls from 'hls.js';
 
 const EMBY_SERVER = 'http://192.168.1.100:8096';
@@ -87,6 +87,8 @@ export default function App() {
   const [subtitleTracks, setSubtitleTracks] = useState([]);
   const [selectedSubtitleTrack, setSelectedSubtitleTrack] = useState(null);
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const [selectedQuality, setSelectedQuality] = useState('auto'); // auto, 1080p, 720p, 480p, 360p
   const [mediaSourceId, setMediaSourceId] = useState(null);
   const [playSessionId, setPlaySessionId] = useState(null);
   const [isDraggingTimeline, setIsDraggingTimeline] = useState(false);
@@ -312,6 +314,26 @@ export default function App() {
   const getBackdrop = (item) => {
     if (!item.BackdropImageTags?.[0]) return null;
     return `${EMBY_SERVER}/Items/${item.Id}/Images/Backdrop?api_key=${API_KEY}`;
+  };
+
+  const getHorizontalImg = (item) => {
+    // For episodes, use episode's Primary image (usually 16:9)
+    if (item.Type === 'Episode' && item.ImageTags?.Primary) {
+      return `${EMBY_SERVER}/Items/${item.Id}/Images/Primary?maxWidth=480&maxHeight=270&quality=90&api_key=${API_KEY}`;
+    }
+    // Try Thumb first (16:9 format)
+    if (item.ImageTags?.Thumb) {
+      return `${EMBY_SERVER}/Items/${item.Id}/Images/Thumb?maxWidth=480&maxHeight=270&quality=90&api_key=${API_KEY}`;
+    }
+    // Try Backdrop
+    if (item.BackdropImageTags?.[0]) {
+      return `${EMBY_SERVER}/Items/${item.Id}/Images/Backdrop/0?maxWidth=480&maxHeight=270&quality=90&api_key=${API_KEY}`;
+    }
+    // Fallback to Primary with horizontal crop
+    if (item.ImageTags?.Primary) {
+      return `${EMBY_SERVER}/Items/${item.Id}/Images/Primary?maxWidth=480&maxHeight=270&quality=90&api_key=${API_KEY}`;
+    }
+    return 'https://via.placeholder.com/480x270/1a1a1a/666?text=No+Image';
   };
 
   const openDetails = async (item) => {
@@ -579,6 +601,18 @@ export default function App() {
     setIsPlaying(true);
   };
 
+  // Converte qualità selezionata in bitrate
+  const getVideoBitrate = (quality) => {
+    const bitrates = {
+      'auto': '199680000',    // ~200 Mbps - massima qualità
+      '1080p': '8000000',     // 8 Mbps
+      '720p': '4000000',      // 4 Mbps
+      '480p': '1500000',      // 1.5 Mbps
+      '360p': '700000'        // 0.7 Mbps
+    };
+    return bitrates[quality] || bitrates['auto'];
+  };
+
   // Inizializza Hls.js quando il player si apre
   useEffect(() => {
     if (playingItem && videoRef.current && !hlsRef.current && selectedAudioTrack !== null) {
@@ -599,7 +633,7 @@ export default function App() {
         api_key: API_KEY,
         VideoCodec: 'hevc,h264,av1',
         AudioCodec: isMobile ? 'aac,mp3' : 'ac3,mp3,aac',
-        VideoBitrate: '199680000',
+        VideoBitrate: getVideoBitrate(selectedQuality),
         AudioBitrate: '320000',
         AudioStreamIndex: selectedAudioTrack,
         TranscodingMaxAudioChannels: '2',
@@ -730,7 +764,7 @@ export default function App() {
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [playingItem, selectedAudioTrack]);
+  }, [playingItem, selectedAudioTrack, selectedQuality]);
 
   const closePlayer = async () => {
     // CRITICAL: Prima termina FFmpeg sul server, POI notifica la fine
@@ -929,6 +963,33 @@ export default function App() {
     }
   };
 
+  const changeQuality = (quality) => {
+    console.log('🎬 Cambio qualità a:', quality);
+
+    if (videoRef.current && playingItem && quality !== selectedQuality) {
+      // Salva posizione corrente
+      const currentTimeSeconds = videoRef.current.currentTime;
+      const resumePositionTicks = Math.floor(currentTimeSeconds * 10000000);
+      console.log('⏸️ Salvo posizione corrente:', currentTimeSeconds, 's');
+
+      // Imposta StartTimeTicks per riprendere dalla stessa posizione
+      setStartTimeTicks(resumePositionTicks);
+
+      // Distruggi Hls.js corrente
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+
+      // Aggiorna la qualità - il useEffect ricreerà il player
+      setSelectedQuality(quality);
+      setShowQualityMenu(false);
+    } else {
+      setSelectedQuality(quality);
+      setShowQualityMenu(false);
+    }
+  };
+
   const changeSubtitleTrack = (trackIndex) => {
     console.log('📝 Cambio sottotitoli a index:', trackIndex);
     setSelectedSubtitleTrack(trackIndex);
@@ -1068,8 +1129,14 @@ export default function App() {
             <div className="text-center text-sm text-gray-400 mt-4">Server: ilmioserver.diskstation.me</div>
           </div>
           <div className="absolute bottom-4 right-4 group">
-            <div className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-help transition"><span className="text-white text-xs">?</span></div>
-            <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block"><div className="bg-black/90 backdrop-blur-xl border border-white/20 rounded-lg px-4 py-2 text-sm text-gray-300 whitespace-nowrap shadow-xl">Connesso a: {EMBY_SERVER}</div></div>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-600/20 hover:from-emerald-500/30 hover:to-green-600/30 border border-emerald-500/30 flex items-center justify-center cursor-help transition-all hover:scale-110 shadow-lg shadow-emerald-500/20">
+              {EMBY_SERVER.includes('192.168.1.100') ? (
+                <Home className="w-5 h-5 text-emerald-400" />
+              ) : (
+                <Cloud className="w-5 h-5 text-emerald-400" />
+              )}
+            </div>
+            <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block"><div className="bg-black/90 backdrop-blur-xl border border-emerald-500/30 rounded-lg px-4 py-2 text-sm text-gray-300 whitespace-nowrap shadow-xl shadow-emerald-500/20"><span className="text-emerald-400 font-semibold">{EMBY_SERVER.includes('192.168.1.100') ? '🏠 Rete locale' : '☁️ Connessione remota'}</span><br/><span className="text-gray-500 text-xs">{EMBY_SERVER}</span></div></div>
           </div>
         </div>
       </div>
@@ -1235,7 +1302,7 @@ export default function App() {
                   if(item.Type==='Episode'){
                     return <div key={item.Id} className="flex-none w-72 cursor-pointer group/card" onClick={()=>startPlay(item)}>
                       <div className="relative overflow-hidden rounded-xl">
-                        <img src={getImg(item, 'Thumb')} alt={item.SeriesName} className="w-full aspect-video object-cover group-hover/card:scale-105 transition-all duration-500 shadow-lg"/>
+                        <img src={getHorizontalImg(item)} alt={item.SeriesName} className="w-full aspect-video object-cover group-hover/card:scale-105 transition-all duration-500 shadow-lg"/>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl scale-90 group-hover/card:scale-100 transition-transform duration-300"><Play className="w-6 h-6 fill-white"/></div></div>
                         {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/60"><div className="h-full bg-gradient-to-r from-emerald-400 to-green-500 shadow-lg shadow-emerald-500/50 transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
@@ -1248,7 +1315,7 @@ export default function App() {
                   }
                   return <div key={item.Id} className="flex-none w-72 cursor-pointer group/card" onClick={()=>startPlay(item)}>
                     <div className="relative overflow-hidden rounded-xl">
-                      <img src={getImg(item, 'Thumb')} alt={item.Name} className="w-full aspect-video object-cover group-hover/card:scale-105 transition-all duration-500 shadow-lg"/>
+                      <img src={getHorizontalImg(item)} alt={item.Name} className="w-full aspect-video object-cover group-hover/card:scale-105 transition-all duration-500 shadow-lg"/>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl scale-90 group-hover/card:scale-100 transition-transform duration-300"><Play className="w-6 h-6 fill-white"/></div></div>
                       {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/60"><div className="h-full bg-gradient-to-r from-emerald-400 to-green-500 shadow-lg shadow-emerald-500/50 transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
@@ -1788,6 +1855,68 @@ export default function App() {
                         )}
                       </div>
                     )}
+
+                    {/* Qualità video */}
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowQualityMenu(!showQualityMenu)}
+                        className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
+                      >
+                        <Settings className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
+                      </button>
+
+                      {/* Menu qualità - Desktop dropdown / Mobile full-screen */}
+                      {showQualityMenu && (
+                        <div className={isMobile
+                          ? "fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex flex-col"
+                          : "absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
+                        }>
+                          <div className={isMobile ? "p-6 border-b border-white/10 flex items-center justify-between" : "p-3 border-b border-white/10"}>
+                            <h4 className={isMobile ? "text-2xl font-bold text-white" : "text-sm font-bold text-white"}>Qualità video</h4>
+                            {isMobile && (
+                              <button onClick={() => setShowQualityMenu(false)} className="text-white">
+                                <X className="w-8 h-8"/>
+                              </button>
+                            )}
+                          </div>
+                          <div className={isMobile ? "flex-1 overflow-y-auto" : "max-h-[300px] overflow-y-auto"}>
+                            {[
+                              { value: 'auto', label: 'Auto', desc: 'Massima qualità' },
+                              { value: '1080p', label: '1080p Full HD', desc: '8 Mbps' },
+                              { value: '720p', label: '720p HD', desc: '4 Mbps' },
+                              { value: '480p', label: '480p', desc: '1.5 Mbps' },
+                              { value: '360p', label: '360p', desc: '0.7 Mbps' }
+                            ].map(quality => (
+                              <button
+                                key={quality.value}
+                                onClick={() => changeQuality(quality.value)}
+                                className={`w-full text-left transition-colors ${
+                                  isMobile ? 'px-6 py-6' : 'px-4 py-3'
+                                } ${
+                                  selectedQuality === quality.value
+                                    ? 'bg-emerald-600/30 text-white border-l-4 border-emerald-500'
+                                    : 'hover:bg-white/10 text-gray-300 border-l-4 border-transparent'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <div className={isMobile ? "font-medium text-xl" : "font-medium text-sm"}>
+                                      {quality.label}
+                                    </div>
+                                    <div className={isMobile ? "text-base text-gray-400 mt-2" : "text-xs text-gray-500 mt-1"}>
+                                      {quality.desc}
+                                    </div>
+                                  </div>
+                                  {selectedQuality === quality.value && (
+                                    <div className={isMobile ? "w-4 h-4 bg-emerald-500 rounded-full" : "w-2 h-2 bg-emerald-500 rounded-full"}></div>
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Fullscreen */}
                     <button
