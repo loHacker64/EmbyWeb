@@ -1,0 +1,5580 @@
+ImageService
+API Documentation: Images
+
+
+GET
+/Items/{Id}/Images/{Type}/{Index}/{Tag}/{Format}/{MaxWidth}/{MaxHeight}/{PercentPlayed}/{UnPlayedCount}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+PercentPlayed *
+integer($int32)
+(path)
+PercentPlayed
+UnPlayedCount *
+integer($int32)
+(path)
+UnPlayedCount
+Id *
+string
+(path)
+Item Id
+
+Id
+MaxWidth *
+integer($int32)
+(path)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight *
+integer($int32)
+(path)
+The maximum image height to return.
+
+MaxHeight
+Tag *
+string
+(path)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+Format *
+string
+(path)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Items/{Id}/Images/{Type}/{Index}/{Tag}/{Format}/{MaxWidth}/{MaxHeight}/{PercentPlayed}/{UnPlayedCount}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+PercentPlayed *
+integer($int32)
+(path)
+PercentPlayed
+UnPlayedCount *
+integer($int32)
+(path)
+UnPlayedCount
+Id *
+string
+(path)
+Item Id
+
+Id
+MaxWidth *
+integer($int32)
+(path)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight *
+integer($int32)
+(path)
+The maximum image height to return.
+
+MaxHeight
+Tag *
+string
+(path)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+Format *
+string
+(path)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Items/{Id}/Images
+Gets information about an item's images
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a List object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[ImageInfo{
+ImageType	ImageTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.ImageType
+($enum)(Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor)
+ImageIndex	integer($int32, nullable)
+Path	string
+Filename	string
+Height	integer($int32, nullable)
+Width	integer($int32, nullable)
+Size	integer($int64)
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Artists/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Artists/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/GameGenres/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/GameGenres/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Genres/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Genres/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Items/{Id}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Items/{Id}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Images/{Type}
+Uploads an image for an item, must be base64 encoded.
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Request body
+
+application/octet-stream
+Example values are not available for application/octet-stream media types.
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Items/{Id}/Images/{Type}
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/MusicGenres/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/MusicGenres/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Persons/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Persons/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Studios/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Studios/{Name}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{Id}/Images/{Type}
+
+Requires authentication as user
+
+Find more details
+API Documentation: Authentication
+
+https://dev.emby.media/doc/restapi/User-Authentication.html
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Users/{Id}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Images/{Type}
+Uploads an image for an item, must be base64 encoded.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Request body
+
+application/octet-stream
+Example values are not available for application/octet-stream media types.
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Users/{Id}/Images/{Type}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Artists/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Artists/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/GameGenres/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/GameGenres/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Genres/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Genres/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Items/{Id}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Items/{Id}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Images/{Type}/{Index}
+Uploads an image for an item, must be base64 encoded.
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Request body
+
+application/octet-stream
+Example values are not available for application/octet-stream media types.
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Items/{Id}/Images/{Type}/{Index}
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Images/{Type}/Delete
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/MusicGenres/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/MusicGenres/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Persons/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Persons/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Studios/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Studios/{Name}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Name *
+string
+(path)
+Item name
+
+Name
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{Id}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Users/{Id}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+MaxWidth
+integer($int32)
+(query)
+The maximum image width to return.
+
+MaxWidth
+MaxHeight
+integer($int32)
+(query)
+The maximum image height to return.
+
+MaxHeight
+Width
+integer($int32)
+(query)
+The fixed image width to return.
+
+Width
+Height
+integer($int32)
+(query)
+The fixed image height to return.
+
+Height
+Quality
+integer($int32)
+(query)
+Optional quality setting, from 0-100. Defaults to 90 and should suffice in most cases.
+
+Quality
+Tag
+string
+(query)
+Optional. Supply the cache tag from the item object to receive strong caching headers.
+
+Tag
+CropWhitespace
+boolean
+(query)
+Specify if whitespace should be cropped out of the image. True/False. If unspecified, whitespace will be cropped from logos and clear art.
+
+
+--
+EnableImageEnhancers
+boolean
+(query)
+Enable or disable image enhancers such as cover art.
+
+
+--
+Format
+string
+(query)
+Determines the output foramt of the image - original,gif,jpg,png
+
+Format
+BackgroundColor
+string
+(query)
+Optional. Apply a background color for transparent images.
+
+BackgroundColor
+ForegroundLayer
+string
+(query)
+Optional. Apply a foreground layer on top of the image.
+
+ForegroundLayer
+AutoOrient
+boolean
+(query)
+Set to true to force normalization of orientation in the event the renderer does not support it.
+
+
+--
+KeepAnimation
+boolean
+(query)
+Set to true to retain image animation (when supported).
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Images/{Type}/{Index}
+Uploads an image for an item, must be base64 encoded.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Request body
+
+application/octet-stream
+Example values are not available for application/octet-stream media types.
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Users/{Id}/Images/{Type}/{Index}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Images/{Type}/Delete
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index
+integer($int32)
+(query)
+Image Index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Images/{Type}/{Index}/Delete
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Images/{Type}/{Index}/Index
+Updates the index for an item image
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+NewIndex *
+integer($int32)
+(query)
+The new image index
+
+NewIndex
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Images/{Type}/{Index}/Url
+Updates the index for an item image
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Url *
+string
+(query)
+The url for the new image
+
+Url
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Images/{Type}/{Index}/Delete
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+User Id
+
+Id
+Index *
+integer($int32)
+(path)
+Image Index
+
+Index
+Type *
+string
+(path)
+Image Type
+
+Available values : Primary, Art, Backdrop, Banner, Logo, Thumb, Disc, Box, Screenshot, Menu, Chapter, BoxRear, Thumbnail, LogoLight, LogoLightColor
+
+
+Primary
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links

@@ -1,0 +1,1107 @@
+SubtitleService
+API Reference: SubtitleService
+
+
+DELETE
+/Items/{Id}/Subtitles/{Index}
+Deletes an external subtitle file
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+MediaSourceId *
+string
+(query)
+MediaSourceId
+
+MediaSourceId
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Providers/Subtitles/Subtitles/{Id}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Videos/{Id}/Subtitles/{Index}
+Deletes an external subtitle file
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+MediaSourceId *
+string
+(query)
+MediaSourceId
+
+MediaSourceId
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Items/{Id}/RemoteSearch/Subtitles/{Language}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Language *
+string
+(path)
+Language
+
+Language
+MediaSourceId *
+string
+(query)
+MediaSourceId
+
+MediaSourceId
+IsPerfectMatch
+boolean
+(query)
+IsPerfectMatch
+
+
+--
+IsForced
+boolean
+(query)
+IsForced
+
+
+--
+IsHearingImpaired
+boolean
+(query)
+IsHearingImpaired
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a RemoteSubtitleInfo[] object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[RemoteSubtitleInfo{
+ThreeLetterISOLanguageName	string
+deprecated: true
+Use language instead to return the language specified by the subtitle provider
+
+Id	string
+ProviderName	string
+Name	string
+Format	string
+Author	string
+Comment	string
+DateCreated	string($date-time, nullable)
+CommunityRating	number($float, nullable)
+DownloadCount	integer($int32, nullable)
+IsHashMatch	boolean(nullable)
+IsForced	boolean(nullable)
+IsHearingImpaired	boolean(nullable)
+Language	string
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/Subtitles/{Index}/Delete
+Deletes an external subtitle file
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+MediaSourceId *
+string
+(query)
+MediaSourceId
+
+MediaSourceId
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/RemoteSearch/Subtitles/{SubtitleId}
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+SubtitleId *
+string
+(path)
+SubtitleId
+
+SubtitleId
+MediaSourceId *
+string
+(query)
+MediaSourceId
+
+MediaSourceId
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a SubtitleDownloadResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+Subtitles.SubtitleDownloadResult{
+NewIndex	integer($int32, nullable)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Videos/{Id}/Subtitles/{Index}/Delete
+Deletes an external subtitle file
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+MediaSourceId *
+string
+(query)
+MediaSourceId
+
+MediaSourceId
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Items/{Id}/{MediaSourceId}/Subtitles/{Index}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks
+integer($int64)
+(query)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Items/{Id}/{MediaSourceId}/Subtitles/{Index}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks
+integer($int64)
+(query)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Videos/{Id}/{MediaSourceId}/Subtitles/{Index}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks
+integer($int64)
+(query)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Videos/{Id}/{MediaSourceId}/Subtitles/{Index}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks
+integer($int64)
+(query)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Videos/{Id}/{MediaSourceId}/Attachments/{Index}/Stream
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Items/{Id}/{MediaSourceId}/Subtitles/{Index}/{StartPositionTicks}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks *
+integer($int64)
+(path)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Items/{Id}/{MediaSourceId}/Subtitles/{Index}/{StartPositionTicks}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks *
+integer($int64)
+(path)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Videos/{Id}/{MediaSourceId}/Subtitles/{Index}/{StartPositionTicks}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks *
+integer($int64)
+(path)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+HEAD
+/Videos/{Id}/{MediaSourceId}/Subtitles/{Index}/{StartPositionTicks}/Stream.{Format}
+Gets subtitles in a specified format.
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+MediaSourceId *
+string
+(path)
+MediaSourceId
+
+MediaSourceId
+Index *
+integer($int32)
+(path)
+The subtitle stream index
+
+Index
+Format *
+string
+(path)
+Format
+
+Format
+StartPositionTicks *
+integer($int64)
+(path)
+StartPositionTicks
+
+StartPositionTicks
+EndPositionTicks
+integer($int64)
+(query)
+EndPositionTicks
+
+EndPositionTicks
+CopyTimestamps
+boolean
+(query)
+CopyTimestamps
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links

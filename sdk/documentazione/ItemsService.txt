@@ -1,0 +1,2037 @@
+ItemsService
+API Documentation: Item Information
+
+
+GET
+/Items
+Gets items based on a query.
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+ArtistType
+string
+(query)
+Artist or AlbumArtist
+
+ArtistType
+MaxOfficialRating
+string
+(query)
+Optional filter by maximum official rating (PG, PG-13, TV-MA, etc).
+
+MaxOfficialRating
+HasThemeSong
+boolean
+(query)
+Optional filter by items with theme songs.
+
+
+--
+HasThemeVideo
+boolean
+(query)
+Optional filter by items with theme videos.
+
+
+--
+HasSubtitles
+boolean
+(query)
+Optional filter by items with subtitles.
+
+
+--
+HasSpecialFeature
+boolean
+(query)
+Optional filter by items with special features.
+
+
+--
+HasTrailer
+boolean
+(query)
+Optional filter by items with trailers.
+
+
+--
+IsSpecialSeason
+boolean
+(query)
+Optional. Filter by special season.
+
+
+--
+AdjacentTo
+string
+(query)
+Optional. Return items that are siblings of a supplied item.
+
+AdjacentTo
+StartItemId
+string
+(query)
+Optional. Skip through the list until a given item is found.
+
+StartItemId
+MinIndexNumber
+integer($int32)
+(query)
+Optional filter by minimum index number.
+
+MinIndexNumber
+MinStartDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinStartDate
+MaxStartDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxStartDate
+MinEndDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinEndDate
+MaxEndDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxEndDate
+MinPlayers
+integer($int32)
+(query)
+Optional filter by minimum number of game players.
+
+MinPlayers
+MaxPlayers
+integer($int32)
+(query)
+Optional filter by maximum number of game players.
+
+MaxPlayers
+ParentIndexNumber
+integer($int32)
+(query)
+Optional filter by parent index number.
+
+ParentIndexNumber
+HasParentalRating
+boolean
+(query)
+Optional filter by items that have or do not have a parental rating
+
+
+--
+IsHD
+boolean
+(query)
+Optional filter by items that are HD or not.
+
+
+--
+IsUnaired
+boolean
+(query)
+Optional filter by items that are unaired episodes or not.
+
+
+--
+MinCommunityRating
+number($double)
+(query)
+Optional filter by minimum community rating.
+
+MinCommunityRating
+MinCriticRating
+number($double)
+(query)
+Optional filter by minimum critic rating.
+
+MinCriticRating
+AiredDuringSeason
+integer($int32)
+(query)
+Gets all episodes that aired during a season, including specials.
+
+AiredDuringSeason
+MinPremiereDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinPremiereDate
+MinDateLastSaved
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinDateLastSaved
+MinDateLastSavedForUser
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinDateLastSavedForUser
+MaxPremiereDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxPremiereDate
+HasOverview
+boolean
+(query)
+Optional filter by items that have an overview or not.
+
+
+--
+HasImdbId
+boolean
+(query)
+Optional filter by items that have an imdb id or not.
+
+
+--
+HasTmdbId
+boolean
+(query)
+Optional filter by items that have a tmdb id or not.
+
+
+--
+HasTvdbId
+boolean
+(query)
+Optional filter by items that have a tvdb id or not.
+
+
+--
+ExcludeItemIds
+string
+(query)
+Optional. If specified, results will be filtered by exxcluding item ids. This allows multiple, comma delimeted.
+
+ExcludeItemIds
+StartIndex
+integer($int32)
+(query)
+Optional. The record index to start at. All items with a lower index will be dropped from the results.
+
+StartIndex
+Limit
+integer($int32)
+(query)
+Optional. The maximum number of records to return
+
+Limit
+Recursive
+boolean
+(query)
+When searching within folders, this determines whether or not the search will be recursive. true/false
+
+
+--
+SearchTerm
+string
+(query)
+Enter a search term to perform a search request
+
+SearchTerm
+SortOrder
+string
+(query)
+Sort Order - Ascending,Descending
+
+SortOrder
+ParentId
+string
+(query)
+Specify this to localize the search to a specific item or folder. Omit to use the root
+
+ParentId
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines
+
+Fields
+ExcludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+ExcludeItemTypes
+IncludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+IncludeItemTypes
+AnyProviderIdEquals
+string
+(query)
+Optional. If specified, result will be filtered to contain only items which match at least one of the specified IDs. Each provider ID must be in the form 'prov.id', e.g. 'imdb.tt123456'. This allows multiple, comma delimeted value pairs.
+
+AnyProviderIdEquals
+Filters
+string
+(query)
+Optional. Specify additional filters to apply. This allows multiple, comma delimeted. Options: IsFolder, IsNotFolder, IsUnplayed, IsPlayed, IsFavorite, IsResumable, Likes, Dislikes
+
+Filters
+IsFavorite
+boolean
+(query)
+Optional filter by items that are marked as favorite, or not.
+
+
+--
+IsMovie
+boolean
+(query)
+Optional filter for movies.
+
+
+--
+IsSeries
+boolean
+(query)
+Optional filter for series.
+
+
+--
+IsFolder
+boolean
+(query)
+Optional filter for folders.
+
+
+--
+IsNews
+boolean
+(query)
+Optional filter for news.
+
+
+--
+IsKids
+boolean
+(query)
+Optional filter for kids.
+
+
+--
+IsSports
+boolean
+(query)
+Optional filter for sports.
+
+
+--
+IsNew
+boolean
+(query)
+Optional filter for IsNew.
+
+
+--
+IsPremiere
+boolean
+(query)
+Optional filter for IsPremiere.
+
+
+--
+IsNewOrPremiere
+boolean
+(query)
+Optional filter for IsNewOrPremiere.
+
+
+--
+IsRepeat
+boolean
+(query)
+Optional filter for IsRepeat.
+
+
+--
+ProjectToMedia
+boolean
+(query)
+ProjectToMedia
+
+
+--
+MediaTypes
+string
+(query)
+Optional filter by MediaType. Allows multiple, comma delimited.
+
+MediaTypes
+ImageTypes
+string
+(query)
+Optional. If specified, results will be filtered based on those containing image types. This allows multiple, comma delimited.
+
+ImageTypes
+SortBy
+string
+(query)
+Optional. Specify one or more sort orders, comma delimeted. Options: Album, AlbumArtist, Artist, Budget, CommunityRating, CriticRating, DateCreated, DatePlayed, PlayCount, PremiereDate, ProductionYear, SortName, Random, Revenue, Runtime
+
+SortBy
+IsPlayed
+boolean
+(query)
+Optional filter by items that are played, or not.
+
+
+--
+Genres
+string
+(query)
+Optional. If specified, results will be filtered based on genre. This allows multiple, pipe delimeted.
+
+Genres
+OfficialRatings
+string
+(query)
+Optional. If specified, results will be filtered based on OfficialRating. This allows multiple, pipe delimeted.
+
+OfficialRatings
+Tags
+string
+(query)
+Optional. If specified, results will be filtered based on tag. This allows multiple, pipe delimeted.
+
+Tags
+ExcludeTags
+string
+(query)
+Optional. If specified, results will be filtered based on tag. This allows multiple, pipe delimeted.
+
+ExcludeTags
+Years
+string
+(query)
+Optional. If specified, results will be filtered based on production year. This allows multiple, comma delimeted.
+
+Years
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+Person
+string
+(query)
+Optional. If specified, results will be filtered to include only those containing the specified person.
+
+Person
+PersonIds
+string
+(query)
+Optional. If specified, results will be filtered to include only those containing the specified person.
+
+PersonIds
+PersonTypes
+string
+(query)
+Optional. If specified, along with Person, results will be filtered to include only those containing the specified person and PersonType. Allows multiple, comma-delimited
+
+PersonTypes
+Studios
+string
+(query)
+Optional. If specified, results will be filtered based on studio. This allows multiple, pipe delimeted.
+
+Studios
+StudioIds
+string
+(query)
+Optional. If specified, results will be filtered based on studio. This allows multiple, pipe delimeted.
+
+StudioIds
+Artists
+string
+(query)
+Optional. If specified, results will be filtered based on artist. This allows multiple, pipe delimeted.
+
+Artists
+ArtistIds
+string
+(query)
+Optional. If specified, results will be filtered based on artist. This allows multiple, pipe delimeted.
+
+ArtistIds
+Albums
+string
+(query)
+Optional. If specified, results will be filtered based on album. This allows multiple, pipe delimeted.
+
+Albums
+Ids
+string
+(query)
+Optional. If specific items are needed, specify a list of item id's to retrieve. This allows multiple, comma delimited.
+
+Ids
+VideoTypes
+string
+(query)
+Optional filter by VideoType (videofile, dvd, bluray, iso). Allows multiple, comma delimeted.
+
+VideoTypes
+Containers
+string
+(query)
+Optional filter by Container. Allows multiple, comma delimeted.
+
+Containers
+AudioCodecs
+string
+(query)
+Optional filter by AudioCodec. Allows multiple, comma delimeted.
+
+AudioCodecs
+AudioLayouts
+string
+(query)
+Optional filter by AudioLayout. Allows multiple, comma delimeted.
+
+AudioLayouts
+VideoCodecs
+string
+(query)
+Optional filter by VideoCodec. Allows multiple, comma delimeted.
+
+VideoCodecs
+ExtendedVideoTypes
+string
+(query)
+Optional filter by ExtendedVideoType. Allows multiple, comma delimeted.
+
+ExtendedVideoTypes
+SubtitleCodecs
+string
+(query)
+Optional filter by SubtitleCodec. Allows multiple, comma delimeted.
+
+SubtitleCodecs
+Path
+string
+(query)
+Optional filter by Path.
+
+Path
+UserId
+string($guid)
+(query)
+User Id
+
+UserId
+MinOfficialRating
+string
+(query)
+Optional filter by minimum official rating (PG, PG-13, TV-MA, etc).
+
+MinOfficialRating
+IsLocked
+boolean
+(query)
+Optional filter by items that are locked.
+
+
+--
+IsPlaceHolder
+boolean
+(query)
+Optional filter by items that are placeholders
+
+
+--
+HasOfficialRating
+boolean
+(query)
+Optional filter by items that have official ratings
+
+
+--
+GroupItemsIntoCollections
+boolean
+(query)
+Whether or not to hide items behind their boxsets.
+
+
+--
+Is3D
+boolean
+(query)
+Optional filter by items that are 3D, or not.
+
+
+--
+SeriesStatus
+string
+(query)
+Optional filter by Series Status. Allows multiple, comma delimeted.
+
+SeriesStatus
+NameStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+NameStartsWithOrGreater
+ArtistStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+ArtistStartsWithOrGreater
+AlbumArtistStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+AlbumArtistStartsWithOrGreater
+NameStartsWith
+string
+(query)
+Optional filter by items whose name is sorted equally than a given input string.
+
+NameStartsWith
+NameLessThan
+string
+(query)
+Optional filter by items whose name is equally or lesser than a given input string.
+
+NameLessThan
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_BaseItemDto{
+Items	[BaseItemDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items
+Gets items based on a query.
+
+Requires authentication as user
+
+Find more details
+API Documentation: Browsing the Library
+
+https://dev.emby.media/doc/restapi/Browsing-the-Library.html
+Parameters
+Try it out
+Name	Description
+ArtistType
+string
+(query)
+Artist or AlbumArtist
+
+ArtistType
+MaxOfficialRating
+string
+(query)
+Optional filter by maximum official rating (PG, PG-13, TV-MA, etc).
+
+MaxOfficialRating
+HasThemeSong
+boolean
+(query)
+Optional filter by items with theme songs.
+
+
+--
+HasThemeVideo
+boolean
+(query)
+Optional filter by items with theme videos.
+
+
+--
+HasSubtitles
+boolean
+(query)
+Optional filter by items with subtitles.
+
+
+--
+HasSpecialFeature
+boolean
+(query)
+Optional filter by items with special features.
+
+
+--
+HasTrailer
+boolean
+(query)
+Optional filter by items with trailers.
+
+
+--
+IsSpecialSeason
+boolean
+(query)
+Optional. Filter by special season.
+
+
+--
+AdjacentTo
+string
+(query)
+Optional. Return items that are siblings of a supplied item.
+
+AdjacentTo
+StartItemId
+string
+(query)
+Optional. Skip through the list until a given item is found.
+
+StartItemId
+MinIndexNumber
+integer($int32)
+(query)
+Optional filter by minimum index number.
+
+MinIndexNumber
+MinStartDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinStartDate
+MaxStartDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxStartDate
+MinEndDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinEndDate
+MaxEndDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxEndDate
+MinPlayers
+integer($int32)
+(query)
+Optional filter by minimum number of game players.
+
+MinPlayers
+MaxPlayers
+integer($int32)
+(query)
+Optional filter by maximum number of game players.
+
+MaxPlayers
+ParentIndexNumber
+integer($int32)
+(query)
+Optional filter by parent index number.
+
+ParentIndexNumber
+HasParentalRating
+boolean
+(query)
+Optional filter by items that have or do not have a parental rating
+
+
+--
+IsHD
+boolean
+(query)
+Optional filter by items that are HD or not.
+
+
+--
+IsUnaired
+boolean
+(query)
+Optional filter by items that are unaired episodes or not.
+
+
+--
+MinCommunityRating
+number($double)
+(query)
+Optional filter by minimum community rating.
+
+MinCommunityRating
+MinCriticRating
+number($double)
+(query)
+Optional filter by minimum critic rating.
+
+MinCriticRating
+AiredDuringSeason
+integer($int32)
+(query)
+Gets all episodes that aired during a season, including specials.
+
+AiredDuringSeason
+MinPremiereDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinPremiereDate
+MinDateLastSaved
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinDateLastSaved
+MinDateLastSavedForUser
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinDateLastSavedForUser
+MaxPremiereDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxPremiereDate
+HasOverview
+boolean
+(query)
+Optional filter by items that have an overview or not.
+
+
+--
+HasImdbId
+boolean
+(query)
+Optional filter by items that have an imdb id or not.
+
+
+--
+HasTmdbId
+boolean
+(query)
+Optional filter by items that have a tmdb id or not.
+
+
+--
+HasTvdbId
+boolean
+(query)
+Optional filter by items that have a tvdb id or not.
+
+
+--
+ExcludeItemIds
+string
+(query)
+Optional. If specified, results will be filtered by exxcluding item ids. This allows multiple, comma delimeted.
+
+ExcludeItemIds
+StartIndex
+integer($int32)
+(query)
+Optional. The record index to start at. All items with a lower index will be dropped from the results.
+
+StartIndex
+Limit
+integer($int32)
+(query)
+Optional. The maximum number of records to return
+
+Limit
+Recursive
+boolean
+(query)
+When searching within folders, this determines whether or not the search will be recursive. true/false
+
+
+--
+SearchTerm
+string
+(query)
+Enter a search term to perform a search request
+
+SearchTerm
+SortOrder
+string
+(query)
+Sort Order - Ascending,Descending
+
+SortOrder
+ParentId
+string
+(query)
+Specify this to localize the search to a specific item or folder. Omit to use the root
+
+ParentId
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines
+
+Fields
+ExcludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+ExcludeItemTypes
+IncludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+IncludeItemTypes
+AnyProviderIdEquals
+string
+(query)
+Optional. If specified, result will be filtered to contain only items which match at least one of the specified IDs. Each provider ID must be in the form 'prov.id', e.g. 'imdb.tt123456'. This allows multiple, comma delimeted value pairs.
+
+AnyProviderIdEquals
+Filters
+string
+(query)
+Optional. Specify additional filters to apply. This allows multiple, comma delimeted. Options: IsFolder, IsNotFolder, IsUnplayed, IsPlayed, IsFavorite, IsResumable, Likes, Dislikes
+
+Filters
+IsFavorite
+boolean
+(query)
+Optional filter by items that are marked as favorite, or not.
+
+
+--
+IsMovie
+boolean
+(query)
+Optional filter for movies.
+
+
+--
+IsSeries
+boolean
+(query)
+Optional filter for series.
+
+
+--
+IsFolder
+boolean
+(query)
+Optional filter for folders.
+
+
+--
+IsNews
+boolean
+(query)
+Optional filter for news.
+
+
+--
+IsKids
+boolean
+(query)
+Optional filter for kids.
+
+
+--
+IsSports
+boolean
+(query)
+Optional filter for sports.
+
+
+--
+IsNew
+boolean
+(query)
+Optional filter for IsNew.
+
+
+--
+IsPremiere
+boolean
+(query)
+Optional filter for IsPremiere.
+
+
+--
+IsNewOrPremiere
+boolean
+(query)
+Optional filter for IsNewOrPremiere.
+
+
+--
+IsRepeat
+boolean
+(query)
+Optional filter for IsRepeat.
+
+
+--
+ProjectToMedia
+boolean
+(query)
+ProjectToMedia
+
+
+--
+MediaTypes
+string
+(query)
+Optional filter by MediaType. Allows multiple, comma delimited.
+
+MediaTypes
+ImageTypes
+string
+(query)
+Optional. If specified, results will be filtered based on those containing image types. This allows multiple, comma delimited.
+
+ImageTypes
+SortBy
+string
+(query)
+Optional. Specify one or more sort orders, comma delimeted. Options: Album, AlbumArtist, Artist, Budget, CommunityRating, CriticRating, DateCreated, DatePlayed, PlayCount, PremiereDate, ProductionYear, SortName, Random, Revenue, Runtime
+
+SortBy
+IsPlayed
+boolean
+(query)
+Optional filter by items that are played, or not.
+
+
+--
+Genres
+string
+(query)
+Optional. If specified, results will be filtered based on genre. This allows multiple, pipe delimeted.
+
+Genres
+OfficialRatings
+string
+(query)
+Optional. If specified, results will be filtered based on OfficialRating. This allows multiple, pipe delimeted.
+
+OfficialRatings
+Tags
+string
+(query)
+Optional. If specified, results will be filtered based on tag. This allows multiple, pipe delimeted.
+
+Tags
+ExcludeTags
+string
+(query)
+Optional. If specified, results will be filtered based on tag. This allows multiple, pipe delimeted.
+
+ExcludeTags
+Years
+string
+(query)
+Optional. If specified, results will be filtered based on production year. This allows multiple, comma delimeted.
+
+Years
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+Person
+string
+(query)
+Optional. If specified, results will be filtered to include only those containing the specified person.
+
+Person
+PersonIds
+string
+(query)
+Optional. If specified, results will be filtered to include only those containing the specified person.
+
+PersonIds
+PersonTypes
+string
+(query)
+Optional. If specified, along with Person, results will be filtered to include only those containing the specified person and PersonType. Allows multiple, comma-delimited
+
+PersonTypes
+Studios
+string
+(query)
+Optional. If specified, results will be filtered based on studio. This allows multiple, pipe delimeted.
+
+Studios
+StudioIds
+string
+(query)
+Optional. If specified, results will be filtered based on studio. This allows multiple, pipe delimeted.
+
+StudioIds
+Artists
+string
+(query)
+Optional. If specified, results will be filtered based on artist. This allows multiple, pipe delimeted.
+
+Artists
+ArtistIds
+string
+(query)
+Optional. If specified, results will be filtered based on artist. This allows multiple, pipe delimeted.
+
+ArtistIds
+Albums
+string
+(query)
+Optional. If specified, results will be filtered based on album. This allows multiple, pipe delimeted.
+
+Albums
+Ids
+string
+(query)
+Optional. If specific items are needed, specify a list of item id's to retrieve. This allows multiple, comma delimited.
+
+Ids
+VideoTypes
+string
+(query)
+Optional filter by VideoType (videofile, dvd, bluray, iso). Allows multiple, comma delimeted.
+
+VideoTypes
+Containers
+string
+(query)
+Optional filter by Container. Allows multiple, comma delimeted.
+
+Containers
+AudioCodecs
+string
+(query)
+Optional filter by AudioCodec. Allows multiple, comma delimeted.
+
+AudioCodecs
+AudioLayouts
+string
+(query)
+Optional filter by AudioLayout. Allows multiple, comma delimeted.
+
+AudioLayouts
+VideoCodecs
+string
+(query)
+Optional filter by VideoCodec. Allows multiple, comma delimeted.
+
+VideoCodecs
+ExtendedVideoTypes
+string
+(query)
+Optional filter by ExtendedVideoType. Allows multiple, comma delimeted.
+
+ExtendedVideoTypes
+SubtitleCodecs
+string
+(query)
+Optional filter by SubtitleCodec. Allows multiple, comma delimeted.
+
+SubtitleCodecs
+Path
+string
+(query)
+Optional filter by Path.
+
+Path
+MinOfficialRating
+string
+(query)
+Optional filter by minimum official rating (PG, PG-13, TV-MA, etc).
+
+MinOfficialRating
+IsLocked
+boolean
+(query)
+Optional filter by items that are locked.
+
+
+--
+IsPlaceHolder
+boolean
+(query)
+Optional filter by items that are placeholders
+
+
+--
+HasOfficialRating
+boolean
+(query)
+Optional filter by items that have official ratings
+
+
+--
+GroupItemsIntoCollections
+boolean
+(query)
+Whether or not to hide items behind their boxsets.
+
+
+--
+Is3D
+boolean
+(query)
+Optional filter by items that are 3D, or not.
+
+
+--
+SeriesStatus
+string
+(query)
+Optional filter by Series Status. Allows multiple, comma delimeted.
+
+SeriesStatus
+NameStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+NameStartsWithOrGreater
+ArtistStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+ArtistStartsWithOrGreater
+AlbumArtistStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+AlbumArtistStartsWithOrGreater
+NameStartsWith
+string
+(query)
+Optional filter by items whose name is sorted equally than a given input string.
+
+NameStartsWith
+NameLessThan
+string
+(query)
+Optional filter by items whose name is equally or lesser than a given input string.
+
+NameLessThan
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_BaseItemDto{
+Items	[BaseItemDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/Resume
+Gets items based on a query.
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+ArtistType
+string
+(query)
+Artist or AlbumArtist
+
+ArtistType
+MaxOfficialRating
+string
+(query)
+Optional filter by maximum official rating (PG, PG-13, TV-MA, etc).
+
+MaxOfficialRating
+HasThemeSong
+boolean
+(query)
+Optional filter by items with theme songs.
+
+
+--
+HasThemeVideo
+boolean
+(query)
+Optional filter by items with theme videos.
+
+
+--
+HasSubtitles
+boolean
+(query)
+Optional filter by items with subtitles.
+
+
+--
+HasSpecialFeature
+boolean
+(query)
+Optional filter by items with special features.
+
+
+--
+HasTrailer
+boolean
+(query)
+Optional filter by items with trailers.
+
+
+--
+IsSpecialSeason
+boolean
+(query)
+Optional. Filter by special season.
+
+
+--
+AdjacentTo
+string
+(query)
+Optional. Return items that are siblings of a supplied item.
+
+AdjacentTo
+StartItemId
+string
+(query)
+Optional. Skip through the list until a given item is found.
+
+StartItemId
+MinIndexNumber
+integer($int32)
+(query)
+Optional filter by minimum index number.
+
+MinIndexNumber
+MinStartDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinStartDate
+MaxStartDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxStartDate
+MinEndDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinEndDate
+MaxEndDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxEndDate
+MinPlayers
+integer($int32)
+(query)
+Optional filter by minimum number of game players.
+
+MinPlayers
+MaxPlayers
+integer($int32)
+(query)
+Optional filter by maximum number of game players.
+
+MaxPlayers
+ParentIndexNumber
+integer($int32)
+(query)
+Optional filter by parent index number.
+
+ParentIndexNumber
+HasParentalRating
+boolean
+(query)
+Optional filter by items that have or do not have a parental rating
+
+
+--
+IsHD
+boolean
+(query)
+Optional filter by items that are HD or not.
+
+
+--
+IsUnaired
+boolean
+(query)
+Optional filter by items that are unaired episodes or not.
+
+
+--
+MinCommunityRating
+number($double)
+(query)
+Optional filter by minimum community rating.
+
+MinCommunityRating
+MinCriticRating
+number($double)
+(query)
+Optional filter by minimum critic rating.
+
+MinCriticRating
+AiredDuringSeason
+integer($int32)
+(query)
+Gets all episodes that aired during a season, including specials.
+
+AiredDuringSeason
+MinPremiereDate
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinPremiereDate
+MinDateLastSaved
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinDateLastSaved
+MinDateLastSavedForUser
+string($date-time)
+(query)
+Optional. The minimum premiere date. Format = ISO
+
+MinDateLastSavedForUser
+MaxPremiereDate
+string($date-time)
+(query)
+Optional. The maximum premiere date. Format = ISO
+
+MaxPremiereDate
+HasOverview
+boolean
+(query)
+Optional filter by items that have an overview or not.
+
+
+--
+HasImdbId
+boolean
+(query)
+Optional filter by items that have an imdb id or not.
+
+
+--
+HasTmdbId
+boolean
+(query)
+Optional filter by items that have a tmdb id or not.
+
+
+--
+HasTvdbId
+boolean
+(query)
+Optional filter by items that have a tvdb id or not.
+
+
+--
+ExcludeItemIds
+string
+(query)
+Optional. If specified, results will be filtered by exxcluding item ids. This allows multiple, comma delimeted.
+
+ExcludeItemIds
+StartIndex
+integer($int32)
+(query)
+Optional. The record index to start at. All items with a lower index will be dropped from the results.
+
+StartIndex
+Limit
+integer($int32)
+(query)
+Optional. The maximum number of records to return
+
+Limit
+Recursive
+boolean
+(query)
+When searching within folders, this determines whether or not the search will be recursive. true/false
+
+
+--
+SearchTerm
+string
+(query)
+Enter a search term to perform a search request
+
+SearchTerm
+SortOrder
+string
+(query)
+Sort Order - Ascending,Descending
+
+SortOrder
+ParentId
+string
+(query)
+Specify this to localize the search to a specific item or folder. Omit to use the root
+
+ParentId
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines
+
+Fields
+ExcludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+ExcludeItemTypes
+IncludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+IncludeItemTypes
+AnyProviderIdEquals
+string
+(query)
+Optional. If specified, result will be filtered to contain only items which match at least one of the specified IDs. Each provider ID must be in the form 'prov.id', e.g. 'imdb.tt123456'. This allows multiple, comma delimeted value pairs.
+
+AnyProviderIdEquals
+Filters
+string
+(query)
+Optional. Specify additional filters to apply. This allows multiple, comma delimeted. Options: IsFolder, IsNotFolder, IsUnplayed, IsPlayed, IsFavorite, IsResumable, Likes, Dislikes
+
+Filters
+IsFavorite
+boolean
+(query)
+Optional filter by items that are marked as favorite, or not.
+
+
+--
+IsMovie
+boolean
+(query)
+Optional filter for movies.
+
+
+--
+IsSeries
+boolean
+(query)
+Optional filter for series.
+
+
+--
+IsFolder
+boolean
+(query)
+Optional filter for folders.
+
+
+--
+IsNews
+boolean
+(query)
+Optional filter for news.
+
+
+--
+IsKids
+boolean
+(query)
+Optional filter for kids.
+
+
+--
+IsSports
+boolean
+(query)
+Optional filter for sports.
+
+
+--
+IsNew
+boolean
+(query)
+Optional filter for IsNew.
+
+
+--
+IsPremiere
+boolean
+(query)
+Optional filter for IsPremiere.
+
+
+--
+IsNewOrPremiere
+boolean
+(query)
+Optional filter for IsNewOrPremiere.
+
+
+--
+IsRepeat
+boolean
+(query)
+Optional filter for IsRepeat.
+
+
+--
+ProjectToMedia
+boolean
+(query)
+ProjectToMedia
+
+
+--
+MediaTypes
+string
+(query)
+Optional filter by MediaType. Allows multiple, comma delimited.
+
+MediaTypes
+ImageTypes
+string
+(query)
+Optional. If specified, results will be filtered based on those containing image types. This allows multiple, comma delimited.
+
+ImageTypes
+SortBy
+string
+(query)
+Optional. Specify one or more sort orders, comma delimeted. Options: Album, AlbumArtist, Artist, Budget, CommunityRating, CriticRating, DateCreated, DatePlayed, PlayCount, PremiereDate, ProductionYear, SortName, Random, Revenue, Runtime
+
+SortBy
+IsPlayed
+boolean
+(query)
+Optional filter by items that are played, or not.
+
+
+--
+Genres
+string
+(query)
+Optional. If specified, results will be filtered based on genre. This allows multiple, pipe delimeted.
+
+Genres
+OfficialRatings
+string
+(query)
+Optional. If specified, results will be filtered based on OfficialRating. This allows multiple, pipe delimeted.
+
+OfficialRatings
+Tags
+string
+(query)
+Optional. If specified, results will be filtered based on tag. This allows multiple, pipe delimeted.
+
+Tags
+ExcludeTags
+string
+(query)
+Optional. If specified, results will be filtered based on tag. This allows multiple, pipe delimeted.
+
+ExcludeTags
+Years
+string
+(query)
+Optional. If specified, results will be filtered based on production year. This allows multiple, comma delimeted.
+
+Years
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+Person
+string
+(query)
+Optional. If specified, results will be filtered to include only those containing the specified person.
+
+Person
+PersonIds
+string
+(query)
+Optional. If specified, results will be filtered to include only those containing the specified person.
+
+PersonIds
+PersonTypes
+string
+(query)
+Optional. If specified, along with Person, results will be filtered to include only those containing the specified person and PersonType. Allows multiple, comma-delimited
+
+PersonTypes
+Studios
+string
+(query)
+Optional. If specified, results will be filtered based on studio. This allows multiple, pipe delimeted.
+
+Studios
+StudioIds
+string
+(query)
+Optional. If specified, results will be filtered based on studio. This allows multiple, pipe delimeted.
+
+StudioIds
+Artists
+string
+(query)
+Optional. If specified, results will be filtered based on artist. This allows multiple, pipe delimeted.
+
+Artists
+ArtistIds
+string
+(query)
+Optional. If specified, results will be filtered based on artist. This allows multiple, pipe delimeted.
+
+ArtistIds
+Albums
+string
+(query)
+Optional. If specified, results will be filtered based on album. This allows multiple, pipe delimeted.
+
+Albums
+Ids
+string
+(query)
+Optional. If specific items are needed, specify a list of item id's to retrieve. This allows multiple, comma delimited.
+
+Ids
+VideoTypes
+string
+(query)
+Optional filter by VideoType (videofile, dvd, bluray, iso). Allows multiple, comma delimeted.
+
+VideoTypes
+Containers
+string
+(query)
+Optional filter by Container. Allows multiple, comma delimeted.
+
+Containers
+AudioCodecs
+string
+(query)
+Optional filter by AudioCodec. Allows multiple, comma delimeted.
+
+AudioCodecs
+AudioLayouts
+string
+(query)
+Optional filter by AudioLayout. Allows multiple, comma delimeted.
+
+AudioLayouts
+VideoCodecs
+string
+(query)
+Optional filter by VideoCodec. Allows multiple, comma delimeted.
+
+VideoCodecs
+ExtendedVideoTypes
+string
+(query)
+Optional filter by ExtendedVideoType. Allows multiple, comma delimeted.
+
+ExtendedVideoTypes
+SubtitleCodecs
+string
+(query)
+Optional filter by SubtitleCodec. Allows multiple, comma delimeted.
+
+SubtitleCodecs
+Path
+string
+(query)
+Optional filter by Path.
+
+Path
+MinOfficialRating
+string
+(query)
+Optional filter by minimum official rating (PG, PG-13, TV-MA, etc).
+
+MinOfficialRating
+IsLocked
+boolean
+(query)
+Optional filter by items that are locked.
+
+
+--
+IsPlaceHolder
+boolean
+(query)
+Optional filter by items that are placeholders
+
+
+--
+HasOfficialRating
+boolean
+(query)
+Optional filter by items that have official ratings
+
+
+--
+GroupItemsIntoCollections
+boolean
+(query)
+Whether or not to hide items behind their boxsets.
+
+
+--
+Is3D
+boolean
+(query)
+Optional filter by items that are 3D, or not.
+
+
+--
+SeriesStatus
+string
+(query)
+Optional filter by Series Status. Allows multiple, comma delimeted.
+
+SeriesStatus
+NameStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+NameStartsWithOrGreater
+ArtistStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+ArtistStartsWithOrGreater
+AlbumArtistStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+AlbumArtistStartsWithOrGreater
+NameStartsWith
+string
+(query)
+Optional filter by items whose name is sorted equally than a given input string.
+
+NameStartsWith
+NameLessThan
+string
+(query)
+Optional filter by items whose name is equally or lesser than a given input string.
+
+NameLessThan
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_BaseItemDto{
+Items	[BaseItemDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
