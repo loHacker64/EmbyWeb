@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, LayoutGrid, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
+import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles } from 'lucide-react';
 import Hls from 'hls.js';
 
 const EMBY_SERVER = 'http://192.168.1.100:8096';
@@ -1104,10 +1104,10 @@ export default function App() {
             <>
               {/* Desktop o Mobile normale */}
               <div className={isMobile ? "flex items-center gap-4" : "flex items-center gap-8"}>
-                <h1 className={isMobile ? "text-2xl font-bold text-emerald-500" : "text-3xl font-bold text-emerald-500"}>EMBY</h1>
+                <h1 className={isMobile ? "text-2xl font-bold bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent" : "text-3xl font-bold bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent drop-shadow-lg"}>EMBY</h1>
                 {!isMobile && (
-                  <nav className="flex gap-6">
-                    {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-base font-semibold transition px-3 py-2 rounded-lg ${activeView===v?'text-white bg-white/10':'text-gray-400 hover:text-white hover:bg-white/5'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
+                  <nav className="flex gap-2">
+                    {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-sm font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${activeView===v?'text-white bg-gradient-to-r from-emerald-600 to-green-600 shadow-lg shadow-emerald-500/30':'text-gray-400 hover:text-white hover:bg-white/10'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
                   </nav>
                 )}
               </div>
@@ -1115,7 +1115,7 @@ export default function App() {
               {/* Mobile: Pulsanti HOME/FILM/SERIE solo quando search non espansa */}
               {isMobile && !searchExpanded && (
                 <nav className="flex gap-2">
-                  {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-xs font-semibold transition px-2 py-1.5 rounded-lg ${activeView===v?'text-white bg-emerald-600':'text-gray-400'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
+                  {['home','movies','series'].map(v=><button key={v} onClick={()=>{setActiveView(v);closeSearch();}} className={`text-xs font-semibold transition-all duration-300 px-3 py-1.5 rounded-lg ${activeView===v?'text-white bg-gradient-to-r from-emerald-600 to-green-600 shadow-lg':'text-gray-400 hover:text-white'}`}>{v==='home'?'HOME':v==='movies'?'FILM':'SERIE TV'}</button>)}
                 </nav>
               )}
 
@@ -1129,11 +1129,11 @@ export default function App() {
                 </button>
               ) : (
                 <div className="flex-1 max-w-2xl mx-8">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input type="text" placeholder="Cerca film o serie TV..." value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);handleSearch(e.target.value);setShowSearch(e.target.value.length>0);}} className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-full pl-12 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:bg-white/20 focus:border-emerald-500 transition" />
+                  <div className="relative group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-400 w-5 h-5 transition-colors" />
+                    <input type="text" placeholder="Cerca film o serie TV..." value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);handleSearch(e.target.value);setShowSearch(e.target.value.length>0);}} className="w-full bg-white/5 backdrop-blur-xl border border-white/20 rounded-full pl-12 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-500/20 transition-all" />
                     {searchQuery && (
-                      <button onClick={closeSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
+                      <button onClick={closeSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
                         <X className="w-5 h-5" />
                       </button>
                     )}
@@ -1144,7 +1144,6 @@ export default function App() {
               {/* Link e logout - Nascosti su mobile quando search espansa */}
               {!isMobile && (
                 <div className="flex items-center gap-4">
-                  <a href="https://ilmioserver.diskstattion.me:8096" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LayoutGrid className="w-4 h-4" /><span className="text-sm">Versione classica</span></a>
                   <button onClick={()=>setUser(null)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition"><LogOut className="w-4 h-4" /></button>
                 </div>
               )}
@@ -1231,26 +1230,32 @@ export default function App() {
 
             <div className="relative group">
               <button onClick={()=>scroll('continue','left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-emerald-600/20 hover:bg-emerald-600/40 backdrop-blur-md border border-emerald-500/30 p-3 rounded-full opacity-0 group-hover:opacity-100 transition shadow-xl shadow-emerald-500/20"><ChevronLeft className="w-6 h-6 text-emerald-400"/></button>
-              <div id="continue" className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
+              <div id="continue" className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
                 {continueWatching.map(item=>{
                   if(item.Type==='Episode'){
-                    return <div key={item.Id} className="flex-none w-56 cursor-pointer group/card" onClick={()=>startPlay(item)}>
-                      <div className="relative">
-                        <img src={`${EMBY_SERVER}/Items/${item.SeriesId}/Images/Primary?api_key=${API_KEY}`} alt={item.SeriesName} className="w-full aspect-video object-cover rounded-xl group-hover/card:ring-4 group-hover/card:ring-emerald-500/60 group-hover/card:brightness-110 transition-all duration-300 shadow-xl group-hover/card:shadow-2xl group-hover/card:shadow-emerald-500/40"/>
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition flex items-center justify-center rounded-xl"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl"><Play className="w-6 h-6 fill-white"/></div></div>
-                        {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-800/80 rounded-b-xl backdrop-blur-sm"><div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-bl-xl transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
+                    return <div key={item.Id} className="flex-none w-72 cursor-pointer group/card" onClick={()=>startPlay(item)}>
+                      <div className="relative overflow-hidden rounded-xl">
+                        <img src={getImg(item, 'Thumb')} alt={item.SeriesName} className="w-full aspect-video object-cover group-hover/card:scale-105 transition-all duration-500 shadow-lg"/>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl scale-90 group-hover/card:scale-100 transition-transform duration-300"><Play className="w-6 h-6 fill-white"/></div></div>
+                        {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/60"><div className="h-full bg-gradient-to-r from-emerald-400 to-green-500 shadow-lg shadow-emerald-500/50 transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <p className="text-sm font-bold text-white drop-shadow-lg line-clamp-1">{item.SeriesName}</p>
+                          <p className="text-xs text-emerald-400 font-semibold drop-shadow-lg">S{item.ParentIndexNumber} E{item.IndexNumber}</p>
+                        </div>
                       </div>
-                      <p className="mt-3 text-sm font-semibold text-center line-clamp-2">{item.SeriesName}</p>
-                      <p className="text-xs text-emerald-400/80 text-center font-medium">S{item.ParentIndexNumber} E{item.IndexNumber}</p>
                     </div>;
                   }
-                  return <div key={item.Id} className="flex-none w-56 cursor-pointer group/card" onClick={()=>startPlay(item)}>
-                    <div className="relative">
-                      <img src={getImg(item)} alt={item.Name} className="w-full aspect-video object-cover rounded-xl group-hover/card:ring-4 group-hover/card:ring-emerald-500/60 group-hover/card:brightness-110 transition-all duration-300 shadow-xl group-hover/card:shadow-2xl group-hover/card:shadow-emerald-500/40"/>
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition flex items-center justify-center rounded-xl"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl"><Play className="w-6 h-6 fill-white"/></div></div>
-                      {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-800/80 rounded-b-xl backdrop-blur-sm"><div className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-bl-xl transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
+                  return <div key={item.Id} className="flex-none w-72 cursor-pointer group/card" onClick={()=>startPlay(item)}>
+                    <div className="relative overflow-hidden rounded-xl">
+                      <img src={getImg(item, 'Thumb')} alt={item.Name} className="w-full aspect-video object-cover group-hover/card:scale-105 transition-all duration-500 shadow-lg"/>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center"><div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-full p-3 shadow-2xl scale-90 group-hover/card:scale-100 transition-transform duration-300"><Play className="w-6 h-6 fill-white"/></div></div>
+                      {item.UserData?.PlayedPercentage && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/60"><div className="h-full bg-gradient-to-r from-emerald-400 to-green-500 shadow-lg shadow-emerald-500/50 transition-all" style={{width:`${item.UserData.PlayedPercentage}%`}}></div></div>}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <p className="text-sm font-bold text-white drop-shadow-lg line-clamp-1">{item.Name}</p>
+                      </div>
                     </div>
-                    <p className="mt-3 text-sm font-semibold text-center line-clamp-2">{item.Name}</p>
                   </div>;
                 })}
               </div>
@@ -1261,26 +1266,32 @@ export default function App() {
 
         {activeView==='home' && libraries.map(lib=>(
           <div key={lib.Id}>
-            <h3 className="text-2xl font-bold mb-6">{lib.Name}</h3>
+            <div className="mb-6 flex items-center gap-3">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">{lib.Name}</h3>
+              <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
+            </div>
             <div className="relative group">
-              <button onClick={()=>scroll(`row-${lib.Id}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-6 h-6"/></button>
+              <button onClick={()=>scroll(`row-${lib.Id}`,'left')} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-emerald-600/40 backdrop-blur-md border border-white/20 hover:border-emerald-500/50 p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl hover:scale-110"><ChevronLeft className="w-6 h-6 hover:text-emerald-400 transition-colors"/></button>
               <div id={`row-${lib.Id}`} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
                 {(lib.CollectionType==='movies'?movieLibrary:lib.CollectionType==='tvshows'?seriesLibrary:featuredItems).slice(0,20).map(item=><div key={item.Id} className="flex-none w-48 cursor-pointer" onClick={()=>openDetails(item)}><img src={getImg(item)} alt={item.Name} className="w-full aspect-[2/3] object-cover rounded-lg hover:ring-4 hover:ring-emerald-500/60 hover:brightness-110 transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30"/><p className="mt-3 text-sm font-medium text-center line-clamp-2">{item.Name}</p></div>)}
               </div>
-              <button onClick={()=>scroll(`row-${lib.Id}`,'right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-6 h-6"/></button>
+              <button onClick={()=>scroll(`row-${lib.Id}`,'right')} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-emerald-600/40 backdrop-blur-md border border-white/20 hover:border-emerald-500/50 p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl hover:scale-110"><ChevronRight className="w-6 h-6 hover:text-emerald-400 transition-colors"/></button>
             </div>
           </div>
         ))}
 
         {activeView==='movies' && (
           <div ref={movieGridRef}>
-            <div className="flex justify-between items-center mb-6 pt-12">
-              <h3 className="text-3xl font-bold">Film</h3>
-              <select value={movieSortOrder} onChange={e=>loadMoviesSort(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500">
-                <option value="SortName" className="bg-gray-800 text-white">A-Z</option>
-                <option value="DateCreated" className="bg-gray-800 text-white">Più recenti</option>
-                <option value="PremiereDate" className="bg-gray-800 text-white">Data uscita</option>
-                <option value="Random" className="bg-gray-800 text-white">Casuale</option>
+            <div className="flex justify-between items-center mb-8 pt-12">
+              <div className="flex items-center gap-3">
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Film</h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-white/30 to-transparent w-20"></div>
+              </div>
+              <select value={movieSortOrder} onChange={e=>loadMoviesSort(e.target.value)} className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/20 rounded-xl px-5 py-2.5 text-white focus:outline-none focus:border-emerald-500 hover:border-emerald-500/50 transition-all shadow-lg cursor-pointer">
+                <option value="SortName" className="bg-gray-900 text-white">A-Z</option>
+                <option value="DateCreated" className="bg-gray-900 text-white">Più recenti</option>
+                <option value="PremiereDate" className="bg-gray-900 text-white">Data uscita</option>
+                <option value="Random" className="bg-gray-900 text-white">Casuale</option>
               </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
@@ -1293,13 +1304,16 @@ export default function App() {
 
         {activeView==='series' && (
           <div ref={seriesGridRef}>
-            <div className="flex justify-between items-center mb-6 pt-12">
-              <h3 className="text-3xl font-bold">Serie TV</h3>
-              <select value={seriesSortOrder} onChange={e=>loadSeriesSort(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500">
-                <option value="SortName" className="bg-gray-800 text-white">A-Z</option>
-                <option value="DateCreated" className="bg-gray-800 text-white">Più recenti</option>
-                <option value="PremiereDate" className="bg-gray-800 text-white">Data uscita</option>
-                <option value="Random" className="bg-gray-800 text-white">Casuale</option>
+            <div className="flex justify-between items-center mb-8 pt-12">
+              <div className="flex items-center gap-3">
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Serie TV</h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-white/30 to-transparent w-20"></div>
+              </div>
+              <select value={seriesSortOrder} onChange={e=>loadSeriesSort(e.target.value)} className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/20 rounded-xl px-5 py-2.5 text-white focus:outline-none focus:border-emerald-500 hover:border-emerald-500/50 transition-all shadow-lg cursor-pointer">
+                <option value="SortName" className="bg-gray-900 text-white">A-Z</option>
+                <option value="DateCreated" className="bg-gray-900 text-white">Più recenti</option>
+                <option value="PremiereDate" className="bg-gray-900 text-white">Data uscita</option>
+                <option value="Random" className="bg-gray-900 text-white">Casuale</option>
               </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
