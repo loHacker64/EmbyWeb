@@ -1,0 +1,2402 @@
+UserLibraryService
+API Documentation: Browsing the Library
+
+
+POST
+/Items/Access
+Updates user item access
+
+Requires authentication as user
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+UpdateUserItemAccess
+
+Example Value
+Schema
+UserLibrary.UpdateUserItemAccess{
+ItemIds	[string]
+UserIds	[string]
+ItemAccess	UserItemShareLevelstring
+x-internal-ref-name: MediaBrowser.Model.Dto.UserItemShareLevel
+($enum)(None, Read, Write, Manage, ManageDelete)
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/MakePublic
+Makes an item public to all users
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/{Id}/MakePrivate
+Makes an item private
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Items/Shared/Leave
+Leaves a shared item
+
+Requires authentication as user
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+LeaveSharedItems
+
+Example Value
+Schema
+UserLibrary.LeaveSharedItems{
+ItemIds	[string]
+UserId	string
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/LiveTv/Programs/{Id}
+Gets a live tv program
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a BaseItemDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+BaseItemDto{
+Name	string
+OriginalTitle	string
+ServerId	string
+Id	string
+Guid	string
+Etag	string
+Prefix	string
+TunerName	string
+PlaylistItemId	string
+DateCreated	string($date-time, nullable)
+DateModified	string($date-time, nullable)
+VideoCodec	string
+AudioCodec	string
+AverageFrameRate	number($float, nullable)
+RealFrameRate	number($float, nullable)
+ExtraType	string
+SortIndexNumber	integer($int32, nullable)
+SortParentIndexNumber	integer($int32, nullable)
+CanDelete	boolean(nullable)
+CanDownload	boolean(nullable)
+CanEditItems	boolean(nullable)
+SupportsResume	boolean(nullable)
+PresentationUniqueKey	string
+PreferredMetadataLanguage	string
+PreferredMetadataCountryCode	string
+SupportsSync	boolean(nullable)
+SyncStatus	SyncJobItemStatusstring
+x-internal-ref-name: MediaBrowser.Model.Sync.SyncJobItemStatus
+($enum)(Queued, Converting, ReadyToTransfer, Transferring, Synced, Failed)
+CanManageAccess	boolean(nullable)
+CanLeaveContent	boolean(nullable)
+CanMakePublic	boolean(nullable)
+Container	string
+SortName	string
+ForcedSortName	string
+Video3DFormat	Video3DFormatstring
+x-internal-ref-name: MediaBrowser.Model.Entities.Video3DFormat
+($enum)(HalfSideBySide, FullSideBySide, FullTopAndBottom, HalfTopAndBottom, MVC)
+PremiereDate	string($date-time, nullable)
+ExternalUrls	[ExternalUrl{...}]
+MediaSources	[MediaSourceInfo{...}]
+CriticRating	number($float, nullable)
+GameSystemId	integer($int64, nullable)
+AsSeries	boolean(nullable)
+GameSystem	string
+ProductionLocations	[string]
+Path	string
+OfficialRating	string
+CustomRating	string
+ChannelId	string
+ChannelName	string
+Overview	string
+Taglines	[string]
+Genres	[string]
+CommunityRating	number($float, nullable)
+RunTimeTicks	integer($int64, nullable)
+Size	integer($int64, nullable)
+FileName	string
+Bitrate	integer($int32, nullable)
+ProductionYear	integer($int32, nullable)
+Number	string
+ChannelNumber	string
+IndexNumber	integer($int32, nullable)
+IndexNumberEnd	integer($int32, nullable)
+ParentIndexNumber	integer($int32, nullable)
+RemoteTrailers	[MediaUrl{...}]
+ProviderIds	ProviderIdDictionary{...}
+IsFolder	boolean(nullable)
+ParentId	string
+Type	string
+People	[BaseItemPerson{...}]
+Studios	[NameLongIdPair{...}]
+GenreItems	[NameLongIdPair{...}]
+TagItems	[NameLongIdPair{...}]
+ParentLogoItemId	string
+ParentBackdropItemId	string
+ParentBackdropImageTags	[string]
+LocalTrailerCount	integer($int32, nullable)
+UserData	UserItemDataDto{...}
+RecursiveItemCount	integer($int32, nullable)
+ChildCount	integer($int32, nullable)
+SeasonCount	integer($int32, nullable)
+SeriesName	string
+SeriesId	string
+SeasonId	string
+SpecialFeatureCount	integer($int32, nullable)
+DisplayPreferencesId	string
+Status	string
+AirDays	[DayOfWeekstring
+x-internal-ref-name: System.DayOfWeek
+($enum)(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+]
+Tags	[string]
+PrimaryImageAspectRatio	number($double, nullable)
+Artists	[string]
+ArtistItems	[NameIdPair{...}]
+Composers	[NameIdPair{...}]
+Album	string
+CollectionType	string
+DisplayOrder	string
+AlbumId	string
+AlbumPrimaryImageTag	string
+SeriesPrimaryImageTag	string
+AlbumArtist	string
+AlbumArtists	[NameIdPair{...}]
+SeasonName	string
+MediaStreams	[MediaStream{...}]
+PartCount	integer($int32, nullable)
+ImageTags	{...}
+BackdropImageTags	[string]
+ParentLogoImageTag	string
+SeriesStudio	string
+PrimaryImageItemId	string
+PrimaryImageTag	string
+ParentThumbItemId	string
+ParentThumbImageTag	string
+Chapters	[ChapterInfo{...}]
+LocationType	LocationTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.LocationType
+($enum)(FileSystem, Virtual)
+MediaType	string
+EndDate	string($date-time, nullable)
+LockedFields	[MetadataFieldsstring
+x-internal-ref-name: MediaBrowser.Model.Entities.MetadataFields
+($enum)(Cast, Genres, ProductionLocations, Studios, Tags, Name, Overview, Runtime, OfficialRating, Collections, ChannelNumber, SortName, OriginalTitle, SortIndexNumber, SortParentIndexNumber, CommunityRating, CriticRating, Tagline, Composers, Artists, AlbumArtists)
+]
+LockData	boolean(nullable)
+Width	integer($int32, nullable)
+Height	integer($int32, nullable)
+CameraMake	string
+CameraModel	string
+Software	string
+ExposureTime	number($double, nullable)
+FocalLength	number($double, nullable)
+ImageOrientation	Drawing.ImageOrientationstring
+x-internal-ref-name: MediaBrowser.Model.Drawing.ImageOrientation
+($enum)(TopLeft, TopRight, BottomRight, BottomLeft, LeftTop, RightTop, RightBottom, LeftBottom)
+Aperture	number($double, nullable)
+ShutterSpeed	number($double, nullable)
+Latitude	number($double, nullable)
+Longitude	number($double, nullable)
+Altitude	number($double, nullable)
+IsoSpeedRating	integer($int32, nullable)
+SeriesTimerId	string
+ChannelPrimaryImageTag	string
+StartDate	string($date-time, nullable)
+CompletionPercentage	number($double, nullable)
+IsRepeat	boolean(nullable)
+IsNew	boolean(nullable)
+EpisodeTitle	string
+IsMovie	boolean(nullable)
+IsSports	boolean(nullable)
+IsSeries	boolean(nullable)
+IsLive	boolean(nullable)
+IsNews	boolean(nullable)
+IsKids	boolean(nullable)
+IsPremiere	boolean(nullable)
+TimerType	LiveTv.TimerTypestring
+x-internal-ref-name: MediaBrowser.Model.LiveTv.TimerType
+($enum)(Program, DateTime, Keyword)
+Disabled	boolean(nullable)
+ManagementId	string
+TimerId	string
+CurrentProgram	{...}
+MovieCount	integer($int32, nullable)
+SeriesCount	integer($int32, nullable)
+AlbumCount	integer($int32, nullable)
+SongCount	integer($int32, nullable)
+MusicVideoCount	integer($int32, nullable)
+Subviews	[string]
+ListingsProviderId	string
+ListingsChannelId	string
+ListingsPath	string
+ListingsId	string
+ListingsChannelName	string
+ListingsChannelNumber	string
+AffiliateCallSign	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Videos/{Id}/AdditionalParts
+Gets additional parts for a video.
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+UserId
+string($guid)
+(query)
+Optional. Filter by user id, and attach user data
+
+UserId
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines, TrailerUrls
+
+Fields
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_BaseItemDto{
+Items	[BaseItemDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/Latest
+Gets latest media
+
+Requires authentication as user
+
+Find more details
+API Documentation: Latest Items
+
+https://dev.emby.media/doc/restapi/Latest-Items.html
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Limit
+integer($int32)
+(query)
+Limit
+
+Limit
+ParentId
+string
+(query)
+Specify this to localize the search to a specific item or folder. Omit to use the root
+
+ParentId
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, SortName, Studios, Taglines
+
+Fields
+IncludeItemTypes
+string
+(query)
+Optional. If specified, results will be filtered based on item type. This allows multiple, comma delimeted.
+
+IncludeItemTypes
+MediaTypes
+string
+(query)
+Optional filter by MediaType. Allows multiple, comma delimited.
+
+MediaTypes
+IsFolder
+boolean
+(query)
+Filter by items that are folders, or not.
+
+
+--
+IsPlayed
+boolean
+(query)
+Filter by items that are played, or not.
+
+
+--
+GroupItems
+boolean
+(query)
+Whether or not to group items into a parent container.
+
+
+--
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a BaseItemDto[] object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[BaseItemDto{
+Name	string
+OriginalTitle	string
+ServerId	string
+Id	string
+Guid	string
+Etag	string
+Prefix	string
+TunerName	string
+PlaylistItemId	string
+DateCreated	string($date-time, nullable)
+DateModified	string($date-time, nullable)
+VideoCodec	string
+AudioCodec	string
+AverageFrameRate	number($float, nullable)
+RealFrameRate	number($float, nullable)
+ExtraType	string
+SortIndexNumber	integer($int32, nullable)
+SortParentIndexNumber	integer($int32, nullable)
+CanDelete	boolean(nullable)
+CanDownload	boolean(nullable)
+CanEditItems	boolean(nullable)
+SupportsResume	boolean(nullable)
+PresentationUniqueKey	string
+PreferredMetadataLanguage	string
+PreferredMetadataCountryCode	string
+SupportsSync	boolean(nullable)
+SyncStatus	SyncJobItemStatusstring
+x-internal-ref-name: MediaBrowser.Model.Sync.SyncJobItemStatus
+($enum)(Queued, Converting, ReadyToTransfer, Transferring, Synced, Failed)
+CanManageAccess	boolean(nullable)
+CanLeaveContent	boolean(nullable)
+CanMakePublic	boolean(nullable)
+Container	string
+SortName	string
+ForcedSortName	string
+Video3DFormat	Video3DFormatstring
+x-internal-ref-name: MediaBrowser.Model.Entities.Video3DFormat
+($enum)(HalfSideBySide, FullSideBySide, FullTopAndBottom, HalfTopAndBottom, MVC)
+PremiereDate	string($date-time, nullable)
+ExternalUrls	[ExternalUrl{...}]
+MediaSources	[MediaSourceInfo{...}]
+CriticRating	number($float, nullable)
+GameSystemId	integer($int64, nullable)
+AsSeries	boolean(nullable)
+GameSystem	string
+ProductionLocations	[string]
+Path	string
+OfficialRating	string
+CustomRating	string
+ChannelId	string
+ChannelName	string
+Overview	string
+Taglines	[string]
+Genres	[string]
+CommunityRating	number($float, nullable)
+RunTimeTicks	integer($int64, nullable)
+Size	integer($int64, nullable)
+FileName	string
+Bitrate	integer($int32, nullable)
+ProductionYear	integer($int32, nullable)
+Number	string
+ChannelNumber	string
+IndexNumber	integer($int32, nullable)
+IndexNumberEnd	integer($int32, nullable)
+ParentIndexNumber	integer($int32, nullable)
+RemoteTrailers	[MediaUrl{...}]
+ProviderIds	ProviderIdDictionary{...}
+IsFolder	boolean(nullable)
+ParentId	string
+Type	string
+People	[BaseItemPerson{...}]
+Studios	[NameLongIdPair{...}]
+GenreItems	[NameLongIdPair{...}]
+TagItems	[NameLongIdPair{...}]
+ParentLogoItemId	string
+ParentBackdropItemId	string
+ParentBackdropImageTags	[string]
+LocalTrailerCount	integer($int32, nullable)
+UserData	UserItemDataDto{...}
+RecursiveItemCount	integer($int32, nullable)
+ChildCount	integer($int32, nullable)
+SeasonCount	integer($int32, nullable)
+SeriesName	string
+SeriesId	string
+SeasonId	string
+SpecialFeatureCount	integer($int32, nullable)
+DisplayPreferencesId	string
+Status	string
+AirDays	[DayOfWeekstring
+x-internal-ref-name: System.DayOfWeek
+($enum)(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+]
+Tags	[string]
+PrimaryImageAspectRatio	number($double, nullable)
+Artists	[string]
+ArtistItems	[NameIdPair{...}]
+Composers	[NameIdPair{...}]
+Album	string
+CollectionType	string
+DisplayOrder	string
+AlbumId	string
+AlbumPrimaryImageTag	string
+SeriesPrimaryImageTag	string
+AlbumArtist	string
+AlbumArtists	[NameIdPair{...}]
+SeasonName	string
+MediaStreams	[MediaStream{...}]
+PartCount	integer($int32, nullable)
+ImageTags	{...}
+BackdropImageTags	[string]
+ParentLogoImageTag	string
+SeriesStudio	string
+PrimaryImageItemId	string
+PrimaryImageTag	string
+ParentThumbItemId	string
+ParentThumbImageTag	string
+Chapters	[ChapterInfo{...}]
+LocationType	LocationTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.LocationType
+($enum)(FileSystem, Virtual)
+MediaType	string
+EndDate	string($date-time, nullable)
+LockedFields	[MetadataFieldsstring
+x-internal-ref-name: MediaBrowser.Model.Entities.MetadataFields
+($enum)(Cast, Genres, ProductionLocations, Studios, Tags, Name, Overview, Runtime, OfficialRating, Collections, ChannelNumber, SortName, OriginalTitle, SortIndexNumber, SortParentIndexNumber, CommunityRating, CriticRating, Tagline, Composers, Artists, AlbumArtists)
+]
+LockData	boolean(nullable)
+Width	integer($int32, nullable)
+Height	integer($int32, nullable)
+CameraMake	string
+CameraModel	string
+Software	string
+ExposureTime	number($double, nullable)
+FocalLength	number($double, nullable)
+ImageOrientation	Drawing.ImageOrientationstring
+x-internal-ref-name: MediaBrowser.Model.Drawing.ImageOrientation
+($enum)(TopLeft, TopRight, BottomRight, BottomLeft, LeftTop, RightTop, RightBottom, LeftBottom)
+Aperture	number($double, nullable)
+ShutterSpeed	number($double, nullable)
+Latitude	number($double, nullable)
+Longitude	number($double, nullable)
+Altitude	number($double, nullable)
+IsoSpeedRating	integer($int32, nullable)
+SeriesTimerId	string
+ChannelPrimaryImageTag	string
+StartDate	string($date-time, nullable)
+CompletionPercentage	number($double, nullable)
+IsRepeat	boolean(nullable)
+IsNew	boolean(nullable)
+EpisodeTitle	string
+IsMovie	boolean(nullable)
+IsSports	boolean(nullable)
+IsSeries	boolean(nullable)
+IsLive	boolean(nullable)
+IsNews	boolean(nullable)
+IsKids	boolean(nullable)
+IsPremiere	boolean(nullable)
+TimerType	LiveTv.TimerTypestring
+x-internal-ref-name: MediaBrowser.Model.LiveTv.TimerType
+($enum)(Program, DateTime, Keyword)
+Disabled	boolean(nullable)
+ManagementId	string
+TimerId	string
+CurrentProgram	{...}
+MovieCount	integer($int32, nullable)
+SeriesCount	integer($int32, nullable)
+AlbumCount	integer($int32, nullable)
+SongCount	integer($int32, nullable)
+MusicVideoCount	integer($int32, nullable)
+Subviews	[string]
+ListingsProviderId	string
+ListingsChannelId	string
+ListingsPath	string
+ListingsId	string
+ListingsChannelName	string
+ListingsChannelNumber	string
+AffiliateCallSign	string
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/{Id}
+Gets an item from a user's library
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a BaseItemDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+BaseItemDto{
+Name	string
+OriginalTitle	string
+ServerId	string
+Id	string
+Guid	string
+Etag	string
+Prefix	string
+TunerName	string
+PlaylistItemId	string
+DateCreated	string($date-time, nullable)
+DateModified	string($date-time, nullable)
+VideoCodec	string
+AudioCodec	string
+AverageFrameRate	number($float, nullable)
+RealFrameRate	number($float, nullable)
+ExtraType	string
+SortIndexNumber	integer($int32, nullable)
+SortParentIndexNumber	integer($int32, nullable)
+CanDelete	boolean(nullable)
+CanDownload	boolean(nullable)
+CanEditItems	boolean(nullable)
+SupportsResume	boolean(nullable)
+PresentationUniqueKey	string
+PreferredMetadataLanguage	string
+PreferredMetadataCountryCode	string
+SupportsSync	boolean(nullable)
+SyncStatus	SyncJobItemStatusstring
+x-internal-ref-name: MediaBrowser.Model.Sync.SyncJobItemStatus
+($enum)(Queued, Converting, ReadyToTransfer, Transferring, Synced, Failed)
+CanManageAccess	boolean(nullable)
+CanLeaveContent	boolean(nullable)
+CanMakePublic	boolean(nullable)
+Container	string
+SortName	string
+ForcedSortName	string
+Video3DFormat	Video3DFormatstring
+x-internal-ref-name: MediaBrowser.Model.Entities.Video3DFormat
+($enum)(HalfSideBySide, FullSideBySide, FullTopAndBottom, HalfTopAndBottom, MVC)
+PremiereDate	string($date-time, nullable)
+ExternalUrls	[ExternalUrl{...}]
+MediaSources	[MediaSourceInfo{...}]
+CriticRating	number($float, nullable)
+GameSystemId	integer($int64, nullable)
+AsSeries	boolean(nullable)
+GameSystem	string
+ProductionLocations	[string]
+Path	string
+OfficialRating	string
+CustomRating	string
+ChannelId	string
+ChannelName	string
+Overview	string
+Taglines	[string]
+Genres	[string]
+CommunityRating	number($float, nullable)
+RunTimeTicks	integer($int64, nullable)
+Size	integer($int64, nullable)
+FileName	string
+Bitrate	integer($int32, nullable)
+ProductionYear	integer($int32, nullable)
+Number	string
+ChannelNumber	string
+IndexNumber	integer($int32, nullable)
+IndexNumberEnd	integer($int32, nullable)
+ParentIndexNumber	integer($int32, nullable)
+RemoteTrailers	[MediaUrl{...}]
+ProviderIds	ProviderIdDictionary{...}
+IsFolder	boolean(nullable)
+ParentId	string
+Type	string
+People	[BaseItemPerson{...}]
+Studios	[NameLongIdPair{...}]
+GenreItems	[NameLongIdPair{...}]
+TagItems	[NameLongIdPair{...}]
+ParentLogoItemId	string
+ParentBackdropItemId	string
+ParentBackdropImageTags	[string]
+LocalTrailerCount	integer($int32, nullable)
+UserData	UserItemDataDto{...}
+RecursiveItemCount	integer($int32, nullable)
+ChildCount	integer($int32, nullable)
+SeasonCount	integer($int32, nullable)
+SeriesName	string
+SeriesId	string
+SeasonId	string
+SpecialFeatureCount	integer($int32, nullable)
+DisplayPreferencesId	string
+Status	string
+AirDays	[DayOfWeekstring
+x-internal-ref-name: System.DayOfWeek
+($enum)(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+]
+Tags	[string]
+PrimaryImageAspectRatio	number($double, nullable)
+Artists	[string]
+ArtistItems	[NameIdPair{...}]
+Composers	[NameIdPair{...}]
+Album	string
+CollectionType	string
+DisplayOrder	string
+AlbumId	string
+AlbumPrimaryImageTag	string
+SeriesPrimaryImageTag	string
+AlbumArtist	string
+AlbumArtists	[NameIdPair{...}]
+SeasonName	string
+MediaStreams	[MediaStream{...}]
+PartCount	integer($int32, nullable)
+ImageTags	{...}
+BackdropImageTags	[string]
+ParentLogoImageTag	string
+SeriesStudio	string
+PrimaryImageItemId	string
+PrimaryImageTag	string
+ParentThumbItemId	string
+ParentThumbImageTag	string
+Chapters	[ChapterInfo{...}]
+LocationType	LocationTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.LocationType
+($enum)(FileSystem, Virtual)
+MediaType	string
+EndDate	string($date-time, nullable)
+LockedFields	[MetadataFieldsstring
+x-internal-ref-name: MediaBrowser.Model.Entities.MetadataFields
+($enum)(Cast, Genres, ProductionLocations, Studios, Tags, Name, Overview, Runtime, OfficialRating, Collections, ChannelNumber, SortName, OriginalTitle, SortIndexNumber, SortParentIndexNumber, CommunityRating, CriticRating, Tagline, Composers, Artists, AlbumArtists)
+]
+LockData	boolean(nullable)
+Width	integer($int32, nullable)
+Height	integer($int32, nullable)
+CameraMake	string
+CameraModel	string
+Software	string
+ExposureTime	number($double, nullable)
+FocalLength	number($double, nullable)
+ImageOrientation	Drawing.ImageOrientationstring
+x-internal-ref-name: MediaBrowser.Model.Drawing.ImageOrientation
+($enum)(TopLeft, TopRight, BottomRight, BottomLeft, LeftTop, RightTop, RightBottom, LeftBottom)
+Aperture	number($double, nullable)
+ShutterSpeed	number($double, nullable)
+Latitude	number($double, nullable)
+Longitude	number($double, nullable)
+Altitude	number($double, nullable)
+IsoSpeedRating	integer($int32, nullable)
+SeriesTimerId	string
+ChannelPrimaryImageTag	string
+StartDate	string($date-time, nullable)
+CompletionPercentage	number($double, nullable)
+IsRepeat	boolean(nullable)
+IsNew	boolean(nullable)
+EpisodeTitle	string
+IsMovie	boolean(nullable)
+IsSports	boolean(nullable)
+IsSeries	boolean(nullable)
+IsLive	boolean(nullable)
+IsNews	boolean(nullable)
+IsKids	boolean(nullable)
+IsPremiere	boolean(nullable)
+TimerType	LiveTv.TimerTypestring
+x-internal-ref-name: MediaBrowser.Model.LiveTv.TimerType
+($enum)(Program, DateTime, Keyword)
+Disabled	boolean(nullable)
+ManagementId	string
+TimerId	string
+CurrentProgram	{...}
+MovieCount	integer($int32, nullable)
+SeriesCount	integer($int32, nullable)
+AlbumCount	integer($int32, nullable)
+SongCount	integer($int32, nullable)
+MusicVideoCount	integer($int32, nullable)
+Subviews	[string]
+ListingsProviderId	string
+ListingsChannelId	string
+ListingsPath	string
+ListingsId	string
+ListingsChannelName	string
+ListingsChannelNumber	string
+AffiliateCallSign	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/Root
+Gets the root folder from a user's library
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a BaseItemDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+BaseItemDto{
+Name	string
+OriginalTitle	string
+ServerId	string
+Id	string
+Guid	string
+Etag	string
+Prefix	string
+TunerName	string
+PlaylistItemId	string
+DateCreated	string($date-time, nullable)
+DateModified	string($date-time, nullable)
+VideoCodec	string
+AudioCodec	string
+AverageFrameRate	number($float, nullable)
+RealFrameRate	number($float, nullable)
+ExtraType	string
+SortIndexNumber	integer($int32, nullable)
+SortParentIndexNumber	integer($int32, nullable)
+CanDelete	boolean(nullable)
+CanDownload	boolean(nullable)
+CanEditItems	boolean(nullable)
+SupportsResume	boolean(nullable)
+PresentationUniqueKey	string
+PreferredMetadataLanguage	string
+PreferredMetadataCountryCode	string
+SupportsSync	boolean(nullable)
+SyncStatus	SyncJobItemStatusstring
+x-internal-ref-name: MediaBrowser.Model.Sync.SyncJobItemStatus
+($enum)(Queued, Converting, ReadyToTransfer, Transferring, Synced, Failed)
+CanManageAccess	boolean(nullable)
+CanLeaveContent	boolean(nullable)
+CanMakePublic	boolean(nullable)
+Container	string
+SortName	string
+ForcedSortName	string
+Video3DFormat	Video3DFormatstring
+x-internal-ref-name: MediaBrowser.Model.Entities.Video3DFormat
+($enum)(HalfSideBySide, FullSideBySide, FullTopAndBottom, HalfTopAndBottom, MVC)
+PremiereDate	string($date-time, nullable)
+ExternalUrls	[ExternalUrl{...}]
+MediaSources	[MediaSourceInfo{...}]
+CriticRating	number($float, nullable)
+GameSystemId	integer($int64, nullable)
+AsSeries	boolean(nullable)
+GameSystem	string
+ProductionLocations	[string]
+Path	string
+OfficialRating	string
+CustomRating	string
+ChannelId	string
+ChannelName	string
+Overview	string
+Taglines	[string]
+Genres	[string]
+CommunityRating	number($float, nullable)
+RunTimeTicks	integer($int64, nullable)
+Size	integer($int64, nullable)
+FileName	string
+Bitrate	integer($int32, nullable)
+ProductionYear	integer($int32, nullable)
+Number	string
+ChannelNumber	string
+IndexNumber	integer($int32, nullable)
+IndexNumberEnd	integer($int32, nullable)
+ParentIndexNumber	integer($int32, nullable)
+RemoteTrailers	[MediaUrl{...}]
+ProviderIds	ProviderIdDictionary{...}
+IsFolder	boolean(nullable)
+ParentId	string
+Type	string
+People	[BaseItemPerson{...}]
+Studios	[NameLongIdPair{...}]
+GenreItems	[NameLongIdPair{...}]
+TagItems	[NameLongIdPair{...}]
+ParentLogoItemId	string
+ParentBackdropItemId	string
+ParentBackdropImageTags	[string]
+LocalTrailerCount	integer($int32, nullable)
+UserData	UserItemDataDto{...}
+RecursiveItemCount	integer($int32, nullable)
+ChildCount	integer($int32, nullable)
+SeasonCount	integer($int32, nullable)
+SeriesName	string
+SeriesId	string
+SeasonId	string
+SpecialFeatureCount	integer($int32, nullable)
+DisplayPreferencesId	string
+Status	string
+AirDays	[DayOfWeekstring
+x-internal-ref-name: System.DayOfWeek
+($enum)(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+]
+Tags	[string]
+PrimaryImageAspectRatio	number($double, nullable)
+Artists	[string]
+ArtistItems	[NameIdPair{...}]
+Composers	[NameIdPair{...}]
+Album	string
+CollectionType	string
+DisplayOrder	string
+AlbumId	string
+AlbumPrimaryImageTag	string
+SeriesPrimaryImageTag	string
+AlbumArtist	string
+AlbumArtists	[NameIdPair{...}]
+SeasonName	string
+MediaStreams	[MediaStream{...}]
+PartCount	integer($int32, nullable)
+ImageTags	{...}
+BackdropImageTags	[string]
+ParentLogoImageTag	string
+SeriesStudio	string
+PrimaryImageItemId	string
+PrimaryImageTag	string
+ParentThumbItemId	string
+ParentThumbImageTag	string
+Chapters	[ChapterInfo{...}]
+LocationType	LocationTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.LocationType
+($enum)(FileSystem, Virtual)
+MediaType	string
+EndDate	string($date-time, nullable)
+LockedFields	[MetadataFieldsstring
+x-internal-ref-name: MediaBrowser.Model.Entities.MetadataFields
+($enum)(Cast, Genres, ProductionLocations, Studios, Tags, Name, Overview, Runtime, OfficialRating, Collections, ChannelNumber, SortName, OriginalTitle, SortIndexNumber, SortParentIndexNumber, CommunityRating, CriticRating, Tagline, Composers, Artists, AlbumArtists)
+]
+LockData	boolean(nullable)
+Width	integer($int32, nullable)
+Height	integer($int32, nullable)
+CameraMake	string
+CameraModel	string
+Software	string
+ExposureTime	number($double, nullable)
+FocalLength	number($double, nullable)
+ImageOrientation	Drawing.ImageOrientationstring
+x-internal-ref-name: MediaBrowser.Model.Drawing.ImageOrientation
+($enum)(TopLeft, TopRight, BottomRight, BottomLeft, LeftTop, RightTop, RightBottom, LeftBottom)
+Aperture	number($double, nullable)
+ShutterSpeed	number($double, nullable)
+Latitude	number($double, nullable)
+Longitude	number($double, nullable)
+Altitude	number($double, nullable)
+IsoSpeedRating	integer($int32, nullable)
+SeriesTimerId	string
+ChannelPrimaryImageTag	string
+StartDate	string($date-time, nullable)
+CompletionPercentage	number($double, nullable)
+IsRepeat	boolean(nullable)
+IsNew	boolean(nullable)
+EpisodeTitle	string
+IsMovie	boolean(nullable)
+IsSports	boolean(nullable)
+IsSeries	boolean(nullable)
+IsLive	boolean(nullable)
+IsNews	boolean(nullable)
+IsKids	boolean(nullable)
+IsPremiere	boolean(nullable)
+TimerType	LiveTv.TimerTypestring
+x-internal-ref-name: MediaBrowser.Model.LiveTv.TimerType
+($enum)(Program, DateTime, Keyword)
+Disabled	boolean(nullable)
+ManagementId	string
+TimerId	string
+CurrentProgram	{...}
+MovieCount	integer($int32, nullable)
+SeriesCount	integer($int32, nullable)
+AlbumCount	integer($int32, nullable)
+SongCount	integer($int32, nullable)
+MusicVideoCount	integer($int32, nullable)
+Subviews	[string]
+ListingsProviderId	string
+ListingsChannelId	string
+ListingsPath	string
+ListingsId	string
+ListingsChannelName	string
+ListingsChannelNumber	string
+AffiliateCallSign	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{UserId}/FavoriteItems/{Id}
+Marks an item as a favorite
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Users/{UserId}/FavoriteItems/{Id}
+Unmarks an item as a favorite
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/{Id}/SpecialFeatures
+Gets special features for an item
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Movie Id
+
+Id
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines, TrailerUrls
+
+Fields
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a BaseItemDto[] object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[BaseItemDto{
+Name	string
+OriginalTitle	string
+ServerId	string
+Id	string
+Guid	string
+Etag	string
+Prefix	string
+TunerName	string
+PlaylistItemId	string
+DateCreated	string($date-time, nullable)
+DateModified	string($date-time, nullable)
+VideoCodec	string
+AudioCodec	string
+AverageFrameRate	number($float, nullable)
+RealFrameRate	number($float, nullable)
+ExtraType	string
+SortIndexNumber	integer($int32, nullable)
+SortParentIndexNumber	integer($int32, nullable)
+CanDelete	boolean(nullable)
+CanDownload	boolean(nullable)
+CanEditItems	boolean(nullable)
+SupportsResume	boolean(nullable)
+PresentationUniqueKey	string
+PreferredMetadataLanguage	string
+PreferredMetadataCountryCode	string
+SupportsSync	boolean(nullable)
+SyncStatus	SyncJobItemStatusstring
+x-internal-ref-name: MediaBrowser.Model.Sync.SyncJobItemStatus
+($enum)(Queued, Converting, ReadyToTransfer, Transferring, Synced, Failed)
+CanManageAccess	boolean(nullable)
+CanLeaveContent	boolean(nullable)
+CanMakePublic	boolean(nullable)
+Container	string
+SortName	string
+ForcedSortName	string
+Video3DFormat	Video3DFormatstring
+x-internal-ref-name: MediaBrowser.Model.Entities.Video3DFormat
+($enum)(HalfSideBySide, FullSideBySide, FullTopAndBottom, HalfTopAndBottom, MVC)
+PremiereDate	string($date-time, nullable)
+ExternalUrls	[ExternalUrl{...}]
+MediaSources	[MediaSourceInfo{...}]
+CriticRating	number($float, nullable)
+GameSystemId	integer($int64, nullable)
+AsSeries	boolean(nullable)
+GameSystem	string
+ProductionLocations	[string]
+Path	string
+OfficialRating	string
+CustomRating	string
+ChannelId	string
+ChannelName	string
+Overview	string
+Taglines	[string]
+Genres	[string]
+CommunityRating	number($float, nullable)
+RunTimeTicks	integer($int64, nullable)
+Size	integer($int64, nullable)
+FileName	string
+Bitrate	integer($int32, nullable)
+ProductionYear	integer($int32, nullable)
+Number	string
+ChannelNumber	string
+IndexNumber	integer($int32, nullable)
+IndexNumberEnd	integer($int32, nullable)
+ParentIndexNumber	integer($int32, nullable)
+RemoteTrailers	[MediaUrl{...}]
+ProviderIds	ProviderIdDictionary{...}
+IsFolder	boolean(nullable)
+ParentId	string
+Type	string
+People	[BaseItemPerson{...}]
+Studios	[NameLongIdPair{...}]
+GenreItems	[NameLongIdPair{...}]
+TagItems	[NameLongIdPair{...}]
+ParentLogoItemId	string
+ParentBackdropItemId	string
+ParentBackdropImageTags	[string]
+LocalTrailerCount	integer($int32, nullable)
+UserData	UserItemDataDto{...}
+RecursiveItemCount	integer($int32, nullable)
+ChildCount	integer($int32, nullable)
+SeasonCount	integer($int32, nullable)
+SeriesName	string
+SeriesId	string
+SeasonId	string
+SpecialFeatureCount	integer($int32, nullable)
+DisplayPreferencesId	string
+Status	string
+AirDays	[DayOfWeekstring
+x-internal-ref-name: System.DayOfWeek
+($enum)(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+]
+Tags	[string]
+PrimaryImageAspectRatio	number($double, nullable)
+Artists	[string]
+ArtistItems	[NameIdPair{...}]
+Composers	[NameIdPair{...}]
+Album	string
+CollectionType	string
+DisplayOrder	string
+AlbumId	string
+AlbumPrimaryImageTag	string
+SeriesPrimaryImageTag	string
+AlbumArtist	string
+AlbumArtists	[NameIdPair{...}]
+SeasonName	string
+MediaStreams	[MediaStream{...}]
+PartCount	integer($int32, nullable)
+ImageTags	{...}
+BackdropImageTags	[string]
+ParentLogoImageTag	string
+SeriesStudio	string
+PrimaryImageItemId	string
+PrimaryImageTag	string
+ParentThumbItemId	string
+ParentThumbImageTag	string
+Chapters	[ChapterInfo{...}]
+LocationType	LocationTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.LocationType
+($enum)(FileSystem, Virtual)
+MediaType	string
+EndDate	string($date-time, nullable)
+LockedFields	[MetadataFieldsstring
+x-internal-ref-name: MediaBrowser.Model.Entities.MetadataFields
+($enum)(Cast, Genres, ProductionLocations, Studios, Tags, Name, Overview, Runtime, OfficialRating, Collections, ChannelNumber, SortName, OriginalTitle, SortIndexNumber, SortParentIndexNumber, CommunityRating, CriticRating, Tagline, Composers, Artists, AlbumArtists)
+]
+LockData	boolean(nullable)
+Width	integer($int32, nullable)
+Height	integer($int32, nullable)
+CameraMake	string
+CameraModel	string
+Software	string
+ExposureTime	number($double, nullable)
+FocalLength	number($double, nullable)
+ImageOrientation	Drawing.ImageOrientationstring
+x-internal-ref-name: MediaBrowser.Model.Drawing.ImageOrientation
+($enum)(TopLeft, TopRight, BottomRight, BottomLeft, LeftTop, RightTop, RightBottom, LeftBottom)
+Aperture	number($double, nullable)
+ShutterSpeed	number($double, nullable)
+Latitude	number($double, nullable)
+Longitude	number($double, nullable)
+Altitude	number($double, nullable)
+IsoSpeedRating	integer($int32, nullable)
+SeriesTimerId	string
+ChannelPrimaryImageTag	string
+StartDate	string($date-time, nullable)
+CompletionPercentage	number($double, nullable)
+IsRepeat	boolean(nullable)
+IsNew	boolean(nullable)
+EpisodeTitle	string
+IsMovie	boolean(nullable)
+IsSports	boolean(nullable)
+IsSeries	boolean(nullable)
+IsLive	boolean(nullable)
+IsNews	boolean(nullable)
+IsKids	boolean(nullable)
+IsPremiere	boolean(nullable)
+TimerType	LiveTv.TimerTypestring
+x-internal-ref-name: MediaBrowser.Model.LiveTv.TimerType
+($enum)(Program, DateTime, Keyword)
+Disabled	boolean(nullable)
+ManagementId	string
+TimerId	string
+CurrentProgram	{...}
+MovieCount	integer($int32, nullable)
+SeriesCount	integer($int32, nullable)
+AlbumCount	integer($int32, nullable)
+SongCount	integer($int32, nullable)
+MusicVideoCount	integer($int32, nullable)
+Subviews	[string]
+ListingsProviderId	string
+ListingsChannelId	string
+ListingsPath	string
+ListingsId	string
+ListingsChannelName	string
+ListingsChannelNumber	string
+AffiliateCallSign	string
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/{Id}/LocalTrailers
+Gets local trailers for an item
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines, TrailerUrls
+
+Fields
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a BaseItemDto[] object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[BaseItemDto{
+Name	string
+OriginalTitle	string
+ServerId	string
+Id	string
+Guid	string
+Etag	string
+Prefix	string
+TunerName	string
+PlaylistItemId	string
+DateCreated	string($date-time, nullable)
+DateModified	string($date-time, nullable)
+VideoCodec	string
+AudioCodec	string
+AverageFrameRate	number($float, nullable)
+RealFrameRate	number($float, nullable)
+ExtraType	string
+SortIndexNumber	integer($int32, nullable)
+SortParentIndexNumber	integer($int32, nullable)
+CanDelete	boolean(nullable)
+CanDownload	boolean(nullable)
+CanEditItems	boolean(nullable)
+SupportsResume	boolean(nullable)
+PresentationUniqueKey	string
+PreferredMetadataLanguage	string
+PreferredMetadataCountryCode	string
+SupportsSync	boolean(nullable)
+SyncStatus	SyncJobItemStatusstring
+x-internal-ref-name: MediaBrowser.Model.Sync.SyncJobItemStatus
+($enum)(Queued, Converting, ReadyToTransfer, Transferring, Synced, Failed)
+CanManageAccess	boolean(nullable)
+CanLeaveContent	boolean(nullable)
+CanMakePublic	boolean(nullable)
+Container	string
+SortName	string
+ForcedSortName	string
+Video3DFormat	Video3DFormatstring
+x-internal-ref-name: MediaBrowser.Model.Entities.Video3DFormat
+($enum)(HalfSideBySide, FullSideBySide, FullTopAndBottom, HalfTopAndBottom, MVC)
+PremiereDate	string($date-time, nullable)
+ExternalUrls	[ExternalUrl{...}]
+MediaSources	[MediaSourceInfo{...}]
+CriticRating	number($float, nullable)
+GameSystemId	integer($int64, nullable)
+AsSeries	boolean(nullable)
+GameSystem	string
+ProductionLocations	[string]
+Path	string
+OfficialRating	string
+CustomRating	string
+ChannelId	string
+ChannelName	string
+Overview	string
+Taglines	[string]
+Genres	[string]
+CommunityRating	number($float, nullable)
+RunTimeTicks	integer($int64, nullable)
+Size	integer($int64, nullable)
+FileName	string
+Bitrate	integer($int32, nullable)
+ProductionYear	integer($int32, nullable)
+Number	string
+ChannelNumber	string
+IndexNumber	integer($int32, nullable)
+IndexNumberEnd	integer($int32, nullable)
+ParentIndexNumber	integer($int32, nullable)
+RemoteTrailers	[MediaUrl{...}]
+ProviderIds	ProviderIdDictionary{...}
+IsFolder	boolean(nullable)
+ParentId	string
+Type	string
+People	[BaseItemPerson{...}]
+Studios	[NameLongIdPair{...}]
+GenreItems	[NameLongIdPair{...}]
+TagItems	[NameLongIdPair{...}]
+ParentLogoItemId	string
+ParentBackdropItemId	string
+ParentBackdropImageTags	[string]
+LocalTrailerCount	integer($int32, nullable)
+UserData	UserItemDataDto{...}
+RecursiveItemCount	integer($int32, nullable)
+ChildCount	integer($int32, nullable)
+SeasonCount	integer($int32, nullable)
+SeriesName	string
+SeriesId	string
+SeasonId	string
+SpecialFeatureCount	integer($int32, nullable)
+DisplayPreferencesId	string
+Status	string
+AirDays	[DayOfWeekstring
+x-internal-ref-name: System.DayOfWeek
+($enum)(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday)
+]
+Tags	[string]
+PrimaryImageAspectRatio	number($double, nullable)
+Artists	[string]
+ArtistItems	[NameIdPair{...}]
+Composers	[NameIdPair{...}]
+Album	string
+CollectionType	string
+DisplayOrder	string
+AlbumId	string
+AlbumPrimaryImageTag	string
+SeriesPrimaryImageTag	string
+AlbumArtist	string
+AlbumArtists	[NameIdPair{...}]
+SeasonName	string
+MediaStreams	[MediaStream{...}]
+PartCount	integer($int32, nullable)
+ImageTags	{...}
+BackdropImageTags	[string]
+ParentLogoImageTag	string
+SeriesStudio	string
+PrimaryImageItemId	string
+PrimaryImageTag	string
+ParentThumbItemId	string
+ParentThumbImageTag	string
+Chapters	[ChapterInfo{...}]
+LocationType	LocationTypestring
+x-internal-ref-name: MediaBrowser.Model.Entities.LocationType
+($enum)(FileSystem, Virtual)
+MediaType	string
+EndDate	string($date-time, nullable)
+LockedFields	[MetadataFieldsstring
+x-internal-ref-name: MediaBrowser.Model.Entities.MetadataFields
+($enum)(Cast, Genres, ProductionLocations, Studios, Tags, Name, Overview, Runtime, OfficialRating, Collections, ChannelNumber, SortName, OriginalTitle, SortIndexNumber, SortParentIndexNumber, CommunityRating, CriticRating, Tagline, Composers, Artists, AlbumArtists)
+]
+LockData	boolean(nullable)
+Width	integer($int32, nullable)
+Height	integer($int32, nullable)
+CameraMake	string
+CameraModel	string
+Software	string
+ExposureTime	number($double, nullable)
+FocalLength	number($double, nullable)
+ImageOrientation	Drawing.ImageOrientationstring
+x-internal-ref-name: MediaBrowser.Model.Drawing.ImageOrientation
+($enum)(TopLeft, TopRight, BottomRight, BottomLeft, LeftTop, RightTop, RightBottom, LeftBottom)
+Aperture	number($double, nullable)
+ShutterSpeed	number($double, nullable)
+Latitude	number($double, nullable)
+Longitude	number($double, nullable)
+Altitude	number($double, nullable)
+IsoSpeedRating	integer($int32, nullable)
+SeriesTimerId	string
+ChannelPrimaryImageTag	string
+StartDate	string($date-time, nullable)
+CompletionPercentage	number($double, nullable)
+IsRepeat	boolean(nullable)
+IsNew	boolean(nullable)
+EpisodeTitle	string
+IsMovie	boolean(nullable)
+IsSports	boolean(nullable)
+IsSeries	boolean(nullable)
+IsLive	boolean(nullable)
+IsNews	boolean(nullable)
+IsKids	boolean(nullable)
+IsPremiere	boolean(nullable)
+TimerType	LiveTv.TimerTypestring
+x-internal-ref-name: MediaBrowser.Model.LiveTv.TimerType
+($enum)(Program, DateTime, Keyword)
+Disabled	boolean(nullable)
+ManagementId	string
+TimerId	string
+CurrentProgram	{...}
+MovieCount	integer($int32, nullable)
+SeriesCount	integer($int32, nullable)
+AlbumCount	integer($int32, nullable)
+SongCount	integer($int32, nullable)
+MusicVideoCount	integer($int32, nullable)
+Subviews	[string]
+ListingsProviderId	string
+ListingsChannelId	string
+ListingsPath	string
+ListingsId	string
+ListingsChannelName	string
+ListingsChannelNumber	string
+AffiliateCallSign	string
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/Items/{Id}/Intros
+Gets intros to play before the main media item plays
+
+Requires authentication as user
+
+Find more details
+API Documentation: Item Information
+
+https://dev.emby.media/doc/restapi/Item-Information.html
+Parameters
+Try it out
+Name	Description
+UserId *
+string($guid)
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Fields
+string
+(query)
+Optional. Specify additional fields of information to return in the output. This allows multiple, comma delimeted. Options: Budget, Chapters, DateCreated, Genres, HomePageUrl, IndexOptions, MediaStreams, Overview, ParentId, Path, People, ProviderIds, PrimaryImageAspectRatio, Revenue, SortName, Studios, Taglines, TrailerUrls
+
+Fields
+EnableImages
+boolean
+(query)
+Optional, include image information in output
+
+
+--
+ImageTypeLimit
+integer($int32)
+(query)
+Optional, the max number of images to return, per image type
+
+ImageTypeLimit
+EnableImageTypes
+string
+(query)
+Optional. The image types to include in the output.
+
+EnableImageTypes
+EnableUserData
+boolean
+(query)
+Optional, include user data
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_BaseItemDto{
+Items	[BaseItemDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{UserId}/FavoriteItems/{Id}/Delete
+Unmarks an item as a favorite
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Users/{UserId}/Items/{Id}/Rating
+Deletes a user's saved personal rating for an item
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{UserId}/Items/{Id}/Rating
+Updates a user's rating for an item
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Likes *
+boolean
+(query)
+Whether the user likes the item or not. true/false
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{UserId}/Items/{Id}/HideFromResume
+Updates a user's hide from resume for an item
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Hide *
+boolean
+(query)
+Whether the item should be hidden from reusme or not. true/false
+
+
+--
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{UserId}/Items/{Id}/Rating/Delete
+Deletes a user's saved personal rating for an item
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+User Id
+
+UserId
+Id *
+string
+(path)
+Item Id
+
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserItemDataDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserItemDataDto{
+Rating	number($double, nullable)
+PlayedPercentage	number($double, nullable)
+UnplayedItemCount	integer($int32, nullable)
+PlaybackPositionTicks	integer($int64)
+PlayCount	integer($int32, nullable)
+IsFavorite	boolean
+LastPlayedDate	string($date-time, nullable)
+Played	boolean
+Key	string
+ItemId	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links

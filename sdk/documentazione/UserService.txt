@@ -1,0 +1,1335 @@
+UserService
+API Reference: UserService
+
+
+GET
+/Users/Public
+Gets a list of publicly visible users for display on a login screen.
+
+Requires authentication as user
+
+Find more details
+API Documentation: Authentication
+
+https://dev.emby.media/doc/restapi/User-Authentication.html
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserDto[] object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[UserDto{
+Name	string
+ServerId	string
+ServerName	string
+Prefix	string
+ConnectUserName	string
+DateCreated	string($date-time, nullable)
+ConnectLinkType	Connect.UserLinkTypestring
+x-internal-ref-name: MediaBrowser.Model.Connect.UserLinkType
+($enum)(LinkedUser, Guest)
+Id	string
+PrimaryImageTag	string
+HasPassword	boolean(nullable)
+HasConfiguredPassword	boolean(nullable)
+EnableAutoLogin	boolean(nullable)
+LastLoginDate	string($date-time, nullable)
+LastActivityDate	string($date-time, nullable)
+Configuration	UserConfiguration{...}
+Policy	UserPolicy{...}
+PrimaryImageAspectRatio	number($double, nullable)
+UserItemShareLevel	UserItemShareLevelstring
+x-internal-ref-name: MediaBrowser.Model.Dto.UserItemShareLevel
+($enum)(None, Read, Write, Manage, ManageDelete)
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/Query
+Gets a list of users
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+IsHidden
+boolean
+(query)
+Optional filter by IsHidden=true or false
+
+
+--
+IsDisabled
+boolean
+(query)
+Optional filter by IsDisabled=true or false
+
+
+--
+StartIndex
+integer($int32)
+(query)
+Optional. The record index to start at. All items with a lower index will be dropped from the results.
+
+StartIndex
+Limit
+integer($int32)
+(query)
+Optional. The maximum number of records to return
+
+Limit
+NameStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+NameStartsWithOrGreater
+SortOrder
+string
+(query)
+Sort Order - Ascending,Descending
+
+SortOrder
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_UserDto{
+Items	[UserDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/Prefixes
+Gets a list of users
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+IsHidden
+boolean
+(query)
+Optional filter by IsHidden=true or false
+
+
+--
+IsDisabled
+boolean
+(query)
+Optional filter by IsDisabled=true or false
+
+
+--
+StartIndex
+integer($int32)
+(query)
+Optional. The record index to start at. All items with a lower index will be dropped from the results.
+
+StartIndex
+Limit
+integer($int32)
+(query)
+Optional. The maximum number of records to return
+
+Limit
+NameStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+NameStartsWithOrGreater
+SortOrder
+string
+(query)
+Sort Order - Ascending,Descending
+
+SortOrder
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a NameIdPair[] object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[NameIdPair{
+Name	string
+Id	string
+}]
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/ItemAccess
+Gets a list of users
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+IsHidden
+boolean
+(query)
+Optional filter by IsHidden=true or false
+
+
+--
+IsDisabled
+boolean
+(query)
+Optional filter by IsDisabled=true or false
+
+
+--
+StartIndex
+integer($int32)
+(query)
+Optional. The record index to start at. All items with a lower index will be dropped from the results.
+
+StartIndex
+Limit
+integer($int32)
+(query)
+Optional. The maximum number of records to return
+
+Limit
+NameStartsWithOrGreater
+string
+(query)
+Optional filter by items whose name is sorted equally or greater than a given input string.
+
+NameStartsWithOrGreater
+SortOrder
+string
+(query)
+Sort Order - Ascending,Descending
+
+SortOrder
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a QueryResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+QueryResult_UserDto{
+Items	[UserDto{...}]
+TotalRecordCount	integer($int32)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{Id}
+Gets a user by Id
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserDto{
+Name	string
+ServerId	string
+ServerName	string
+Prefix	string
+ConnectUserName	string
+DateCreated	string($date-time, nullable)
+ConnectLinkType	Connect.UserLinkTypestring
+x-internal-ref-name: MediaBrowser.Model.Connect.UserLinkType
+($enum)(LinkedUser, Guest)
+Id	string
+PrimaryImageTag	string
+HasPassword	boolean(nullable)
+HasConfiguredPassword	boolean(nullable)
+EnableAutoLogin	boolean(nullable)
+LastLoginDate	string($date-time, nullable)
+LastActivityDate	string($date-time, nullable)
+Configuration	UserConfiguration{...}
+Policy	UserPolicy{...}
+PrimaryImageAspectRatio	number($double, nullable)
+UserItemShareLevel	UserItemShareLevelstring
+x-internal-ref-name: MediaBrowser.Model.Dto.UserItemShareLevel
+($enum)(None, Read, Write, Manage, ManageDelete)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Users/{Id}
+Deletes a user
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}
+Updates a user
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Request body
+
+application/json
+UserDto:
+
+Example Value
+Schema
+UserDto{
+Name	string
+ServerId	string
+ServerName	string
+Prefix	string
+ConnectUserName	string
+DateCreated	string($date-time, nullable)
+ConnectLinkType	Connect.UserLinkTypestring
+x-internal-ref-name: MediaBrowser.Model.Connect.UserLinkType
+($enum)(LinkedUser, Guest)
+Id	string
+PrimaryImageTag	string
+HasPassword	boolean(nullable)
+HasConfiguredPassword	boolean(nullable)
+EnableAutoLogin	boolean(nullable)
+LastLoginDate	string($date-time, nullable)
+LastActivityDate	string($date-time, nullable)
+Configuration	UserConfiguration{...}
+Policy	UserPolicy{...}
+PrimaryImageAspectRatio	number($double, nullable)
+UserItemShareLevel	UserItemShareLevelstring
+x-internal-ref-name: MediaBrowser.Model.Dto.UserItemShareLevel
+($enum)(None, Read, Write, Manage, ManageDelete)
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/AuthenticateByName
+Authenticates a user
+
+Authenticate a user by nane and password. A 200 status code indicates success, while anything in the 400 or 500 range indicates failure
+Requires authentication as user
+
+Find more details
+API Documentation: Authentication
+
+https://dev.emby.media/doc/restapi/User-Authentication.html
+Parameters
+Try it out
+Name	Description
+X-Emby-Authorization *
+string
+(header)
+The authorization header can be either named 'Authorization' or 'X-Emby-Authorization'.
+It must be of the following schema:
+Emby UserId="(guid)", Client="(string)", Device="(string)", DeviceId="(string)", Version="string", Token="(string)"
+Please consult the documentation for further details.
+
+X-Emby-Authorization
+Request body
+
+application/json
+AuthenticateUserByName
+
+Example Value
+Schema
+AuthenticateUserByName{
+Username	string
+Pw	string
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a AuthenticationResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+Authentication.AuthenticationResult{
+User	UserDto{...}
+SessionInfo	Session.SessionInfo{...}
+AccessToken	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/New
+Creates a user
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+CreateUserByName
+
+Example Value
+Schema
+CreateUserByName{
+Name	string
+CopyFromUserId	string
+UserCopyOptions	[Library.UserCopyOptionsstring
+x-internal-ref-name: MediaBrowser.Controller.Library.UserCopyOptions
+($enum)(UserPolicy, UserConfiguration, UserData)
+]
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a UserDto object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+UserDto{
+Name	string
+ServerId	string
+ServerName	string
+Prefix	string
+ConnectUserName	string
+DateCreated	string($date-time, nullable)
+ConnectLinkType	Connect.UserLinkTypestring
+x-internal-ref-name: MediaBrowser.Model.Connect.UserLinkType
+($enum)(LinkedUser, Guest)
+Id	string
+PrimaryImageTag	string
+HasPassword	boolean(nullable)
+HasConfiguredPassword	boolean(nullable)
+EnableAutoLogin	boolean(nullable)
+LastLoginDate	string($date-time, nullable)
+LastActivityDate	string($date-time, nullable)
+Configuration	UserConfiguration{...}
+Policy	UserPolicy{...}
+PrimaryImageAspectRatio	number($double, nullable)
+UserItemShareLevel	UserItemShareLevelstring
+x-internal-ref-name: MediaBrowser.Model.Dto.UserItemShareLevel
+($enum)(None, Read, Write, Manage, ManageDelete)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/ForgotPassword
+Initiates the forgot password process for a local user
+
+Requires authentication as user
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+ForgotPassword
+
+Example Value
+Schema
+ForgotPassword{
+EnteredUsername	string
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a ForgotPasswordResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+ForgotPasswordResult{
+Action	ForgotPasswordActionstring
+x-internal-ref-name: MediaBrowser.Model.Users.ForgotPasswordAction
+($enum)(ContactAdmin, PinCode)
+PinFile	string
+PinExpirationDate	string($date-time, nullable)
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Delete
+Deletes a user
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Authenticate
+Authenticates a user
+
+Requires authentication as user
+
+Find more details
+API Documentation: Authentication
+
+https://dev.emby.media/doc/restapi/User-Authentication.html
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Request body
+
+application/json
+AuthenticateUser
+
+Example Value
+Schema
+AuthenticateUser{
+Pw	string
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a AuthenticationResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+Authentication.AuthenticationResult{
+User	UserDto{...}
+SessionInfo	Session.SessionInfo{...}
+AccessToken	string
+ServerId	string
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Password
+Updates a user's password
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Request body
+
+application/json
+UpdateUserPassword
+
+Example Value
+Schema
+UpdateUserPassword{
+Id	string
+NewPw	string
+ResetPassword	boolean
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/ForgotPassword/Pin
+Redeems a forgot password pin
+
+Requires authentication as user
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+ForgotPasswordPin
+
+Example Value
+Schema
+ForgotPasswordPin{
+Pin	string
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Returning a PinRedeemResult object.
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+PinRedeemResult{
+Success	boolean
+UsersReset	[string]
+}
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Configuration
+Updates a user configuration
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Request body
+
+application/json
+UserConfiguration:
+
+Example Value
+Schema
+UserConfiguration{
+AudioLanguagePreference	string
+PlayDefaultAudioTrack	boolean
+SubtitleLanguagePreference	string
+ProfilePin	string
+DisplayMissingEpisodes	boolean
+SubtitleMode	SubtitlePlaybackModestring
+x-internal-ref-name: MediaBrowser.Model.Configuration.SubtitlePlaybackMode
+($enum)(Default, Always, OnlyForced, None, Smart, HearingImpaired)
+OrderedViews	[string]
+LatestItemsExcludes	[string]
+MyMediaExcludes	[string]
+HidePlayedInLatest	boolean
+HidePlayedInMoreLikeThis	boolean
+HidePlayedInSuggestions	boolean
+RememberAudioSelections	boolean
+RememberSubtitleSelections	boolean
+EnableNextEpisodeAutoPlay	boolean
+ResumeRewindSeconds	integer($int32)
+IntroSkipMode	SegmentSkipModestring
+x-internal-ref-name: MediaBrowser.Model.Configuration.SegmentSkipMode
+($enum)(ShowButton, AutoSkip, None)
+EnableLocalPassword	boolean
+deprecated: true
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Policy
+Updates a user policy
+
+Requires authentication as administrator
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Request body
+
+application/json
+UserPolicy:
+
+Example Value
+Schema
+UserPolicy{
+IsAdministrator	boolean
+IsHidden	boolean
+IsHiddenRemotely	boolean
+IsHiddenFromUnusedDevices	boolean
+IsDisabled	boolean
+LockedOutDate	integer($int64)
+MaxParentalRating	integer($int32, nullable)
+AllowTagOrRating	boolean
+BlockedTags	[string]
+IsTagBlockingModeInclusive	boolean
+IncludeTags	[string]
+EnableUserPreferenceAccess	boolean
+AccessSchedules	[AccessSchedule{...}]
+BlockUnratedItems	[UnratedItemstring
+x-internal-ref-name: MediaBrowser.Model.Configuration.UnratedItem
+($enum)(Movie, Trailer, Series, Music, Game, Book, LiveTvChannel, LiveTvProgram, ChannelContent, Other)
+]
+EnableRemoteControlOfOtherUsers	boolean
+EnableSharedDeviceControl	boolean
+EnableRemoteAccess	boolean
+EnableLiveTvManagement	boolean
+EnableLiveTvAccess	boolean
+EnableMediaPlayback	boolean
+EnableAudioPlaybackTranscoding	boolean
+EnableVideoPlaybackTranscoding	boolean
+AutoRemoteQuality	integer($int32)
+EnablePlaybackRemuxing	boolean
+EnableContentDeletion	boolean
+RestrictedFeatures	[string]
+EnableContentDeletionFromFolders	[string]
+EnableContentDownloading	boolean
+EnableSubtitleDownloading	boolean
+EnableSubtitleManagement	boolean
+EnableSyncTranscoding	boolean
+EnableMediaConversion	boolean
+EnabledChannels	[string]
+EnableAllChannels	boolean
+EnabledFolders	[string]
+EnableAllFolders	boolean
+InvalidLoginAttemptCount	integer($int32)
+EnablePublicSharing	boolean
+RemoteClientBitrateLimit	integer($int32)
+AuthenticationProviderId	string
+ExcludedSubFolders	[string]
+SimultaneousStreamLimit	integer($int32)
+EnabledDevices	[string]
+EnableAllDevices	boolean
+AllowCameraUpload	boolean
+AllowSharingPersonalItems	boolean
+}
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+DELETE
+/Users/{Id}/TrackSelections/{TrackType}
+Clears audio or subtitle track selections for a user
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+TrackType *
+string
+(path)
+TrackType
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/Configuration/Partial
+Updates a user configuration
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+Request body
+
+application/octet-stream
+Example values are not available for application/octet-stream media types.
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+GET
+/Users/{UserId}/TypedSettings/{Key}
+Gets a typed user setting
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Key *
+string
+(path)
+Key
+
+Key
+UserId *
+string
+(path)
+UserId
+Responses
+Code	Description	Links
+200	
+Operation successful. Response content unknown.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{UserId}/TypedSettings/{Key}
+Updates a typed user setting
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+UserId *
+string
+(path)
+UserId
+Key *
+string
+(path)
+Key
+
+Key
+Request body
+
+application/octet-stream
+Example values are not available for application/octet-stream media types.
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
+
+POST
+/Users/{Id}/TrackSelections/{TrackType}/Delete
+Clears audio or subtitle track selections for a user
+
+Requires authentication as user
+
+Parameters
+Try it out
+Name	Description
+Id *
+string
+(path)
+Id
+TrackType *
+string
+(path)
+TrackType
+Responses
+Code	Description	Links
+200	
+Operation successful. Empty response.
+
+No links
+400	
+Bad Request. Server cannot process request.
+
+No links
+401	
+Unauthorized. Client needs to authenticate.
+
+No links
+403	
+Forbidden. No permission for the reqested operation.
+
+No links
+404	
+Resource not found or unavailable.
+
+No links
+500	
+Server error.
+
+No links
