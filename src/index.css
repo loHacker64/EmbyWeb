@@ -1,0 +1,111 @@
+/* Utilizziamo le direttive standard di Tailwind se il progetto è configurato localmente */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #000; /* Assicura che non ci siano flash bianchi al caricamento */
+  color: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Utilità per nascondere la scrollbar nelle righe dei film */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Transizione fluida per l'effetto fade del modulo Hero */
+.hero-transition {
+  transition: opacity 1000ms ease-in-out, transform 1000ms ease-in-out;
+}
+
+/* Nasconde COMPLETAMENTE i controlli nativi del video in tutti i browser */
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-timeline {
+  display: none !important;
+}
+
+video::-webkit-media-controls-current-time-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-time-remaining-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+}
+
+video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+}
+
+/* Nasconde controlli nativi anche in fullscreen */
+video::-webkit-full-page-media::-webkit-media-controls {
+  display: none !important;
+}
+
+/* Disabilita il context menu del video */
+video {
+  pointer-events: auto;
+}
+
+video::cue {
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
