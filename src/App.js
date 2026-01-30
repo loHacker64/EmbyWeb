@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles, Home, Cloud, Settings } from 'lucide-react';
+import { Search, Play, Info, ChevronLeft, ChevronRight, LogOut, X, Star, Volume2, VolumeX, Maximize, Pause, RotateCcw, RotateCw, ChevronDown, Languages, Subtitles, Settings } from 'lucide-react';
 import Hls from 'hls.js';
 
 const EMBY_SERVER = 'http://192.168.1.100:8096';
@@ -1128,16 +1128,6 @@ export default function App() {
             {loginError && <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm">{loginError}</div>}
             <button onClick={handleLogin} className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-3 rounded-lg transition transform hover:scale-105 shadow-lg">Accedi</button>
             <div className="text-center text-sm text-gray-400 mt-4">Server: ilmioserver.diskstation.me</div>
-          </div>
-          <div className="absolute bottom-4 right-4 group">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-600/20 hover:from-emerald-500/30 hover:to-green-600/30 border border-emerald-500/30 flex items-center justify-center cursor-help transition-all hover:scale-110 shadow-lg shadow-emerald-500/20">
-              {EMBY_SERVER.includes('192.168.1.100') ? (
-                <Home className="w-5 h-5 text-emerald-400" />
-              ) : (
-                <Cloud className="w-5 h-5 text-emerald-400" />
-              )}
-            </div>
-            <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block"><div className="bg-black/90 backdrop-blur-xl border border-emerald-500/30 rounded-lg px-4 py-2 text-sm text-gray-300 whitespace-nowrap shadow-xl shadow-emerald-500/20"><span className="text-emerald-400 font-semibold">{EMBY_SERVER.includes('192.168.1.100') ? '🏠 Rete locale' : '☁️ Connessione remota'}</span><br/><span className="text-gray-500 text-xs">{EMBY_SERVER}</span></div></div>
           </div>
         </div>
       </div>
