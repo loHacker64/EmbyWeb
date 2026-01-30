@@ -66,8 +66,8 @@ export default function App() {
   const [episodes, setEpisodes] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
-  const [movieSortOrder, setMovieSortOrder] = useState('DateCreated');
-  const [seriesSortOrder, setSeriesSortOrder] = useState('DateCreated');
+  const [movieSortOrder, setMovieSortOrder] = useState('Random');
+  const [seriesSortOrder, setSeriesSortOrder] = useState('Random');
   const [playingItem, setPlayingItem] = useState(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [volume, setVolume] = useState(1);
@@ -317,9 +317,10 @@ export default function App() {
   };
 
   const getHorizontalImg = (item) => {
-    // For episodes, use episode's Primary image (usually 16:9)
-    if (item.Type === 'Episode' && item.ImageTags?.Primary) {
-      return `${EMBY_SERVER}/Items/${item.Id}/Images/Primary?maxWidth=480&maxHeight=270&quality=90&api_key=${API_KEY}`;
+    // For episodes, use the SERIES cover (16:9 format), not episode cover
+    if (item.Type === 'Episode' && item.SeriesId) {
+      // Use series Thumb (16:9) or Backdrop as fallback
+      return `${EMBY_SERVER}/Items/${item.SeriesId}/Images/Thumb?maxWidth=480&maxHeight=270&quality=90&api_key=${API_KEY}`;
     }
     // Try Thumb first (16:9 format)
     if (item.ImageTags?.Thumb) {
@@ -1354,11 +1355,11 @@ export default function App() {
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Film</h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-white/30 to-transparent w-20"></div>
               </div>
-              <select value={movieSortOrder} onChange={e=>loadMoviesSort(e.target.value)} className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/20 rounded-xl px-5 py-2.5 text-white focus:outline-none focus:border-emerald-500 hover:border-emerald-500/50 transition-all shadow-lg cursor-pointer">
-                <option value="SortName" className="bg-gray-900 text-white">A-Z</option>
-                <option value="DateCreated" className="bg-gray-900 text-white">Più recenti</option>
-                <option value="PremiereDate" className="bg-gray-900 text-white">Data uscita</option>
-                <option value="Random" className="bg-gray-900 text-white">Casuale</option>
+              <select value={movieSortOrder} onChange={e=>loadMoviesSort(e.target.value)} className="bg-gradient-to-r from-emerald-950/90 to-gray-900/90 backdrop-blur-xl border-2 border-emerald-500/40 rounded-xl px-5 py-2.5 text-white focus:outline-none focus:border-emerald-400 focus:shadow-emerald-500/30 hover:border-emerald-500/60 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer">
+                <option value="Random" className="bg-gray-900 text-white">🎲 Casuale</option>
+                <option value="SortName" className="bg-gray-900 text-white">🔤 A-Z</option>
+                <option value="DateCreated" className="bg-gray-900 text-white">📅 Più recenti</option>
+                <option value="PremiereDate" className="bg-gray-900 text-white">🎬 Data uscita</option>
               </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
@@ -1376,11 +1377,11 @@ export default function App() {
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Serie TV</h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-white/30 to-transparent w-20"></div>
               </div>
-              <select value={seriesSortOrder} onChange={e=>loadSeriesSort(e.target.value)} className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/20 rounded-xl px-5 py-2.5 text-white focus:outline-none focus:border-emerald-500 hover:border-emerald-500/50 transition-all shadow-lg cursor-pointer">
-                <option value="SortName" className="bg-gray-900 text-white">A-Z</option>
-                <option value="DateCreated" className="bg-gray-900 text-white">Più recenti</option>
-                <option value="PremiereDate" className="bg-gray-900 text-white">Data uscita</option>
-                <option value="Random" className="bg-gray-900 text-white">Casuale</option>
+              <select value={seriesSortOrder} onChange={e=>loadSeriesSort(e.target.value)} className="bg-gradient-to-r from-emerald-950/90 to-gray-900/90 backdrop-blur-xl border-2 border-emerald-500/40 rounded-xl px-5 py-2.5 text-white focus:outline-none focus:border-emerald-400 focus:shadow-emerald-500/30 hover:border-emerald-500/60 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer">
+                <option value="Random" className="bg-gray-900 text-white">🎲 Casuale</option>
+                <option value="SortName" className="bg-gray-900 text-white">🔤 A-Z</option>
+                <option value="DateCreated" className="bg-gray-900 text-white">📅 Più recenti</option>
+                <option value="PremiereDate" className="bg-gray-900 text-white">📺 Data uscita</option>
               </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
@@ -1720,7 +1721,7 @@ export default function App() {
                     {audioTracks.length > 1 && (
                       <div className="relative">
                         <button
-                          onClick={() => setShowAudioMenu(!showAudioMenu)}
+                          onClick={() => {setShowAudioMenu(!showAudioMenu); setShowSubtitleMenu(false); setShowQualityMenu(false);}}
                           className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                         >
                           <Languages className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
@@ -1729,8 +1730,8 @@ export default function App() {
                         {/* Menu tracce audio - Desktop dropdown / Mobile full-screen */}
                         {showAudioMenu && (
                           <div className={isMobile
-                            ? "fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex flex-col"
-                            : "absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
+                            ? "fixed inset-0 bg-black/98 backdrop-blur-3xl z-[100] flex flex-col"
+                            : "absolute bottom-full right-0 mb-3 bg-gray-900 backdrop-blur-3xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
                           }>
                             <div className={isMobile ? "p-6 border-b border-white/10 flex items-center justify-between" : "p-3 border-b border-white/10"}>
                               <h4 className={isMobile ? "text-2xl font-bold text-white" : "text-sm font-bold text-white"}>Traccia Audio</h4>
@@ -1779,7 +1780,7 @@ export default function App() {
                     {subtitleTracks.length > 0 && (
                       <div className="relative">
                         <button
-                          onClick={() => setShowSubtitleMenu(!showSubtitleMenu)}
+                          onClick={() => {setShowSubtitleMenu(!showSubtitleMenu); setShowAudioMenu(false); setShowQualityMenu(false);}}
                           className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                         >
                           <Subtitles className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
@@ -1788,8 +1789,8 @@ export default function App() {
                         {/* Menu sottotitoli - Desktop dropdown / Mobile full-screen */}
                         {showSubtitleMenu && (
                           <div className={isMobile
-                            ? "fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex flex-col"
-                            : "absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
+                            ? "fixed inset-0 bg-black/98 backdrop-blur-3xl z-[100] flex flex-col"
+                            : "absolute bottom-full right-0 mb-3 bg-gray-900 backdrop-blur-3xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
                           }>
                             <div className={isMobile ? "p-6 border-b border-white/10 flex items-center justify-between" : "p-3 border-b border-white/10"}>
                               <h4 className={isMobile ? "text-2xl font-bold text-white" : "text-sm font-bold text-white"}>Sottotitoli</h4>
@@ -1859,7 +1860,7 @@ export default function App() {
                     {/* Qualità video */}
                     <div className="relative">
                       <button
-                        onClick={() => setShowQualityMenu(!showQualityMenu)}
+                        onClick={() => {setShowQualityMenu(!showQualityMenu); setShowAudioMenu(false); setShowSubtitleMenu(false);}}
                         className="bg-white/5 hover:bg-white/15 backdrop-blur-xl rounded-2xl p-3 md:p-4 transition-all hover:scale-105 border border-white/10 shadow-xl group"
                       >
                         <Settings className="w-5 h-5 md:w-6 md:h-6 group-hover:text-emerald-400 transition-colors"/>
@@ -1868,8 +1869,8 @@ export default function App() {
                       {/* Menu qualità - Desktop dropdown / Mobile full-screen */}
                       {showQualityMenu && (
                         <div className={isMobile
-                          ? "fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] flex flex-col"
-                          : "absolute bottom-full right-0 mb-3 bg-gray-900/98 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
+                          ? "fixed inset-0 bg-black/98 backdrop-blur-3xl z-[100] flex flex-col"
+                          : "absolute bottom-full right-0 mb-3 bg-gray-900 backdrop-blur-3xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden min-w-[250px]"
                         }>
                           <div className={isMobile ? "p-6 border-b border-white/10 flex items-center justify-between" : "p-3 border-b border-white/10"}>
                             <h4 className={isMobile ? "text-2xl font-bold text-white" : "text-sm font-bold text-white"}>Qualità video</h4>
